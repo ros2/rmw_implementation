@@ -20,6 +20,8 @@
 #
 function(get_available_rmw_implementations var)
   ament_index_get_resources(middleware_implementations "rmw_implementation")
-  list(SORT middleware_implementations)
+  if(DEFINED middleware_implementations)
+    list(SORT middleware_implementations)
+  endif()
   set(${var} ${middleware_implementations} PARENT_SCOPE)
 endfunction()
