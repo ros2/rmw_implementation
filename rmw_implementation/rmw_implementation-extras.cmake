@@ -14,6 +14,8 @@
 
 # copied from rmw_implementation/rmw_implementation-extras.cmake
 
+include(
+  "${rmw_implementation_DIR}/add_executable_for_each_rmw_implementation.cmake")
 include("${rmw_implementation_DIR}/get_available_rmw_implementations.cmake")
 include("${rmw_implementation_DIR}/get_default_rmw_implementation.cmake")
 
