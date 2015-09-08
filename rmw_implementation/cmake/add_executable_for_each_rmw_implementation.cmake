@@ -37,15 +37,18 @@
 # :param INSTALL: if set install all executables
 # :type INSTALL: option
 #
-function(add_executable_for_each_rmw_implementations target)
+macro(add_executable_for_each_rmw_implementations)
+  # get available rmw implementations
+  get_available_rmw_implementations(_rmw_implementations)
+  foreach(_rmw_implementation ${_rmw_implementations})
+    find_package("${_rmw_implementation}" REQUIRED)
+  endforeach()
+  _add_executable_for_each_rmw_implementations(${ARGN})
+endmacro()
+
+function(_add_executable_for_each_rmw_implementations target)
   cmake_parse_arguments(ARG
     "INSTALL;SKIP_DEFAULT" "ALL_TARGET_NAMES_VAR" "TARGET_DEPENDENCIES" ${ARGN})
-
-  # get available rmw implementations
-  get_available_rmw_implementations(rmw_implementations)
-  foreach(rmw_implementation ${rmw_implementations})
-    find_package("${rmw_implementation}" REQUIRED)
-  endforeach()
 
   set(targets "")
   if(NOT ARG_SKIP_DEFAULT)

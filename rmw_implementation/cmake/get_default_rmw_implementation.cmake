@@ -21,36 +21,36 @@
 # :param var: the output variable name containing the package name
 # :type var: string
 #
-function(get_default_rmw_implementation var)
-  get_available_rmw_implementations(middleware_implementations)
+macro(get_default_rmw_implementation var)
+  get_available_rmw_implementations(_middleware_implementations)
 
-  if("${middleware_implementations} " STREQUAL " ")
+  if("${_middleware_implementations} " STREQUAL " ")
     message(FATAL_ERROR "Could not find any ROS middleware implementation.")
   endif()
 
   # option()
   if(NOT "${ROS_MIDDLEWARE_IMPLEMENTATION} " STREQUAL " ")
-    set(middleware_implementation "${ROS_MIDDLEWARE_IMPLEMENTATION}")
+    set(_middleware_implementation "${ROS_MIDDLEWARE_IMPLEMENTATION}")
   elseif(NOT "$ENV{ROS_MIDDLEWARE_IMPLEMENTATION} " STREQUAL " ")
-    set(middleware_implementation "$ENV{ROS_MIDDLEWARE_IMPLEMENTATION}")
+    set(_middleware_implementation "$ENV{ROS_MIDDLEWARE_IMPLEMENTATION}")
   else()
     # TODO detemine "default" implementation based on the available ones
-    list(GET middleware_implementations 0 middleware_implementation)
+    list(GET _middleware_implementations 0 _middleware_implementation)
   endif()
 
   # verify that the selection one is available
-  list(FIND middleware_implementations "${middleware_implementation}" _index)
+  list(FIND _middleware_implementations "${_middleware_implementation}" _index)
   if(_index EQUAL -1)
-    string(REPLACE ";" ", " middleware_implementations_string "${middleware_implementations}")
-    message(FATAL_ERROR "Could not find ROS middleware implementation '${middleware_implementation}'. Choose one of the following: ${middleware_implementations_string}")
+    string(REPLACE ";" ", " _middleware_implementations_string "${_middleware_implementations}")
+    message(FATAL_ERROR "Could not find ROS middleware implementation '${_middleware_implementation}'. Choose one of the following: ${_middleware_implementations_string}")
   endif()
-  find_package("${middleware_implementation}" REQUIRED)
+  find_package("${_middleware_implementation}" REQUIRED)
 
   # persist implementation decision in cache
   set(
-    ROS_MIDDLEWARE_IMPLEMENTATION "${middleware_implementation}"
+    ROS_MIDDLEWARE_IMPLEMENTATION "${_middleware_implementation}"
     CACHE STRING "Select ROS middleware implementation to link against" FORCE
   )
 
-  set(${var} ${middleware_implementation} PARENT_SCOPE)
-endfunction()
+  set(${var} ${_middleware_implementation})
+endmacro()
