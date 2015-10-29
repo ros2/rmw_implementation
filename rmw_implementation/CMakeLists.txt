@@ -12,8 +12,3 @@ endif()
 ament_package(
   CONFIG_EXTRAS "rmw_implementation-extras.cmake"
 )
-
-install(
-  DIRECTORY cmake
-  DESTINATION share/${PROJECT_NAME}
-)
