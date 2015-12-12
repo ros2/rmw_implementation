@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# copied from rmw_implementation/rmw_implementation-extras.cmake
+# generated from rmw_implementation/rmw_implementation-extras.cmake.in
 
-find_package(rmw_implementation_cmake REQUIRED)
+set(RMW_IMPLEMENTATION "@RMW_IMPLEMENTATION@")
 
-get_default_rmw_implementation(_middleware_implementation)
-find_package("${_middleware_implementation}" REQUIRED)
+message(STATUS "Using RMW implementation: ${RMW_IMPLEMENTATION}")
+
+find_package("${RMW_IMPLEMENTATION}" REQUIRED)
 
 # TODO should never need definitions and include dirs?
-list(APPEND rmw_implementation_DEFINITIONS ${${_middleware_implementation}_DEFINITIONS})
-list(APPEND rmw_implementation_INCLUDE_DIRS ${${_middleware_implementation}_INCLUDE_DIRS})
-list(APPEND rmw_implementation_LIBRARIES ${${_middleware_implementation}_LIBRARIES})
+list(APPEND rmw_implementation_DEFINITIONS ${${RMW_IMPLEMENTATION}_DEFINITIONS})
+list(APPEND rmw_implementation_INCLUDE_DIRS ${${RMW_IMPLEMENTATION}_INCLUDE_DIRS})
+list(APPEND rmw_implementation_LIBRARIES ${${RMW_IMPLEMENTATION}_LIBRARIES})
