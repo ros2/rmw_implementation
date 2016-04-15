@@ -14,10 +14,35 @@
 
 # generated from rmw_implementation/rmw_implementation-extras.cmake.in
 
-set(RMW_IMPLEMENTATION "@RMW_IMPLEMENTATION@")
+find_package(rmw_implementation_cmake REQUIRED)
+set(default_rmw_implementation "@RMW_IMPLEMENTATION@")
 
+if(NOT "${RMW_IMPLEMENTATION} " STREQUAL " ")
+  set(requested_default_rmw_implementation ${RMW_IMPLEMENTATION})
+  if(NOT requested_default_rmw_implementation STREQUAL default_rmw_implementation)
+    message(FATAL_ERROR
+      "The default RMW implementation has been specified as "
+      "'${requested_default_rmw_implementation}' through CMake, however the default "
+      "RMW implementation which will be used is '${default_rmw_implementation}', "
+      "which was specified when the 'rmw_implementation' package was built.")
+  endif()
+endif()
+    
+if(NOT "$ENV{RMW_IMPLEMENTATION} " STREQUAL " ")
+  set(requested_default_rmw_implementation $ENV{RMW_IMPLEMENTATION})
+  if(NOT requested_default_rmw_implementation STREQUAL default_rmw_implementation)
+    message(FATAL_ERROR
+      "The default RMW implementation has been specified as "
+      "'${requested_default_rmw_implementation}' "
+      "through the environment variable 'RMW_IMPLEMENTATION', however the default "
+      "RMW implementation which will be used is '${default_rmw_implementation}', "
+      "which was specified when the 'rmw_implementation' package was built.")
+  endif()
+endif()
+
+
+set(RMW_IMPLEMENTATION "${default_rmw_implementation}")
 message(STATUS "Using RMW implementation: ${RMW_IMPLEMENTATION}")
-
 find_package("${RMW_IMPLEMENTATION}" REQUIRED)
 
 # TODO should never need definitions and include dirs?
