@@ -22,21 +22,23 @@ if(NOT "${RMW_IMPLEMENTATION} " STREQUAL " ")
   if(NOT requested_default_rmw_implementation STREQUAL default_rmw_implementation)
     message(FATAL_ERROR
       "The default RMW implementation has been specified as "
-      "'${requested_default_rmw_implementation}' through CMake, however the default "
-      "RMW implementation which will be used is '${default_rmw_implementation}', "
-      "which was specified when the 'rmw_implementation' package was built.")
+      "'${requested_default_rmw_implementation}' through CMake,"
+      "however the default RMW implementation which will be used is "
+      "'${default_rmw_implementation}', which was specified when the "
+      "'rmw_implementation' package was built.")
   endif()
 endif()
-    
+
 if(NOT "$ENV{RMW_IMPLEMENTATION} " STREQUAL " ")
   set(requested_default_rmw_implementation $ENV{RMW_IMPLEMENTATION})
   if(NOT requested_default_rmw_implementation STREQUAL default_rmw_implementation)
     message(FATAL_ERROR
       "The default RMW implementation has been specified as "
       "'${requested_default_rmw_implementation}' "
-      "through the environment variable 'RMW_IMPLEMENTATION', however the default "
-      "RMW implementation which will be used is '${default_rmw_implementation}', "
-      "which was specified when the 'rmw_implementation' package was built.")
+      "through the environment variable 'RMW_IMPLEMENTATION', "
+      "however the default RMW implementation which will be used is "
+      "'${default_rmw_implementation}', which was specified when the "
+      "'rmw_implementation' package was built.")
   endif()
 endif()
 
