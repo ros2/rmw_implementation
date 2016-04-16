@@ -44,7 +44,7 @@ endif()
 
 
 set(RMW_IMPLEMENTATION "${default_rmw_implementation}")
-message(STATUS "Using RMW implementation: ${RMW_IMPLEMENTATION}")
+message(STATUS "Using RMW implementation '${RMW_IMPLEMENTATION}' as default.")
 find_package("${RMW_IMPLEMENTATION}" REQUIRED)
 
 # TODO should never need definitions and include dirs?
