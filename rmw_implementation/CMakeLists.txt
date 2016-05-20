@@ -13,6 +13,17 @@ endif()
 
 get_default_rmw_implementation(RMW_IMPLEMENTATION)
 
+get_available_rmw_implementations(impls)
+message(STATUS "")
+message(STATUS "Found these rmw implementations:")
+foreach(impl IN LISTS impls)
+  message(STATUS "  '${impl}'")
+endforeach()
+
+message(STATUS "")
+message(STATUS "Using default rmw implementation: '${RMW_IMPLEMENTATION}'")
+message(STATUS "")
+
 ament_package(
   CONFIG_EXTRAS "rmw_implementation-extras.cmake.in"
 )
