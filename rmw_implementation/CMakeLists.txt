@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 
 # must be not NONE since some rmw implementation require compiler checks
 project(rmw_implementation)
