@@ -17,7 +17,7 @@
 find_package(rmw_implementation_cmake REQUIRED)
 set(default_rmw_implementation "@RMW_IMPLEMENTATION@")
 
-if(NOT "${RMW_IMPLEMENTATION} " STREQUAL " ")
+if(NOT "${RMW_IMPLEMENTATION}" STREQUAL "")
   set(requested_default_rmw_implementation ${RMW_IMPLEMENTATION})
   if(NOT requested_default_rmw_implementation STREQUAL default_rmw_implementation)
     message(FATAL_ERROR
@@ -29,7 +29,7 @@ if(NOT "${RMW_IMPLEMENTATION} " STREQUAL " ")
   endif()
 endif()
 
-if(NOT "$ENV{RMW_IMPLEMENTATION} " STREQUAL " ")
+if(NOT "$ENV{RMW_IMPLEMENTATION}" STREQUAL "")
   set(requested_default_rmw_implementation $ENV{RMW_IMPLEMENTATION})
   if(NOT requested_default_rmw_implementation STREQUAL default_rmw_implementation)
     message(FATAL_ERROR
