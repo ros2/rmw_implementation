@@ -9,6 +9,10 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <build_depend>rmw</build_depend>
+
+  <depend>libpoco-dev</depend>
+  <depend>poco_vendor</depend>
   <depend>rmw_implementation_cmake</depend>
   <depend>rmw_connext_cpp</depend>
   <depend>rmw_connext_dynamic_cpp</depend>
