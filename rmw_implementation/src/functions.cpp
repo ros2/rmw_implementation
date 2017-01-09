@@ -190,6 +190,14 @@ rmw_create_node(const char * name, const char * namespace_, size_t domain_id)
     ARG_TYPES(const char *, const char *, size_t), ARG_VALUES(name, namespace_, domain_id));
 }
 
+rmw_node_t *
+rmw_create_secure_node(const char * name, size_t domain_id, const char * security_files_paths)
+{
+  CALL_SYMBOL(
+    "rmw_create_secure_node", rmw_node_t *, nullptr,
+    ARG_TYPES(const char *, size_t, const char *), ARG_VALUES(name, domain_id, security_files_paths));
+}
+
 rmw_ret_t
 rmw_destroy_node(rmw_node_t * node)
 {
