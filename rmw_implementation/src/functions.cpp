@@ -469,21 +469,21 @@ rmw_destroy_topic_names_and_types(
 rmw_ret_t
 rmw_get_node_names(
   const rmw_node_t * node,
-  rmw_node_names_t * node_names)
+  rmw_string_array_t * node_names)
 {
   CALL_SYMBOL(
     "rmw_get_node_names", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, rmw_node_names_t *),
+    ARG_TYPES(const rmw_node_t *, rmw_string_array_t *),
     ARG_VALUES(node, node_names));
 }
 
 rmw_ret_t
 rmw_destroy_node_names(
-  rmw_node_names_t * node_names)
+  rmw_string_array_t * node_names)
 {
   CALL_SYMBOL(
     "rmw_destroy_node_names", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_node_names_t *),
+    ARG_TYPES(rmw_string_array_t *),
     ARG_VALUES(node_names));
 }
 
