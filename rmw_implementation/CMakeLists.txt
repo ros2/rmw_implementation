@@ -7,6 +7,9 @@ if(NOT WIN32)
 endif()
 
 find_package(ament_cmake REQUIRED)
+
+find_package(c_utilities REQUIRED)
+
 # provides FindPoco.cmake and Poco on platforms without it
 find_package(poco_vendor)
 find_package(Poco COMPONENTS Foundation)
