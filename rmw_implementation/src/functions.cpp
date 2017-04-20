@@ -22,7 +22,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "rcutils/types.h"
+#include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
 
