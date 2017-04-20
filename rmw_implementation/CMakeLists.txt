@@ -8,7 +8,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-find_package(c_utilities REQUIRED)
+find_package(rcutils REQUIRED)
 
 # provides FindPoco.cmake and Poco on platforms without it
 find_package(poco_vendor)

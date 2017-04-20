@@ -22,7 +22,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "c_utilities/types.h"
+#include "rcutils/types.h"
 
 #include "Poco/SharedLibrary.h"
 
@@ -471,11 +471,11 @@ rmw_destroy_topic_names_and_types(
 rmw_ret_t
 rmw_get_node_names(
   const rmw_node_t * node,
-  utilities_string_array_t * node_names)
+  rcutils_string_array_t * node_names)
 {
   CALL_SYMBOL(
     "rmw_get_node_names", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, utilities_string_array_t *),
+    ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *),
     ARG_VALUES(node, node_names));
 }
 
