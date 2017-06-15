@@ -183,11 +183,13 @@ rmw_init(void)
 }
 
 rmw_node_t *
-rmw_create_node(const char * name, const char * namespace_, size_t domain_id)
+rmw_create_node(const char * name, const char * namespace_, size_t domain_id,
+  const rmw_node_security_options_t * security_options)
 {
   CALL_SYMBOL(
     "rmw_create_node", rmw_node_t *, nullptr,
-    ARG_TYPES(const char *, const char *, size_t), ARG_VALUES(name, namespace_, domain_id));
+    ARG_TYPES(const char *, const char *, size_t, const rmw_node_security_options_t *),
+    ARG_VALUES(name, namespace_, domain_id, security_options));
 }
 
 rmw_ret_t
