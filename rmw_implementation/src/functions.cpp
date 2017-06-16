@@ -22,11 +22,15 @@
 #include <fstream>
 #include <sstream>
 
+#include "rcutils/allocator.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
 
 #include "rmw/error_handling.h"
+#include "rmw/names_and_types.h"
+#include "rmw/get_service_names_and_types.h"
+#include "rmw/get_topic_names_and_types.h"
 #include "rmw/rmw.h"
 
 std::string get_env_var(const char * env_var)
@@ -452,22 +456,26 @@ rmw_wait(
 rmw_ret_t
 rmw_get_topic_names_and_types(
   const rmw_node_t * node,
-  rmw_topic_names_and_types_t * topic_names_and_types)
+  rcutils_allocator_t * allocator,
+  bool no_demangle,
+  rmw_names_and_types_t * topic_names_and_types)
 {
   CALL_SYMBOL(
     "rmw_get_topic_names_and_types", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, rmw_topic_names_and_types_t *),
-    ARG_VALUES(node, topic_names_and_types));
+    ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, bool, rmw_names_and_types_t *),
+    ARG_VALUES(node, allocator, no_demangle, topic_names_and_types));
 }
 
 rmw_ret_t
-rmw_destroy_topic_names_and_types(
-  rmw_topic_names_and_types_t * topic_names_and_types)
+rmw_get_service_names_and_types(
+  const rmw_node_t * node,
+  rcutils_allocator_t * allocator,
+  rmw_names_and_types_t * service_names_and_types)
 {
   CALL_SYMBOL(
-    "rmw_destroy_topic_names_and_types", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_topic_names_and_types_t *),
-    ARG_VALUES(topic_names_and_types));
+    "rmw_get_service_names_and_types", rmw_ret_t, RMW_RET_ERROR,
+    ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, rmw_names_and_types_t *),
+    ARG_VALUES(node, allocator, service_names_and_types));
 }
 
 rmw_ret_t
