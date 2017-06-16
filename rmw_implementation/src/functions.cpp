@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "rcutils/allocator.h"
+#include "rcutils/format_string.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
@@ -145,7 +146,16 @@ get_symbol(const char * symbol_name)
     return nullptr;
   }
   if (!lib->hasSymbol(symbol_name)) {
-    RMW_SET_ERROR_MSG("failed to resolve symbol in shared library of rmw implementation");
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
+    char * msg = rcutils_format_string(
+      allocator,
+      "failed to resolve symbol in shared library '%s'", lib->getPath().c_str());
+    if (msg) {
+      RMW_SET_ERROR_MSG(msg);
+      allocator.deallocate(msg, allocator.state);
+    } else {
+      RMW_SET_ERROR_MSG("failed to allocate memory for error message")
+    }
     return nullptr;
   }
   return lib->getSymbol(symbol_name);
