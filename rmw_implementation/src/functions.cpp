@@ -170,31 +170,30 @@ extern "C"
 #define ARG_VALUES(...) __VA_ARGS__
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
-  static void * symbol = get_symbol(symbol_name); \
-  if (!symbol) { \
+  if (!symbol_ ## symbol_name) { \
+    /* only necessary for functions called before rmw_init */ \
+    symbol_ ## symbol_name = get_symbol(#symbol_name); \
+  } \
+  if (!symbol_ ## symbol_name) { \
     /* error message set by get_symbol() */ \
     return error_value; \
   } \
   typedef ReturnType (* FunctionSignature)(ArgTypes); \
-  FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol); \
+  FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_ ## symbol_name); \
   return func(arg_values);
 
+
+void * symbol_rmw_get_implementation_identifier = nullptr;
 
 const char *
 rmw_get_implementation_identifier(void)
 {
   CALL_SYMBOL(
-    "rmw_get_implementation_identifier", const char *, nullptr,
+    rmw_get_implementation_identifier, const char *, nullptr,
     ARG_TYPES(void), ARG_VALUES());
 }
 
-rmw_ret_t
-rmw_init(void)
-{
-  CALL_SYMBOL(
-    "rmw_init", rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(void), ARG_VALUES());
-}
+void * symbol_rmw_create_node = nullptr;
 
 rmw_node_t *
 rmw_create_node(
@@ -202,26 +201,32 @@ rmw_create_node(
   const rmw_node_security_options_t * security_options)
 {
   CALL_SYMBOL(
-    "rmw_create_node", rmw_node_t *, nullptr,
+    rmw_create_node, rmw_node_t *, nullptr,
     ARG_TYPES(const char *, const char *, size_t, const rmw_node_security_options_t *),
     ARG_VALUES(name, namespace_, domain_id, security_options));
 }
+
+void * symbol_rmw_destroy_node = nullptr;
 
 rmw_ret_t
 rmw_destroy_node(rmw_node_t * node)
 {
   CALL_SYMBOL(
-    "rmw_destroy_node", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_node, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_node_t *), ARG_VALUES(node));
 }
+
+void * symbol_rmw_node_get_graph_guard_condition = nullptr;
 
 const rmw_guard_condition_t *
 rmw_node_get_graph_guard_condition(const rmw_node_t * node)
 {
   CALL_SYMBOL(
-    "rmw_node_get_graph_guard_condition", const rmw_guard_condition_t *, nullptr,
+    rmw_node_get_graph_guard_condition, const rmw_guard_condition_t *, nullptr,
     ARG_TYPES(const rmw_node_t *), ARG_VALUES(node));
 }
+
+void * symbol_rmw_create_publisher = nullptr;
 
 rmw_publisher_t *
 rmw_create_publisher(
@@ -231,30 +236,36 @@ rmw_create_publisher(
   const rmw_qos_profile_t * qos_policies)
 {
   CALL_SYMBOL(
-    "rmw_create_publisher", rmw_publisher_t *, nullptr,
+    rmw_create_publisher, rmw_publisher_t *, nullptr,
     ARG_TYPES(
       const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
       const rmw_qos_profile_t *),
     ARG_VALUES(node, type_support, topic_name, qos_policies));
 }
 
+void * symbol_rmw_destroy_publisher = nullptr;
+
 rmw_ret_t
 rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
 {
   CALL_SYMBOL(
-    "rmw_destroy_publisher", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_publisher, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_node_t *, rmw_publisher_t *),
     ARG_VALUES(node, publisher));
 }
+
+void * symbol_rmw_publish = nullptr;
 
 rmw_ret_t
 rmw_publish(const rmw_publisher_t * publisher, const void * ros_message)
 {
   CALL_SYMBOL(
-    "rmw_publish", rmw_ret_t, RMW_RET_ERROR,
+    rmw_publish, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_publisher_t *, const void *),
     ARG_VALUES(publisher, ros_message));
 }
+
+void * symbol_rmw_create_subscription = nullptr;
 
 rmw_subscription_t *
 rmw_create_subscription(
@@ -265,30 +276,36 @@ rmw_create_subscription(
   bool ignore_local_publications)
 {
   CALL_SYMBOL(
-    "rmw_create_subscription", rmw_subscription_t *, nullptr,
+    rmw_create_subscription, rmw_subscription_t *, nullptr,
     ARG_TYPES(
       const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
       const rmw_qos_profile_t *, bool),
     ARG_VALUES(node, type_support, topic_name, qos_policies, ignore_local_publications));
 }
 
+void * symbol_rmw_destroy_subscription = nullptr;
+
 rmw_ret_t
 rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
 {
   CALL_SYMBOL(
-    "rmw_destroy_subscription", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_subscription, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_node_t *, rmw_subscription_t *),
     ARG_VALUES(node, subscription));
 }
+
+void * symbol_rmw_take = nullptr;
 
 rmw_ret_t
 rmw_take(const rmw_subscription_t * subscription, void * ros_message, bool * taken)
 {
   CALL_SYMBOL(
-    "rmw_take", rmw_ret_t, RMW_RET_ERROR,
+    rmw_take, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_subscription_t *, void *, bool *),
     ARG_VALUES(subscription, ros_message, taken));
 }
+
+void * symbol_rmw_take_with_info = nullptr;
 
 rmw_ret_t
 rmw_take_with_info(
@@ -298,10 +315,12 @@ rmw_take_with_info(
   rmw_message_info_t * message_info)
 {
   CALL_SYMBOL(
-    "rmw_take_with_info", rmw_ret_t, RMW_RET_ERROR,
+    rmw_take_with_info, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *),
     ARG_VALUES(subscription, ros_message, taken, message_info));
 }
+
+void * symbol_rmw_create_client = nullptr;
 
 rmw_client_t *
 rmw_create_client(
@@ -311,21 +330,25 @@ rmw_create_client(
   const rmw_qos_profile_t * qos_policies)
 {
   CALL_SYMBOL(
-    "rmw_create_client", rmw_client_t *, nullptr,
+    rmw_create_client, rmw_client_t *, nullptr,
     ARG_TYPES(
       const rmw_node_t *, const rosidl_service_type_support_t *, const char *,
       const rmw_qos_profile_t *),
     ARG_VALUES(node, type_support, service_name, qos_policies));
 }
 
+void * symbol_rmw_destroy_client = nullptr;
+
 rmw_ret_t
 rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
 {
   CALL_SYMBOL(
-    "rmw_destroy_client", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_client, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_node_t *, rmw_client_t *),
     ARG_VALUES(node, client));
 }
+
+void * symbol_rmw_send_request = nullptr;
 
 rmw_ret_t
 rmw_send_request(
@@ -334,10 +357,12 @@ rmw_send_request(
   int64_t * sequence_id)
 {
   CALL_SYMBOL(
-    "rmw_send_request", rmw_ret_t, RMW_RET_ERROR,
+    rmw_send_request, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_client_t *, const void *, int64_t *),
     ARG_VALUES(client, ros_request, sequence_id));
 }
+
+void * symbol_rmw_take_response = nullptr;
 
 rmw_ret_t
 rmw_take_response(
@@ -347,10 +372,12 @@ rmw_take_response(
   bool * taken)
 {
   CALL_SYMBOL(
-    "rmw_take_response", rmw_ret_t, RMW_RET_ERROR,
+    rmw_take_response, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_client_t *, rmw_request_id_t *, void *, bool *),
     ARG_VALUES(client, request_header, ros_response, taken));
 }
+
+void * symbol_rmw_create_service = nullptr;
 
 rmw_service_t *
 rmw_create_service(
@@ -360,21 +387,25 @@ rmw_create_service(
   const rmw_qos_profile_t * qos_policies)
 {
   CALL_SYMBOL(
-    "rmw_create_service", rmw_service_t *, nullptr,
+    rmw_create_service, rmw_service_t *, nullptr,
     ARG_TYPES(
       const rmw_node_t *, const rosidl_service_type_support_t *, const char *,
       const rmw_qos_profile_t *),
     ARG_VALUES(node, type_support, service_name, qos_policies));
 }
 
+void * symbol_rmw_destroy_service = nullptr;
+
 rmw_ret_t
 rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
 {
   CALL_SYMBOL(
-    "rmw_destroy_service", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_service, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_node_t *, rmw_service_t *),
     ARG_VALUES(node, service));
 }
+
+void * symbol_rmw_take_request = nullptr;
 
 rmw_ret_t
 rmw_take_request(
@@ -384,10 +415,12 @@ rmw_take_request(
   bool * taken)
 {
   CALL_SYMBOL(
-    "rmw_take_request", rmw_ret_t, RMW_RET_ERROR,
+    rmw_take_request, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *, bool *),
     ARG_VALUES(service, request_header, ros_request, taken));
 }
+
+void * symbol_rmw_send_response = nullptr;
 
 rmw_ret_t
 rmw_send_response(
@@ -396,54 +429,66 @@ rmw_send_response(
   void * ros_response)
 {
   CALL_SYMBOL(
-    "rmw_send_response", rmw_ret_t, RMW_RET_ERROR,
+    rmw_send_response, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *),
     ARG_VALUES(service, request_header, ros_response));
 }
+
+void * symbol_rmw_create_guard_condition = nullptr;
 
 rmw_guard_condition_t *
 rmw_create_guard_condition(void)
 {
   CALL_SYMBOL(
-    "rmw_create_guard_condition", rmw_guard_condition_t *, nullptr,
+    rmw_create_guard_condition, rmw_guard_condition_t *, nullptr,
     ARG_TYPES(void), ARG_VALUES());
 }
+
+void * symbol_rmw_destroy_guard_condition = nullptr;
 
 rmw_ret_t
 rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
 {
   CALL_SYMBOL(
-    "rmw_destroy_guard_condition", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_guard_condition, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_guard_condition_t *),
     ARG_VALUES(guard_condition));
 }
+
+void * symbol_rmw_trigger_guard_condition = nullptr;
 
 rmw_ret_t
 rmw_trigger_guard_condition(const rmw_guard_condition_t * guard_condition)
 {
   CALL_SYMBOL(
-    "rmw_trigger_guard_condition", rmw_ret_t, RMW_RET_ERROR,
+    rmw_trigger_guard_condition, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_guard_condition_t *),
     ARG_VALUES(guard_condition));
 }
+
+void * symbol_rmw_create_waitset = nullptr;
 
 rmw_waitset_t *
 rmw_create_waitset(size_t max_conditions)
 {
   CALL_SYMBOL(
-    "rmw_create_waitset", rmw_waitset_t *, nullptr,
+    rmw_create_waitset, rmw_waitset_t *, nullptr,
     ARG_TYPES(size_t),
     ARG_VALUES(max_conditions));
 }
+
+void * symbol_rmw_destroy_waitset = nullptr;
 
 rmw_ret_t
 rmw_destroy_waitset(rmw_waitset_t * waitset)
 {
   CALL_SYMBOL(
-    "rmw_destroy_waitset", rmw_ret_t, RMW_RET_ERROR,
+    rmw_destroy_waitset, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(rmw_waitset_t *),
     ARG_VALUES(waitset));
 }
+
+void * symbol_rmw_wait = nullptr;
 
 rmw_ret_t
 rmw_wait(
@@ -455,7 +500,7 @@ rmw_wait(
   const rmw_time_t * wait_timeout)
 {
   CALL_SYMBOL(
-    "rmw_wait", rmw_ret_t, RMW_RET_ERROR,
+    rmw_wait, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(
       rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *,
       rmw_clients_t *, rmw_waitset_t *, const rmw_time_t *),
@@ -463,6 +508,8 @@ rmw_wait(
       subscriptions, guard_conditions, services,
       clients, waitset, wait_timeout));
 }
+
+void * symbol_rmw_get_topic_names_and_types = nullptr;
 
 rmw_ret_t
 rmw_get_topic_names_and_types(
@@ -472,10 +519,12 @@ rmw_get_topic_names_and_types(
   rmw_names_and_types_t * topic_names_and_types)
 {
   CALL_SYMBOL(
-    "rmw_get_topic_names_and_types", rmw_ret_t, RMW_RET_ERROR,
+    rmw_get_topic_names_and_types, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, bool, rmw_names_and_types_t *),
     ARG_VALUES(node, allocator, no_demangle, topic_names_and_types));
 }
+
+void * symbol_rmw_get_service_names_and_types = nullptr;
 
 rmw_ret_t
 rmw_get_service_names_and_types(
@@ -484,10 +533,12 @@ rmw_get_service_names_and_types(
   rmw_names_and_types_t * service_names_and_types)
 {
   CALL_SYMBOL(
-    "rmw_get_service_names_and_types", rmw_ret_t, RMW_RET_ERROR,
+    rmw_get_service_names_and_types, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, rmw_names_and_types_t *),
     ARG_VALUES(node, allocator, service_names_and_types));
 }
+
+void * symbol_rmw_get_node_names = nullptr;
 
 rmw_ret_t
 rmw_get_node_names(
@@ -495,10 +546,12 @@ rmw_get_node_names(
   rcutils_string_array_t * node_names)
 {
   CALL_SYMBOL(
-    "rmw_get_node_names", rmw_ret_t, RMW_RET_ERROR,
+    rmw_get_node_names, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *),
     ARG_VALUES(node, node_names));
 }
+
+void * symbol_rmw_count_publishers = nullptr;
 
 rmw_ret_t
 rmw_count_publishers(
@@ -507,10 +560,12 @@ rmw_count_publishers(
   size_t * count)
 {
   CALL_SYMBOL(
-    "rmw_count_publishers", rmw_ret_t, RMW_RET_ERROR,
+    rmw_count_publishers, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_node_t *, const char *, size_t *),
     ARG_VALUES(node, topic_name, count));
 }
+
+void * symbol_rmw_count_subscribers = nullptr;
 
 rmw_ret_t
 rmw_count_subscribers(
@@ -519,29 +574,35 @@ rmw_count_subscribers(
   size_t * count)
 {
   CALL_SYMBOL(
-    "rmw_count_subscribers", rmw_ret_t, RMW_RET_ERROR,
+    rmw_count_subscribers, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_node_t *, const char *, size_t *),
     ARG_VALUES(node, topic_name, count));
 }
+
+void * symbol_rmw_get_gid_for_publisher = nullptr;
 
 rmw_ret_t
 rmw_get_gid_for_publisher(const rmw_publisher_t * publisher, rmw_gid_t * gid)
 {
   CALL_SYMBOL(
-    "rmw_get_gid_for_publisher", rmw_ret_t, RMW_RET_ERROR,
+    rmw_get_gid_for_publisher, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(
       const rmw_publisher_t *, rmw_gid_t *),
     ARG_VALUES(publisher, gid));
 }
 
+void * symbol_rmw_compare_gids_equal = nullptr;
+
 rmw_ret_t
 rmw_compare_gids_equal(const rmw_gid_t * gid1, const rmw_gid_t * gid2, bool * result)
 {
   CALL_SYMBOL(
-    "rmw_compare_gids_equal", rmw_ret_t, RMW_RET_ERROR,
+    rmw_compare_gids_equal, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_gid_t *, const rmw_gid_t *, bool *),
     ARG_VALUES(gid1, gid2, result));
 }
+
+void * symbol_rmw_service_server_is_available = nullptr;
 
 rmw_ret_t
 rmw_service_server_is_available(
@@ -550,9 +611,62 @@ rmw_service_server_is_available(
   bool * is_available)
 {
   CALL_SYMBOL(
-    "rmw_service_server_is_available", rmw_ret_t, RMW_RET_ERROR,
+    rmw_service_server_is_available, rmw_ret_t, RMW_RET_ERROR,
     ARG_TYPES(const rmw_node_t *, const rmw_client_t *, bool *),
     ARG_VALUES(node, client, is_available));
+}
+
+void * symbol_rmw_init = nullptr;
+
+rmw_ret_t
+rmw_init(void)
+{
+  // get all symbols to avoid race conditions later since the passed
+  // symbol name is expected to be a std::string which requires allocation
+  symbol_rmw_get_implementation_identifier = get_symbol(
+    "rmw_get_implementation_identifier");
+  symbol_rmw_create_node = get_symbol("rmw_create_node");
+  symbol_rmw_destroy_node = get_symbol("rmw_destroy_node");
+  symbol_rmw_node_get_graph_guard_condition = get_symbol(
+    "rmw_node_get_graph_guard_condition");
+  symbol_rmw_create_publisher = get_symbol("rmw_create_publisher");
+  symbol_rmw_destroy_publisher = get_symbol("rmw_destroy_publisher");
+  symbol_rmw_publish = get_symbol("rmw_publish");
+  symbol_rmw_create_subscription = get_symbol("rmw_create_subscription");
+  symbol_rmw_destroy_subscription = get_symbol("rmw_destroy_subscription");
+  symbol_rmw_take = get_symbol("rmw_take");
+  symbol_rmw_take_with_info = get_symbol("rmw_take_with_info");
+  symbol_rmw_create_client = get_symbol("rmw_create_client");
+  symbol_rmw_destroy_client = get_symbol("rmw_destroy_client");
+  symbol_rmw_send_request = get_symbol("rmw_send_request");
+  symbol_rmw_take_response = get_symbol("rmw_take_response");
+  symbol_rmw_create_service = get_symbol("rmw_create_service");
+  symbol_rmw_destroy_service = get_symbol("rmw_destroy_service");
+  symbol_rmw_take_request = get_symbol("rmw_take_request");
+  symbol_rmw_send_response = get_symbol("rmw_send_response");
+  symbol_rmw_create_guard_condition = get_symbol("rmw_create_guard_condition");
+  symbol_rmw_destroy_guard_condition = get_symbol(
+    "rmw_destroy_guard_condition");
+  symbol_rmw_trigger_guard_condition = get_symbol(
+    "rmw_trigger_guard_condition");
+  symbol_rmw_create_waitset = get_symbol("rmw_create_waitset");
+  symbol_rmw_destroy_waitset = get_symbol("rmw_destroy_waitset");
+  symbol_rmw_wait = get_symbol("rmw_wait");
+  symbol_rmw_get_topic_names_and_types = get_symbol(
+    "rmw_get_topic_names_and_types");
+  symbol_rmw_get_service_names_and_types = get_symbol(
+    "rmw_get_service_names_and_types");
+  symbol_rmw_get_node_names = get_symbol("rmw_get_node_names");
+  symbol_rmw_count_publishers = get_symbol("rmw_count_publishers");
+  symbol_rmw_count_subscribers = get_symbol("rmw_count_subscribers");
+  symbol_rmw_get_gid_for_publisher = get_symbol("rmw_get_gid_for_publisher");
+  symbol_rmw_compare_gids_equal = get_symbol("rmw_compare_gids_equal");
+  symbol_rmw_service_server_is_available = get_symbol(
+    "rmw_service_server_is_available");
+
+  CALL_SYMBOL(
+    rmw_init, rmw_ret_t, RMW_RET_ERROR,
+    ARG_TYPES(void), ARG_VALUES());
 }
 
 #if __cplusplus
