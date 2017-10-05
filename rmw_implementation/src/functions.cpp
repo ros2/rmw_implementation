@@ -170,7 +170,7 @@ extern "C"
 #define ARG_VALUES(...) __VA_ARGS__
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
-  void * symbol = get_symbol(symbol_name); \
+  static void * symbol = get_symbol(symbol_name); \
   if (!symbol) { \
     /* error message set by get_symbol() */ \
     return error_value; \
