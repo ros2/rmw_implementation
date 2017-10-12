@@ -166,8 +166,24 @@ extern "C"
 {
 #endif
 
+#define EXPAND(x) x
 #define ARG_TYPES(...) __VA_ARGS__
-#define ARG_VALUES(...) __VA_ARGS__
+
+#define ARG_VALS0(...)
+#define ARG_VALS1(t1) v1
+#define ARG_VALS2(t2, ...) v2, EXPAND(ARG_VALS1(__VA_ARGS__))
+#define ARG_VALS3(t3, ...) v3, EXPAND(ARG_VALS2(__VA_ARGS__))
+#define ARG_VALS4(t4, ...) v4, EXPAND(ARG_VALS3(__VA_ARGS__))
+#define ARG_VALS5(t5, ...) v5, EXPAND(ARG_VALS4(__VA_ARGS__))
+#define ARG_VALS6(t6, ...) v6, EXPAND(ARG_VALS5(__VA_ARGS__))
+
+#define ARGS0(...) __VA_ARGS__
+#define ARGS1(t1) t1 v1
+#define ARGS2(t2, ...) t2 v2, EXPAND(ARGS1(__VA_ARGS__))
+#define ARGS3(t3, ...) t3 v3, EXPAND(ARGS2(__VA_ARGS__))
+#define ARGS4(t4, ...) t4 v4, EXPAND(ARGS3(__VA_ARGS__))
+#define ARGS5(t5, ...) t5 v5, EXPAND(ARGS4(__VA_ARGS__))
+#define ARGS6(t6, ...) t6 v6, EXPAND(ARGS5(__VA_ARGS__))
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
   if (!symbol_ ## symbol_name) { \
@@ -182,492 +198,211 @@ extern "C"
   FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_ ## symbol_name); \
   return func(arg_values);
 
-
-void * symbol_rmw_get_implementation_identifier = nullptr;
-
-const char *
-rmw_get_implementation_identifier(void)
-{
-  CALL_SYMBOL(
-    rmw_get_implementation_identifier, const char *, nullptr,
-    ARG_TYPES(void), ARG_VALUES());
-}
-
-void * symbol_rmw_create_node = nullptr;
-
-rmw_node_t *
-rmw_create_node(
-  const char * name, const char * namespace_, size_t domain_id,
-  const rmw_node_security_options_t * security_options)
-{
-  CALL_SYMBOL(
-    rmw_create_node, rmw_node_t *, nullptr,
-    ARG_TYPES(const char *, const char *, size_t, const rmw_node_security_options_t *),
-    ARG_VALUES(name, namespace_, domain_id, security_options));
-}
-
-void * symbol_rmw_destroy_node = nullptr;
-
-rmw_ret_t
-rmw_destroy_node(rmw_node_t * node)
-{
-  CALL_SYMBOL(
-    rmw_destroy_node, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_node_t *), ARG_VALUES(node));
-}
-
-void * symbol_rmw_node_get_graph_guard_condition = nullptr;
-
-const rmw_guard_condition_t *
-rmw_node_get_graph_guard_condition(const rmw_node_t * node)
-{
-  CALL_SYMBOL(
-    rmw_node_get_graph_guard_condition, const rmw_guard_condition_t *, nullptr,
-    ARG_TYPES(const rmw_node_t *), ARG_VALUES(node));
-}
-
-void * symbol_rmw_create_publisher = nullptr;
-
-rmw_publisher_t *
-rmw_create_publisher(
-  const rmw_node_t * node,
-  const rosidl_message_type_support_t * type_support,
-  const char * topic_name,
-  const rmw_qos_profile_t * qos_policies)
-{
-  CALL_SYMBOL(
-    rmw_create_publisher, rmw_publisher_t *, nullptr,
-    ARG_TYPES(
-      const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
-      const rmw_qos_profile_t *),
-    ARG_VALUES(node, type_support, topic_name, qos_policies));
-}
-
-void * symbol_rmw_destroy_publisher = nullptr;
-
-rmw_ret_t
-rmw_destroy_publisher(rmw_node_t * node, rmw_publisher_t * publisher)
-{
-  CALL_SYMBOL(
-    rmw_destroy_publisher, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_node_t *, rmw_publisher_t *),
-    ARG_VALUES(node, publisher));
-}
-
-void * symbol_rmw_publish = nullptr;
-
-rmw_ret_t
-rmw_publish(const rmw_publisher_t * publisher, const void * ros_message)
-{
-  CALL_SYMBOL(
-    rmw_publish, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_publisher_t *, const void *),
-    ARG_VALUES(publisher, ros_message));
-}
-
-void * symbol_rmw_create_subscription = nullptr;
-
-rmw_subscription_t *
-rmw_create_subscription(
-  const rmw_node_t * node,
-  const rosidl_message_type_support_t * type_support,
-  const char * topic_name,
-  const rmw_qos_profile_t * qos_policies,
-  bool ignore_local_publications)
-{
-  CALL_SYMBOL(
-    rmw_create_subscription, rmw_subscription_t *, nullptr,
-    ARG_TYPES(
-      const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
-      const rmw_qos_profile_t *, bool),
-    ARG_VALUES(node, type_support, topic_name, qos_policies, ignore_local_publications));
-}
-
-void * symbol_rmw_destroy_subscription = nullptr;
-
-rmw_ret_t
-rmw_destroy_subscription(rmw_node_t * node, rmw_subscription_t * subscription)
-{
-  CALL_SYMBOL(
-    rmw_destroy_subscription, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_node_t *, rmw_subscription_t *),
-    ARG_VALUES(node, subscription));
-}
-
-void * symbol_rmw_take = nullptr;
-
-rmw_ret_t
-rmw_take(const rmw_subscription_t * subscription, void * ros_message, bool * taken)
-{
-  CALL_SYMBOL(
-    rmw_take, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_subscription_t *, void *, bool *),
-    ARG_VALUES(subscription, ros_message, taken));
-}
-
-void * symbol_rmw_take_with_info = nullptr;
-
-rmw_ret_t
-rmw_take_with_info(
-  const rmw_subscription_t * subscription,
-  void * ros_message,
-  bool * taken,
-  rmw_message_info_t * message_info)
-{
-  CALL_SYMBOL(
-    rmw_take_with_info, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *),
-    ARG_VALUES(subscription, ros_message, taken, message_info));
-}
-
-void * symbol_rmw_create_client = nullptr;
-
-rmw_client_t *
-rmw_create_client(
-  const rmw_node_t * node,
-  const rosidl_service_type_support_t * type_support,
-  const char * service_name,
-  const rmw_qos_profile_t * qos_policies)
-{
-  CALL_SYMBOL(
-    rmw_create_client, rmw_client_t *, nullptr,
-    ARG_TYPES(
-      const rmw_node_t *, const rosidl_service_type_support_t *, const char *,
-      const rmw_qos_profile_t *),
-    ARG_VALUES(node, type_support, service_name, qos_policies));
-}
-
-void * symbol_rmw_destroy_client = nullptr;
-
-rmw_ret_t
-rmw_destroy_client(rmw_node_t * node, rmw_client_t * client)
-{
-  CALL_SYMBOL(
-    rmw_destroy_client, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_node_t *, rmw_client_t *),
-    ARG_VALUES(node, client));
-}
-
-void * symbol_rmw_send_request = nullptr;
-
-rmw_ret_t
-rmw_send_request(
-  const rmw_client_t * client,
-  const void * ros_request,
-  int64_t * sequence_id)
-{
-  CALL_SYMBOL(
-    rmw_send_request, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_client_t *, const void *, int64_t *),
-    ARG_VALUES(client, ros_request, sequence_id));
-}
-
-void * symbol_rmw_take_response = nullptr;
-
-rmw_ret_t
-rmw_take_response(
-  const rmw_client_t * client,
-  rmw_request_id_t * request_header,
-  void * ros_response,
-  bool * taken)
-{
-  CALL_SYMBOL(
-    rmw_take_response, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_client_t *, rmw_request_id_t *, void *, bool *),
-    ARG_VALUES(client, request_header, ros_response, taken));
-}
-
-void * symbol_rmw_create_service = nullptr;
-
-rmw_service_t *
-rmw_create_service(
-  const rmw_node_t * node,
-  const rosidl_service_type_support_t * type_support,
-  const char * service_name,
-  const rmw_qos_profile_t * qos_policies)
-{
-  CALL_SYMBOL(
-    rmw_create_service, rmw_service_t *, nullptr,
-    ARG_TYPES(
-      const rmw_node_t *, const rosidl_service_type_support_t *, const char *,
-      const rmw_qos_profile_t *),
-    ARG_VALUES(node, type_support, service_name, qos_policies));
-}
-
-void * symbol_rmw_destroy_service = nullptr;
-
-rmw_ret_t
-rmw_destroy_service(rmw_node_t * node, rmw_service_t * service)
-{
-  CALL_SYMBOL(
-    rmw_destroy_service, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_node_t *, rmw_service_t *),
-    ARG_VALUES(node, service));
-}
-
-void * symbol_rmw_take_request = nullptr;
-
-rmw_ret_t
-rmw_take_request(
-  const rmw_service_t * service,
-  rmw_request_id_t * request_header,
-  void * ros_request,
-  bool * taken)
-{
-  CALL_SYMBOL(
-    rmw_take_request, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *, bool *),
-    ARG_VALUES(service, request_header, ros_request, taken));
-}
-
-void * symbol_rmw_send_response = nullptr;
-
-rmw_ret_t
-rmw_send_response(
-  const rmw_service_t * service,
-  rmw_request_id_t * request_header,
-  void * ros_response)
-{
-  CALL_SYMBOL(
-    rmw_send_response, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *),
-    ARG_VALUES(service, request_header, ros_response));
-}
-
-void * symbol_rmw_create_guard_condition = nullptr;
-
-rmw_guard_condition_t *
-rmw_create_guard_condition(void)
-{
-  CALL_SYMBOL(
-    rmw_create_guard_condition, rmw_guard_condition_t *, nullptr,
-    ARG_TYPES(void), ARG_VALUES());
-}
-
-void * symbol_rmw_destroy_guard_condition = nullptr;
-
-rmw_ret_t
-rmw_destroy_guard_condition(rmw_guard_condition_t * guard_condition)
-{
-  CALL_SYMBOL(
-    rmw_destroy_guard_condition, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_guard_condition_t *),
-    ARG_VALUES(guard_condition));
-}
-
-void * symbol_rmw_trigger_guard_condition = nullptr;
-
-rmw_ret_t
-rmw_trigger_guard_condition(const rmw_guard_condition_t * guard_condition)
-{
-  CALL_SYMBOL(
-    rmw_trigger_guard_condition, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_guard_condition_t *),
-    ARG_VALUES(guard_condition));
-}
-
-void * symbol_rmw_create_waitset = nullptr;
-
-rmw_waitset_t *
-rmw_create_waitset(size_t max_conditions)
-{
-  CALL_SYMBOL(
-    rmw_create_waitset, rmw_waitset_t *, nullptr,
-    ARG_TYPES(size_t),
-    ARG_VALUES(max_conditions));
-}
-
-void * symbol_rmw_destroy_waitset = nullptr;
-
-rmw_ret_t
-rmw_destroy_waitset(rmw_waitset_t * waitset)
-{
-  CALL_SYMBOL(
-    rmw_destroy_waitset, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(rmw_waitset_t *),
-    ARG_VALUES(waitset));
-}
-
-void * symbol_rmw_wait = nullptr;
-
-rmw_ret_t
-rmw_wait(
-  rmw_subscriptions_t * subscriptions,
-  rmw_guard_conditions_t * guard_conditions,
-  rmw_services_t * services,
-  rmw_clients_t * clients,
-  rmw_waitset_t * waitset,
-  const rmw_time_t * wait_timeout)
-{
-  CALL_SYMBOL(
-    rmw_wait, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(
-      rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *,
-      rmw_clients_t *, rmw_waitset_t *, const rmw_time_t *),
-    ARG_VALUES(
-      subscriptions, guard_conditions, services,
-      clients, waitset, wait_timeout));
-}
-
-void * symbol_rmw_get_topic_names_and_types = nullptr;
-
-rmw_ret_t
-rmw_get_topic_names_and_types(
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  bool no_demangle,
-  rmw_names_and_types_t * topic_names_and_types)
-{
-  CALL_SYMBOL(
-    rmw_get_topic_names_and_types, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, bool, rmw_names_and_types_t *),
-    ARG_VALUES(node, allocator, no_demangle, topic_names_and_types));
-}
-
-void * symbol_rmw_get_service_names_and_types = nullptr;
-
-rmw_ret_t
-rmw_get_service_names_and_types(
-  const rmw_node_t * node,
-  rcutils_allocator_t * allocator,
-  rmw_names_and_types_t * service_names_and_types)
-{
-  CALL_SYMBOL(
-    rmw_get_service_names_and_types, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, rcutils_allocator_t *, rmw_names_and_types_t *),
-    ARG_VALUES(node, allocator, service_names_and_types));
-}
-
-void * symbol_rmw_get_node_names = nullptr;
-
-rmw_ret_t
-rmw_get_node_names(
-  const rmw_node_t * node,
-  rcutils_string_array_t * node_names)
-{
-  CALL_SYMBOL(
-    rmw_get_node_names, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *),
-    ARG_VALUES(node, node_names));
-}
-
-void * symbol_rmw_count_publishers = nullptr;
-
-rmw_ret_t
-rmw_count_publishers(
-  const rmw_node_t * node,
-  const char * topic_name,
-  size_t * count)
-{
-  CALL_SYMBOL(
-    rmw_count_publishers, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, const char *, size_t *),
-    ARG_VALUES(node, topic_name, count));
-}
-
-void * symbol_rmw_count_subscribers = nullptr;
-
-rmw_ret_t
-rmw_count_subscribers(
-  const rmw_node_t * node,
-  const char * topic_name,
-  size_t * count)
-{
-  CALL_SYMBOL(
-    rmw_count_subscribers, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, const char *, size_t *),
-    ARG_VALUES(node, topic_name, count));
-}
-
-void * symbol_rmw_get_gid_for_publisher = nullptr;
-
-rmw_ret_t
-rmw_get_gid_for_publisher(const rmw_publisher_t * publisher, rmw_gid_t * gid)
-{
-  CALL_SYMBOL(
-    rmw_get_gid_for_publisher, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(
-      const rmw_publisher_t *, rmw_gid_t *),
-    ARG_VALUES(publisher, gid));
-}
-
-void * symbol_rmw_compare_gids_equal = nullptr;
-
-rmw_ret_t
-rmw_compare_gids_equal(const rmw_gid_t * gid1, const rmw_gid_t * gid2, bool * result)
-{
-  CALL_SYMBOL(
-    rmw_compare_gids_equal, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_gid_t *, const rmw_gid_t *, bool *),
-    ARG_VALUES(gid1, gid2, result));
-}
-
-void * symbol_rmw_service_server_is_available = nullptr;
-
-rmw_ret_t
-rmw_service_server_is_available(
-  const rmw_node_t * node,
-  const rmw_client_t * client,
-  bool * is_available)
-{
-  CALL_SYMBOL(
-    rmw_service_server_is_available, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(const rmw_node_t *, const rmw_client_t *, bool *),
-    ARG_VALUES(node, client, is_available));
-}
-
-void * symbol_rmw_init = nullptr;
-
-rmw_ret_t
-rmw_init(void)
+#define FOO_INIT do {} while (0)
+
+#define RMW_INTERFACE_FN_INIT(name, ReturnType, error_value, init_fn, _NR, ...) \
+  void * symbol_ ## name = nullptr; \
+  ReturnType name(EXPAND(ARGS ## _NR(__VA_ARGS__))) \
+  { \
+    init_fn; \
+    CALL_SYMBOL(name, ReturnType, error_value, ARG_TYPES(__VA_ARGS__), \
+      EXPAND(ARG_VALS ## _NR(__VA_ARGS__))); \
+  }
+
+#define RMW_INTERFACE_FN(name, ReturnType, error_value, _NR, ...) \
+  RMW_INTERFACE_FN_INIT(name, ReturnType, error_value, FOO_INIT, _NR, __VA_ARGS__)
+
+RMW_INTERFACE_FN(rmw_get_implementation_identifier,
+  const char *, nullptr,
+  0, ARG_TYPES(void))
+
+RMW_INTERFACE_FN(rmw_create_node,
+  rmw_node_t *, nullptr,
+  4, ARG_TYPES(
+    const char *, const char *, size_t,
+    const rmw_node_security_options_t *))
+
+RMW_INTERFACE_FN(rmw_destroy_node,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_node_t *))
+
+RMW_INTERFACE_FN(rmw_node_get_graph_guard_condition,
+  const rmw_guard_condition_t *, nullptr,
+  1, ARG_TYPES(const rmw_node_t *))
+
+RMW_INTERFACE_FN(rmw_create_publisher,
+  rmw_publisher_t *, nullptr,
+  4, ARG_TYPES(
+    const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
+    const rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(rmw_destroy_publisher,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(rmw_node_t *, rmw_publisher_t *))
+
+RMW_INTERFACE_FN(rmw_publish,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, const void *))
+
+RMW_INTERFACE_FN(rmw_create_subscription,
+  rmw_subscription_t *, nullptr,
+  5, ARG_TYPES(
+    const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
+    const rmw_qos_profile_t *, bool))
+
+RMW_INTERFACE_FN(rmw_destroy_subscription,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(rmw_node_t *, rmw_subscription_t *))
+
+RMW_INTERFACE_FN(rmw_take,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_subscription_t *, void *, bool *))
+
+RMW_INTERFACE_FN(rmw_take_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *))
+
+RMW_INTERFACE_FN(rmw_create_client,
+  rmw_client_t *, nullptr,
+  4, ARG_TYPES(
+    const rmw_node_t *, const rosidl_service_type_support_t *, const char *,
+    const rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(rmw_destroy_client,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(rmw_node_t *, rmw_client_t *))
+
+RMW_INTERFACE_FN(rmw_send_request,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_client_t *, const void *, int64_t *))
+
+RMW_INTERFACE_FN(rmw_take_response,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(const rmw_client_t *, rmw_request_id_t *, void *, bool *))
+
+RMW_INTERFACE_FN(rmw_create_service,
+  rmw_service_t *, nullptr,
+  4, ARG_TYPES(
+    const rmw_node_t *, const rosidl_service_type_support_t *, const char *,
+    const rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(rmw_destroy_service,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(rmw_node_t *, rmw_service_t *))
+
+RMW_INTERFACE_FN(rmw_take_request,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *, bool *))
+
+RMW_INTERFACE_FN(rmw_send_response,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *))
+
+RMW_INTERFACE_FN(rmw_create_guard_condition,
+  rmw_guard_condition_t *, nullptr,
+  0, ARG_TYPES(void))
+
+RMW_INTERFACE_FN(rmw_destroy_guard_condition,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_guard_condition_t *))
+
+RMW_INTERFACE_FN(rmw_trigger_guard_condition,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(const rmw_guard_condition_t *))
+
+RMW_INTERFACE_FN(rmw_create_waitset,
+  rmw_waitset_t *, nullptr,
+  1, ARG_TYPES(size_t))
+
+RMW_INTERFACE_FN(rmw_destroy_waitset,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_waitset_t *))
+
+RMW_INTERFACE_FN(rmw_wait,
+  rmw_ret_t, RMW_RET_ERROR,
+  6, ARG_TYPES(
+    rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *,
+    rmw_clients_t *, rmw_waitset_t *, const rmw_time_t *))
+
+RMW_INTERFACE_FN(rmw_get_topic_names_and_types,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_node_t *, rcutils_allocator_t *, bool,
+    rmw_names_and_types_t *))
+
+RMW_INTERFACE_FN(rmw_get_service_names_and_types,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rmw_node_t *, rcutils_allocator_t *,
+    rmw_names_and_types_t *))
+
+RMW_INTERFACE_FN(rmw_get_node_names,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *))
+
+RMW_INTERFACE_FN(rmw_count_publishers,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_node_t *, const char *, size_t *))
+
+RMW_INTERFACE_FN(rmw_count_subscribers,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_node_t *, const char *, size_t *))
+
+RMW_INTERFACE_FN(rmw_get_gid_for_publisher,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, rmw_gid_t *))
+
+RMW_INTERFACE_FN(rmw_compare_gids_equal,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_gid_t *, const rmw_gid_t *, bool *))
+
+RMW_INTERFACE_FN(rmw_service_server_is_available,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_node_t *, const rmw_client_t *, bool *))
+
+#define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x)
+void pre_fetch_symbol(void)
 {
   // get all symbols to avoid race conditions later since the passed
   // symbol name is expected to be a std::string which requires allocation
-  symbol_rmw_get_implementation_identifier = get_symbol(
-    "rmw_get_implementation_identifier");
-  symbol_rmw_create_node = get_symbol("rmw_create_node");
-  symbol_rmw_destroy_node = get_symbol("rmw_destroy_node");
-  symbol_rmw_node_get_graph_guard_condition = get_symbol(
-    "rmw_node_get_graph_guard_condition");
-  symbol_rmw_create_publisher = get_symbol("rmw_create_publisher");
-  symbol_rmw_destroy_publisher = get_symbol("rmw_destroy_publisher");
-  symbol_rmw_publish = get_symbol("rmw_publish");
-  symbol_rmw_create_subscription = get_symbol("rmw_create_subscription");
-  symbol_rmw_destroy_subscription = get_symbol("rmw_destroy_subscription");
-  symbol_rmw_take = get_symbol("rmw_take");
-  symbol_rmw_take_with_info = get_symbol("rmw_take_with_info");
-  symbol_rmw_create_client = get_symbol("rmw_create_client");
-  symbol_rmw_destroy_client = get_symbol("rmw_destroy_client");
-  symbol_rmw_send_request = get_symbol("rmw_send_request");
-  symbol_rmw_take_response = get_symbol("rmw_take_response");
-  symbol_rmw_create_service = get_symbol("rmw_create_service");
-  symbol_rmw_destroy_service = get_symbol("rmw_destroy_service");
-  symbol_rmw_take_request = get_symbol("rmw_take_request");
-  symbol_rmw_send_response = get_symbol("rmw_send_response");
-  symbol_rmw_create_guard_condition = get_symbol("rmw_create_guard_condition");
-  symbol_rmw_destroy_guard_condition = get_symbol(
-    "rmw_destroy_guard_condition");
-  symbol_rmw_trigger_guard_condition = get_symbol(
-    "rmw_trigger_guard_condition");
-  symbol_rmw_create_waitset = get_symbol("rmw_create_waitset");
-  symbol_rmw_destroy_waitset = get_symbol("rmw_destroy_waitset");
-  symbol_rmw_wait = get_symbol("rmw_wait");
-  symbol_rmw_get_topic_names_and_types = get_symbol(
-    "rmw_get_topic_names_and_types");
-  symbol_rmw_get_service_names_and_types = get_symbol(
-    "rmw_get_service_names_and_types");
-  symbol_rmw_get_node_names = get_symbol("rmw_get_node_names");
-  symbol_rmw_count_publishers = get_symbol("rmw_count_publishers");
-  symbol_rmw_count_subscribers = get_symbol("rmw_count_subscribers");
-  symbol_rmw_get_gid_for_publisher = get_symbol("rmw_get_gid_for_publisher");
-  symbol_rmw_compare_gids_equal = get_symbol("rmw_compare_gids_equal");
-  symbol_rmw_service_server_is_available = get_symbol(
-    "rmw_service_server_is_available");
-
-  CALL_SYMBOL(
-    rmw_init, rmw_ret_t, RMW_RET_ERROR,
-    ARG_TYPES(void), ARG_VALUES());
+  GET_SYMBOL(rmw_get_implementation_identifier);
+  GET_SYMBOL(rmw_create_node);
+  GET_SYMBOL(rmw_destroy_node);
+  GET_SYMBOL(rmw_node_get_graph_guard_condition);
+  GET_SYMBOL(rmw_create_publisher);
+  GET_SYMBOL(rmw_destroy_publisher);
+  GET_SYMBOL(rmw_publish);
+  GET_SYMBOL(rmw_create_subscription);
+  GET_SYMBOL(rmw_destroy_subscription);
+  GET_SYMBOL(rmw_take);
+  GET_SYMBOL(rmw_take_with_info);
+  GET_SYMBOL(rmw_create_client);
+  GET_SYMBOL(rmw_destroy_client);
+  GET_SYMBOL(rmw_send_request);
+  GET_SYMBOL(rmw_take_response);
+  GET_SYMBOL(rmw_create_service);
+  GET_SYMBOL(rmw_destroy_service);
+  GET_SYMBOL(rmw_take_request);
+  GET_SYMBOL(rmw_send_response);
+  GET_SYMBOL(rmw_create_guard_condition);
+  GET_SYMBOL(rmw_destroy_guard_condition);
+  GET_SYMBOL(rmw_trigger_guard_condition);
+  GET_SYMBOL(rmw_create_waitset);
+  GET_SYMBOL(rmw_destroy_waitset);
+  GET_SYMBOL(rmw_wait);
+  GET_SYMBOL(rmw_get_topic_names_and_types);
+  GET_SYMBOL(rmw_get_service_names_and_types);
+  GET_SYMBOL(rmw_get_node_names);
+  GET_SYMBOL(rmw_count_publishers);
+  GET_SYMBOL(rmw_count_subscribers);
+  GET_SYMBOL(rmw_get_gid_for_publisher);
+  GET_SYMBOL(rmw_compare_gids_equal);
+  GET_SYMBOL(rmw_service_server_is_available);
 }
+
+RMW_INTERFACE_FN_INIT(rmw_init,
+  rmw_ret_t, RMW_RET_ERROR, pre_fetch_symbol(),
+  0, ARG_TYPES(void))
 
 #if __cplusplus
 }
