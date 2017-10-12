@@ -166,23 +166,24 @@ extern "C"
 {
 #endif
 
+#define EXPAND(x) x
 #define ARG_TYPES(...) __VA_ARGS__
 
 #define ARG_VALS0(...)
 #define ARG_VALS1(t1) v1
-#define ARG_VALS2(t2, ...) v2, ARG_VALS1(__VA_ARGS__)
-#define ARG_VALS3(t3, ...) v3, ARG_VALS2(__VA_ARGS__)
-#define ARG_VALS4(t4, ...) v4, ARG_VALS3(__VA_ARGS__)
-#define ARG_VALS5(t5, ...) v5, ARG_VALS4(__VA_ARGS__)
-#define ARG_VALS6(t6, ...) v6, ARG_VALS5(__VA_ARGS__)
+#define ARG_VALS2(t2, ...) v2, EXPAND(ARG_VALS1(__VA_ARGS__))
+#define ARG_VALS3(t3, ...) v3, EXPAND(ARG_VALS2(__VA_ARGS__))
+#define ARG_VALS4(t4, ...) v4, EXPAND(ARG_VALS3(__VA_ARGS__))
+#define ARG_VALS5(t5, ...) v5, EXPAND(ARG_VALS4(__VA_ARGS__))
+#define ARG_VALS6(t6, ...) v6, EXPAND(ARG_VALS5(__VA_ARGS__))
 
 #define ARGS0(...) __VA_ARGS__
 #define ARGS1(t1) t1 v1
-#define ARGS2(t2, ...) t2 v2, ARGS1(__VA_ARGS__)
-#define ARGS3(t3, ...) t3 v3, ARGS2(__VA_ARGS__)
-#define ARGS4(t4, ...) t4 v4, ARGS3(__VA_ARGS__)
-#define ARGS5(t5, ...) t5 v5, ARGS4(__VA_ARGS__)
-#define ARGS6(t6, ...) t6 v6, ARGS5(__VA_ARGS__)
+#define ARGS2(t2, ...) t2 v2, EXPAND(ARGS1(__VA_ARGS__))
+#define ARGS3(t3, ...) t3 v3, EXPAND(ARGS2(__VA_ARGS__))
+#define ARGS4(t4, ...) t4 v4, EXPAND(ARGS3(__VA_ARGS__))
+#define ARGS5(t5, ...) t5 v5, EXPAND(ARGS4(__VA_ARGS__))
+#define ARGS6(t6, ...) t6 v6, EXPAND(ARGS5(__VA_ARGS__))
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
   if (!symbol_ ## symbol_name) { \
@@ -201,11 +202,11 @@ extern "C"
 
 #define RMW_INTERFACE_FN_INIT(name, ReturnType, error_value, init_fn, _NR, ...) \
   void * symbol_ ## name = nullptr; \
-  ReturnType name(ARGS ## _NR(__VA_ARGS__)) \
+  ReturnType name(EXPAND(ARGS ## _NR(__VA_ARGS__))) \
   { \
     init_fn; \
     CALL_SYMBOL(name, ReturnType, error_value, ARG_TYPES(__VA_ARGS__), \
-      ARG_VALS ## _NR(__VA_ARGS__)); \
+      EXPAND(ARG_VALS ## _NR(__VA_ARGS__))); \
   }
 
 #define RMW_INTERFACE_FN(name, ReturnType, error_value, _NR, ...) \
