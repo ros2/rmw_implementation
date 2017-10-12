@@ -168,21 +168,21 @@ extern "C"
 
 #define ARG_TYPES(...) __VA_ARGS__
 
-#define ARG_VALS0(...)
-#define ARG_VALS1(t1) v1
-#define ARG_VALS2(t2, ...) v2, ARG_VALS1(__VA_ARGS__)
-#define ARG_VALS3(t3, ...) v3, ARG_VALS2(__VA_ARGS__)
-#define ARG_VALS4(t4, ...) v4, ARG_VALS3(__VA_ARGS__)
-#define ARG_VALS5(t5, ...) v5, ARG_VALS4(__VA_ARGS__)
-#define ARG_VALS6(t6, ...) v6, ARG_VALS5(__VA_ARGS__)
+#define ARG_VALUES_0(...)
+#define ARG_VALUES_1(t1) v1
+#define ARG_VALUES_2(t2, ...) v2, ARG_VALUES_1(__VA_ARGS__)
+#define ARG_VALUES_3(t3, ...) v3, ARG_VALUES_2(__VA_ARGS__)
+#define ARG_VALUES_4(t4, ...) v4, ARG_VALUES_3(__VA_ARGS__)
+#define ARG_VALUES_5(t5, ...) v5, ARG_VALUES_4(__VA_ARGS__)
+#define ARG_VALUES_6(t6, ...) v6, ARG_VALUES_5(__VA_ARGS__)
 
-#define ARGS0(...) __VA_ARGS__
-#define ARGS1(t1) t1 v1
-#define ARGS2(t2, ...) t2 v2, ARGS1(__VA_ARGS__)
-#define ARGS3(t3, ...) t3 v3, ARGS2(__VA_ARGS__)
-#define ARGS4(t4, ...) t4 v4, ARGS3(__VA_ARGS__)
-#define ARGS5(t5, ...) t5 v5, ARGS4(__VA_ARGS__)
-#define ARGS6(t6, ...) t6 v6, ARGS5(__VA_ARGS__)
+#define ARGS_0(...) __VA_ARGS__
+#define ARGS_1(t1) t1 v1
+#define ARGS_2(t2, ...) t2 v2, ARGS_1(__VA_ARGS__)
+#define ARGS_3(t3, ...) t3 v3, ARGS_2(__VA_ARGS__)
+#define ARGS_4(t4, ...) t4 v4, ARGS_3(__VA_ARGS__)
+#define ARGS_5(t5, ...) t5 v5, ARGS_4(__VA_ARGS__)
+#define ARGS_6(t6, ...) t6 v6, ARGS_5(__VA_ARGS__)
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
   if (!symbol_ ## symbol_name) { \
@@ -197,19 +197,13 @@ extern "C"
   FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_ ## symbol_name); \
   return func(arg_values);
 
-#define FOO_INIT do {} while (0)
-
-#define RMW_INTERFACE_FN_INIT(name, ReturnType, error_value, init_fn, _NR, ...) \
-  void * symbol_ ## name = nullptr; \
-  ReturnType name(ARGS ## _NR(__VA_ARGS__)) \
-  { \
-    init_fn; \
-    CALL_SYMBOL(name, ReturnType, error_value, ARG_TYPES(__VA_ARGS__), \
-      ARG_VALS ## _NR(__VA_ARGS__)); \
-  }
-
 #define RMW_INTERFACE_FN(name, ReturnType, error_value, _NR, ...) \
-  RMW_INTERFACE_FN_INIT(name, ReturnType, error_value, FOO_INIT, _NR, __VA_ARGS__)
+  void * symbol_ ## name = nullptr; \
+  ReturnType name(ARGS_ ## _NR(__VA_ARGS__)) \
+  { \
+    CALL_SYMBOL(name, ReturnType, error_value, ARG_TYPES(__VA_ARGS__), \
+      ARG_VALUES_ ## _NR(__VA_ARGS__)); \
+  }
 
 RMW_INTERFACE_FN(rmw_get_implementation_identifier,
   const char *, nullptr,
@@ -218,8 +212,7 @@ RMW_INTERFACE_FN(rmw_get_implementation_identifier,
 RMW_INTERFACE_FN(rmw_create_node,
   rmw_node_t *, nullptr,
   4, ARG_TYPES(
-    const char *, const char *, size_t,
-    const rmw_node_security_options_t *))
+    const char *, const char *, size_t, const rmw_node_security_options_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_node,
   rmw_ret_t, RMW_RET_ERROR,
@@ -359,49 +352,55 @@ RMW_INTERFACE_FN(rmw_service_server_is_available,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_node_t *, const rmw_client_t *, bool *))
 
-#define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x)
-void pre_fetch_symbol(void)
+#define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
+
+void prefetch_symbols(void)
 {
   // get all symbols to avoid race conditions later since the passed
   // symbol name is expected to be a std::string which requires allocation
-  GET_SYMBOL(rmw_get_implementation_identifier);
-  GET_SYMBOL(rmw_create_node);
-  GET_SYMBOL(rmw_destroy_node);
-  GET_SYMBOL(rmw_node_get_graph_guard_condition);
-  GET_SYMBOL(rmw_create_publisher);
-  GET_SYMBOL(rmw_destroy_publisher);
-  GET_SYMBOL(rmw_publish);
-  GET_SYMBOL(rmw_create_subscription);
-  GET_SYMBOL(rmw_destroy_subscription);
-  GET_SYMBOL(rmw_take);
-  GET_SYMBOL(rmw_take_with_info);
-  GET_SYMBOL(rmw_create_client);
-  GET_SYMBOL(rmw_destroy_client);
-  GET_SYMBOL(rmw_send_request);
-  GET_SYMBOL(rmw_take_response);
-  GET_SYMBOL(rmw_create_service);
-  GET_SYMBOL(rmw_destroy_service);
-  GET_SYMBOL(rmw_take_request);
-  GET_SYMBOL(rmw_send_response);
-  GET_SYMBOL(rmw_create_guard_condition);
-  GET_SYMBOL(rmw_destroy_guard_condition);
-  GET_SYMBOL(rmw_trigger_guard_condition);
-  GET_SYMBOL(rmw_create_waitset);
-  GET_SYMBOL(rmw_destroy_waitset);
-  GET_SYMBOL(rmw_wait);
-  GET_SYMBOL(rmw_get_topic_names_and_types);
-  GET_SYMBOL(rmw_get_service_names_and_types);
-  GET_SYMBOL(rmw_get_node_names);
-  GET_SYMBOL(rmw_count_publishers);
-  GET_SYMBOL(rmw_count_subscribers);
-  GET_SYMBOL(rmw_get_gid_for_publisher);
-  GET_SYMBOL(rmw_compare_gids_equal);
-  GET_SYMBOL(rmw_service_server_is_available);
+  GET_SYMBOL(rmw_get_implementation_identifier)
+  GET_SYMBOL(rmw_create_node)
+  GET_SYMBOL(rmw_destroy_node)
+  GET_SYMBOL(rmw_node_get_graph_guard_condition)
+  GET_SYMBOL(rmw_create_publisher)
+  GET_SYMBOL(rmw_destroy_publisher)
+  GET_SYMBOL(rmw_publish)
+  GET_SYMBOL(rmw_create_subscription)
+  GET_SYMBOL(rmw_destroy_subscription)
+  GET_SYMBOL(rmw_take)
+  GET_SYMBOL(rmw_take_with_info)
+  GET_SYMBOL(rmw_create_client)
+  GET_SYMBOL(rmw_destroy_client)
+  GET_SYMBOL(rmw_send_request)
+  GET_SYMBOL(rmw_take_response)
+  GET_SYMBOL(rmw_create_service)
+  GET_SYMBOL(rmw_destroy_service)
+  GET_SYMBOL(rmw_take_request)
+  GET_SYMBOL(rmw_send_response)
+  GET_SYMBOL(rmw_create_guard_condition)
+  GET_SYMBOL(rmw_destroy_guard_condition)
+  GET_SYMBOL(rmw_trigger_guard_condition)
+  GET_SYMBOL(rmw_create_waitset)
+  GET_SYMBOL(rmw_destroy_waitset)
+  GET_SYMBOL(rmw_wait)
+  GET_SYMBOL(rmw_get_topic_names_and_types)
+  GET_SYMBOL(rmw_get_service_names_and_types)
+  GET_SYMBOL(rmw_get_node_names)
+  GET_SYMBOL(rmw_count_publishers)
+  GET_SYMBOL(rmw_count_subscribers)
+  GET_SYMBOL(rmw_get_gid_for_publisher)
+  GET_SYMBOL(rmw_compare_gids_equal)
+  GET_SYMBOL(rmw_service_server_is_available)
 }
 
-RMW_INTERFACE_FN_INIT(rmw_init,
-  rmw_ret_t, RMW_RET_ERROR, pre_fetch_symbol(),
-  0, ARG_TYPES(void))
+void * symbol_rmw_init = nullptr;
+
+rmw_ret_t rmw_init()
+{
+  prefetch_symbols();
+  CALL_SYMBOL(
+    rmw_init, rmw_ret_t, RMW_RET_ERROR, ARG_TYPES(void), ARG_VALUES_0())
+}
 
 #if __cplusplus
 }
