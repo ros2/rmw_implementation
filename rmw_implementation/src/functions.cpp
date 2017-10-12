@@ -197,12 +197,14 @@ extern "C"
   FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_ ## symbol_name); \
   return func(arg_values);
 
+#define EXPAND(x) x
+
 #define RMW_INTERFACE_FN(name, ReturnType, error_value, _NR, ...) \
   void * symbol_ ## name = nullptr; \
-  ReturnType name(ARGS_ ## _NR(__VA_ARGS__)) \
+  ReturnType name(EXPAND(ARGS_ ## _NR(__VA_ARGS__))) \
   { \
     CALL_SYMBOL(name, ReturnType, error_value, ARG_TYPES(__VA_ARGS__), \
-      ARG_VALUES_ ## _NR(__VA_ARGS__)); \
+      EXPAND(ARG_VALUES_ ## _NR(__VA_ARGS__))); \
   }
 
 RMW_INTERFACE_FN(rmw_get_implementation_identifier,
