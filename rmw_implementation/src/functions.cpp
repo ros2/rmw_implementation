@@ -172,19 +172,19 @@ extern "C"
 
 #define ARG_VALUES_0(...)
 #define ARG_VALUES_1(t1) v1
-#define ARG_VALUES_2(t2, ...) v2, EXPAND(ARG_VALUES_1(__VA_ARGS__))
-#define ARG_VALUES_3(t3, ...) v3, EXPAND(ARG_VALUES_2(__VA_ARGS__))
-#define ARG_VALUES_4(t4, ...) v4, EXPAND(ARG_VALUES_3(__VA_ARGS__))
-#define ARG_VALUES_5(t5, ...) v5, EXPAND(ARG_VALUES_4(__VA_ARGS__))
-#define ARG_VALUES_6(t6, ...) v6, EXPAND(ARG_VALUES_5(__VA_ARGS__))
+#define ARG_VALUES_2(t2, ...) v2, EXPAND((ARG_VALUES_1(__VA_ARGS__)))
+#define ARG_VALUES_3(t3, ...) v3, EXPAND((ARG_VALUES_2(__VA_ARGS__)))
+#define ARG_VALUES_4(t4, ...) v4, EXPAND((ARG_VALUES_3(__VA_ARGS__)))
+#define ARG_VALUES_5(t5, ...) v5, EXPAND((ARG_VALUES_4(__VA_ARGS__)))
+#define ARG_VALUES_6(t6, ...) v6, EXPAND((ARG_VALUES_5(__VA_ARGS__)))
 
 #define ARGS_0(...) __VA_ARGS__
 #define ARGS_1(t1) t1 v1
-#define ARGS_2(t2, ...) t2 v2, EXPAND(ARGS_1(__VA_ARGS__))
-#define ARGS_3(t3, ...) t3 v3, EXPAND(ARGS_2(__VA_ARGS__))
-#define ARGS_4(t4, ...) t4 v4, EXPAND(ARGS_3(__VA_ARGS__))
-#define ARGS_5(t5, ...) t5 v5, EXPAND(ARGS_4(__VA_ARGS__))
-#define ARGS_6(t6, ...) t6 v6, EXPAND(ARGS_5(__VA_ARGS__))
+#define ARGS_2(t2, ...) t2 v2, EXPAND((ARGS_1(__VA_ARGS__)))
+#define ARGS_3(t3, ...) t3 v3, EXPAND((ARGS_2(__VA_ARGS__)))
+#define ARGS_4(t4, ...) t4 v4, EXPAND((ARGS_3(__VA_ARGS__)))
+#define ARGS_5(t5, ...) t5 v5, EXPAND((ARGS_4(__VA_ARGS__)))
+#define ARGS_6(t6, ...) t6 v6, EXPAND((ARGS_5(__VA_ARGS__)))
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
   if (!symbol_ ## symbol_name) { \
@@ -201,10 +201,10 @@ extern "C"
 
 #define RMW_INTERFACE_FN(name, ReturnType, error_value, _NR, ...) \
   void * symbol_ ## name = nullptr; \
-  ReturnType name(EXPAND(ARGS_ ## _NR(__VA_ARGS__))) \
+  ReturnType name(EXPAND((ARGS_ ## _NR(__VA_ARGS__)))) \
   { \
     CALL_SYMBOL(name, ReturnType, error_value, ARG_TYPES(__VA_ARGS__), \
-      EXPAND(ARG_VALUES_ ## _NR(__VA_ARGS__))); \
+      EXPAND((ARG_VALUES_ ## _NR(__VA_ARGS__)))); \
   }
 
 RMW_INTERFACE_FN(rmw_get_implementation_identifier,
