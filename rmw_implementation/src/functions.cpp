@@ -398,7 +398,8 @@ void prefetch_symbols(void)
 
 void * symbol_rmw_init = nullptr;
 
-rmw_ret_t rmw_init()
+rmw_ret_t
+rmw_init(void)
 {
   prefetch_symbols();
   CALL_SYMBOL(
