@@ -357,7 +357,7 @@ RMW_INTERFACE_FN(rmw_service_server_is_available,
 
 RMW_INTERFACE_FN(rmw_set_log_severity,
   rmw_ret_t, RMW_RET_ERROR,
-  1, ARG_TYPES(const rmw_log_severity_t *))
+  1, ARG_TYPES(rmw_log_severity_t))
 
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
