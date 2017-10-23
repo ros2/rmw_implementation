@@ -246,6 +246,10 @@ RMW_INTERFACE_FN(rmw_publish,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_publisher_t *, const void *))
 
+RMW_INTERFACE_FN(rmw_publish_raw,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, const rmw_message_raw_t *))
+
 RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
   5, ARG_TYPES(
@@ -379,6 +383,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_publish)
+  GET_SYMBOL(rmw_publish_raw)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_take)
