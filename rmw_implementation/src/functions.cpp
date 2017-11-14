@@ -268,6 +268,14 @@ RMW_INTERFACE_FN(rmw_take_with_info,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *))
 
+RMW_INTERFACE_FN(rmw_take_raw,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_subscription_t *, rmw_message_raw_t *, bool *))
+
+RMW_INTERFACE_FN(rmw_take_raw_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(const rmw_subscription_t *, rmw_message_raw_t *, bool *, rmw_message_info_t *))
+
 RMW_INTERFACE_FN(rmw_create_client,
   rmw_client_t *, nullptr,
   4, ARG_TYPES(
