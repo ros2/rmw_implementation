@@ -20,7 +20,7 @@
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
-  <group_depend>rmw_implementations</group_depend>
+  <group_depend>rmw_implementation_packages</group_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
