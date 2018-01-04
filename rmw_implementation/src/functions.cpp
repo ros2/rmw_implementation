@@ -305,19 +305,19 @@ RMW_INTERFACE_FN(rmw_trigger_guard_condition,
   rmw_ret_t, RMW_RET_ERROR,
   1, ARG_TYPES(const rmw_guard_condition_t *))
 
-RMW_INTERFACE_FN(rmw_create_waitset,
-  rmw_waitset_t *, nullptr,
+RMW_INTERFACE_FN(rmw_create_wait_set,
+  rmw_wait_set_t *, nullptr,
   1, ARG_TYPES(size_t))
 
-RMW_INTERFACE_FN(rmw_destroy_waitset,
+RMW_INTERFACE_FN(rmw_destroy_wait_set,
   rmw_ret_t, RMW_RET_ERROR,
-  1, ARG_TYPES(rmw_waitset_t *))
+  1, ARG_TYPES(rmw_wait_set_t *))
 
 RMW_INTERFACE_FN(rmw_wait,
   rmw_ret_t, RMW_RET_ERROR,
   6, ARG_TYPES(
     rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *,
-    rmw_clients_t *, rmw_waitset_t *, const rmw_time_t *))
+    rmw_clients_t *, rmw_wait_set_t *, const rmw_time_t *))
 
 RMW_INTERFACE_FN(rmw_get_topic_names_and_types,
   rmw_ret_t, RMW_RET_ERROR,
@@ -387,8 +387,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_guard_condition)
   GET_SYMBOL(rmw_destroy_guard_condition)
   GET_SYMBOL(rmw_trigger_guard_condition)
-  GET_SYMBOL(rmw_create_waitset)
-  GET_SYMBOL(rmw_destroy_waitset)
+  GET_SYMBOL(rmw_create_wait_set)
+  GET_SYMBOL(rmw_destroy_wait_set)
   GET_SYMBOL(rmw_wait)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)

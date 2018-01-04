@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>rmw_implementation</name>
-  <version>0.0.3</version>
+  <version>0.4.0</version>
   <description>The decision which ROS middleware implementation should be used for C++.</description>
   <maintainer email="dthomas@osrfoundation.org">Dirk Thomas</maintainer>
   <license>Apache License 2.0</license>
@@ -15,13 +15,12 @@
   <depend>libpoco-dev</depend>
   <depend>poco_vendor</depend>
   <depend>rmw_implementation_cmake</depend>
-  <depend>rmw_connext_cpp</depend>
-  <depend>rmw_connext_dynamic_cpp</depend>
   <depend>rmw_fastrtps_cpp</depend>
-  <depend>rmw_opensplice_cpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+
+  <group_depend>rmw_implementation_packages</group_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
