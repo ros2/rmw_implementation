@@ -124,13 +124,20 @@ get_library()
     }
     std::string library_path = find_library_path(env_var);
     if (library_path.empty()) {
-      RMW_SET_ERROR_MSG("failed to find shared library of rmw implementation");
+      RMW_SET_ERROR_MSG(
+        ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
       return nullptr;
     }
     try {
       lib = new Poco::SharedLibrary(library_path);
+    } catch (Poco::LibraryLoadException & e) {
+      RMW_SET_ERROR_MSG(("failed to load shared library of rmw implementation. Exception: " +
+        e.displayText()).c_str());
+      return nullptr;
     } catch (...) {
       RMW_SET_ERROR_MSG("failed to load shared library of rmw implementation");
+      RMW_SET_ERROR_MSG(
+        ("failed to load shared library of rmw implementation: " + library_path).c_str());
       return nullptr;
     }
   }
