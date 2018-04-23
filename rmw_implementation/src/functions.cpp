@@ -168,7 +168,7 @@ get_symbol(const char * symbol_name)
   return lib->getSymbol(symbol_name);
 }
 
-#if __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -417,6 +417,6 @@ rmw_init(void)
     rmw_init, rmw_ret_t, RMW_RET_ERROR, ARG_TYPES(void), ARG_VALUES_0())
 }
 
-#if __cplusplus
+#ifdef __cplusplus
 }
 #endif
