@@ -250,6 +250,14 @@ RMW_INTERFACE_FN(rmw_publish_raw,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_publisher_t *, const rmw_message_raw_t *))
 
+RMW_INTERFACE_FN(rmw_serialize,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const void *, const rosidl_message_type_support_t *, rmw_message_raw_t *))
+
+RMW_INTERFACE_FN(rmw_deserialize,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_message_raw_t *, const rosidl_message_type_support_t *, void *))
+
 RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
   5, ARG_TYPES(
@@ -392,10 +400,14 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_publish)
   GET_SYMBOL(rmw_publish_raw)
+  GET_SYMBOL(rmw_serialize)
+  GET_SYMBOL(rmw_deserialize)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
+  GET_SYMBOL(rmw_take_raw)
+  GET_SYMBOL(rmw_take_raw_with_info)
   GET_SYMBOL(rmw_create_client)
   GET_SYMBOL(rmw_destroy_client)
   GET_SYMBOL(rmw_send_request)
