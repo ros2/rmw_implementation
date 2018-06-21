@@ -11,11 +11,20 @@
 
   <build_depend>rcutils</build_depend>
   <build_depend>rmw</build_depend>
+  <build_depend>rmw_connext_cpp</build_depend>
+  <build_depend>rmw_fastrtps_cpp</build_depend>
+  <build_depend>rmw_opensplice_cpp</build_depend>
 
   <depend>libpoco-dev</depend>
   <depend>poco_vendor</depend>
   <depend>rmw_implementation_cmake</depend>
-  <depend>rmw_fastrtps_cpp</depend>
+  <!--
+  Rather than a hard-dependency on any one rmw implementation.
+  The debian/control template for this package will be modified to depend on either
+  rmw_fastrtps_cpp or rmw_connext_cpp or rmw_opensplice_cpp with rmw_fastrtps_cpp being
+  the default choice if no other rmw implementation is currently installed.
+  <depend>rmw_fastrtps_cpp</depend> 
+  -->
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
