@@ -11,11 +11,18 @@
 
   <build_depend>rcutils</build_depend>
   <build_depend>rmw</build_depend>
+  <!--
+  Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
+  This ensures that binary packages have support for all of these rmw impl. enabled.
+  -->
+  <build_depend>rmw_connext_cpp</build_depend>
+  <build_depend>rmw_fastrtps_cpp</build_depend>
+  <build_depend>rmw_opensplice_cpp</build_depend>
+  <!-- end of group dependencies added for bloom -->
 
   <depend>libpoco-dev</depend>
   <depend>poco_vendor</depend>
   <depend>rmw_implementation_cmake</depend>
-  <depend>rmw_fastrtps_cpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
