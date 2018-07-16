@@ -219,6 +219,10 @@ RMW_INTERFACE_FN(rmw_get_implementation_identifier,
   const char *, nullptr,
   0, ARG_TYPES(void))
 
+RMW_INTERFACE_FN(rmw_get_encoding_identifier,
+  const char *, nullptr,
+  0, ARG_TYPES(void))
+
 RMW_INTERFACE_FN(rmw_create_node,
   rmw_node_t *, nullptr,
   4, ARG_TYPES(
@@ -394,6 +398,7 @@ void prefetch_symbols(void)
   // get all symbols to avoid race conditions later since the passed
   // symbol name is expected to be a std::string which requires allocation
   GET_SYMBOL(rmw_get_implementation_identifier)
+  GET_SYMBOL(rmw_get_encoding_identifier)
   GET_SYMBOL(rmw_create_node)
   GET_SYMBOL(rmw_destroy_node)
   GET_SYMBOL(rmw_node_get_graph_guard_condition)
