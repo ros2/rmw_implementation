@@ -66,13 +66,15 @@ endif()
 
 if(@RMW_IMPLEMENTATION_SUPPORTS_POCO@)
   set(selected_rmw_implementation "@PROJECT_NAME@")
+  # no need to find_package @PROJECT_NAME@
+  # since this code is already part of a find_package call of that package
 else()
   set(selected_rmw_implementation "${default_rmw_implementation}")
   message(STATUS "Using RMW implementation '${selected_rmw_implementation}' as default")
-endif()
-find_package("${selected_rmw_implementation}" REQUIRED)
+  find_package("${selected_rmw_implementation}" REQUIRED)
 
-# TODO should never need definitions and include dirs?
-list(APPEND rmw_implementation_DEFINITIONS ${${selected_rmw_implementation}_DEFINITIONS})
-list(APPEND rmw_implementation_INCLUDE_DIRS ${${selected_rmw_implementation}_INCLUDE_DIRS})
-list(APPEND rmw_implementation_LIBRARIES ${${selected_rmw_implementation}_LIBRARIES})
+  # TODO should never need definitions and include dirs?
+  list(APPEND rmw_implementation_DEFINITIONS ${${selected_rmw_implementation}_DEFINITIONS})
+  list(APPEND rmw_implementation_INCLUDE_DIRS ${${selected_rmw_implementation}_INCLUDE_DIRS})
+  list(APPEND rmw_implementation_LIBRARIES ${${selected_rmw_implementation}_LIBRARIES})
+endif()
