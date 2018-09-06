@@ -365,7 +365,7 @@ RMW_INTERFACE_FN(rmw_get_service_names_and_types,
 
 RMW_INTERFACE_FN(rmw_get_node_names,
   rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *))
+  3, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *, rcutils_string_array_t *))
 
 RMW_INTERFACE_FN(rmw_count_publishers,
   rmw_ret_t, RMW_RET_ERROR,
