@@ -161,7 +161,7 @@ get_symbol(const char * symbol_name)
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
     } else {
-      RMW_SET_ERROR_MSG("failed to allocate memory for error message")
+      RMW_SET_ERROR_MSG("failed to allocate memory for error message");
     }
     return nullptr;
   }
