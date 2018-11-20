@@ -219,14 +219,30 @@ RMW_INTERFACE_FN(rmw_get_implementation_identifier,
   const char *, nullptr,
   0, ARG_TYPES(void))
 
+RMW_INTERFACE_FN(rmw_init_options_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(rmw_init_options_t *, rcutils_allocator_t))
+
+RMW_INTERFACE_FN(rmw_init_options_copy,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_init_options_t *, rmw_init_options_t *))
+
+RMW_INTERFACE_FN(rmw_init_options_fini,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_init_options_t *))
+
+RMW_INTERFACE_FN(rmw_shutdown,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_context_t *))
+
 RMW_INTERFACE_FN(rmw_get_serialization_format,
   const char *, nullptr,
   0, ARG_TYPES(void))
 
 RMW_INTERFACE_FN(rmw_create_node,
   rmw_node_t *, nullptr,
-  4, ARG_TYPES(
-    const char *, const char *, size_t, const rmw_node_security_options_t *))
+  5, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_node,
   rmw_ret_t, RMW_RET_ERROR,
@@ -335,7 +351,7 @@ RMW_INTERFACE_FN(rmw_send_response,
 
 RMW_INTERFACE_FN(rmw_create_guard_condition,
   rmw_guard_condition_t *, nullptr,
-  0, ARG_TYPES(void))
+  1, ARG_TYPES(rmw_context_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_guard_condition,
   rmw_ret_t, RMW_RET_ERROR,
@@ -406,6 +422,10 @@ void prefetch_symbols(void)
   // get all symbols to avoid race conditions later since the passed
   // symbol name is expected to be a std::string which requires allocation
   GET_SYMBOL(rmw_get_implementation_identifier)
+  GET_SYMBOL(rmw_init_options_init)
+  GET_SYMBOL(rmw_init_options_copy)
+  GET_SYMBOL(rmw_init_options_fini)
+  GET_SYMBOL(rmw_shutdown)
   GET_SYMBOL(rmw_get_serialization_format)
   GET_SYMBOL(rmw_create_node)
   GET_SYMBOL(rmw_destroy_node)
@@ -451,11 +471,19 @@ void prefetch_symbols(void)
 void * symbol_rmw_init = nullptr;
 
 rmw_ret_t
-rmw_init(void)
+rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 {
   prefetch_symbols();
-  CALL_SYMBOL(
-    rmw_init, rmw_ret_t, RMW_RET_ERROR, ARG_TYPES(void), ARG_VALUES_0())
+  if (!symbol_rmw_init) {
+    symbol_rmw_init = get_symbol("rmw_init");
+  }
+  if (!symbol_rmw_init) {
+    return RMW_RET_ERROR;
+  }
+
+  typedef rmw_ret_t (* FunctionSignature)(const rmw_init_options_t *, rmw_context_t *);
+  FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_rmw_init);
+  return func(options, context);
 }
 
 #ifdef __cplusplus
