@@ -258,10 +258,11 @@ RMW_INTERFACE_FN(rmw_node_get_graph_guard_condition,
   1, ARG_TYPES(const rmw_node_t *))
 
 RMW_INTERFACE_FN(rmw_init_publisher_allocation,
-  rmw_ret_t, RMW_RET_ERROR, 3,
-  ARG_TYPES(const rosidl_message_type_support_t *,
-            const rosidl_message_bounds_t *,
-            rmw_publisher_allocation_t *))
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rosidl_message_type_support_t *,
+    const rosidl_message_bounds_t *,
+    rmw_publisher_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_create_publisher,
   rmw_publisher_t *, nullptr,
@@ -291,9 +292,10 @@ RMW_INTERFACE_FN(rmw_publish_serialized_message,
 
 RMW_INTERFACE_FN(rmw_get_serialized_message_size,
   rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(const rosidl_message_bounds_t *,
-               const rosidl_message_type_support_t *,
-               size_t *))
+  3, ARG_TYPES(
+    const rosidl_message_bounds_t *,
+    const rosidl_message_type_support_t *,
+    size_t *))
 
 RMW_INTERFACE_FN(rmw_serialize,
   rmw_ret_t, RMW_RET_ERROR,
@@ -304,10 +306,11 @@ RMW_INTERFACE_FN(rmw_deserialize,
   3, ARG_TYPES(const rmw_serialized_message_t *, const rosidl_message_type_support_t *, void *))
 
 RMW_INTERFACE_FN(rmw_init_subscription_allocation,
-  rmw_ret_t, RMW_RET_ERROR, 3,
-  ARG_TYPES(const rosidl_message_type_support_t *,
-            const rosidl_message_bounds_t *,
-            rmw_subscription_allocation_t *))
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rosidl_message_type_support_t *,
+    const rosidl_message_bounds_t *,
+    rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
