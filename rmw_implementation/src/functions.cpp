@@ -236,6 +236,10 @@ RMW_INTERFACE_FN(rmw_shutdown,
   rmw_ret_t, RMW_RET_ERROR,
   1, ARG_TYPES(rmw_context_t *))
 
+RMW_INTERFACE_FN(rmw_context_fini,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_context_t *))
+
 RMW_INTERFACE_FN(rmw_get_serialization_format,
   const char *, nullptr,
   0, ARG_TYPES(void))
@@ -364,7 +368,7 @@ RMW_INTERFACE_FN(rmw_trigger_guard_condition,
 
 RMW_INTERFACE_FN(rmw_create_wait_set,
   rmw_wait_set_t *, nullptr,
-  1, ARG_TYPES(size_t))
+  2, ARG_TYPES(rmw_context_t *, size_t))
 
 RMW_INTERFACE_FN(rmw_destroy_wait_set,
   rmw_ret_t, RMW_RET_ERROR,
@@ -445,6 +449,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_init_options_copy)
   GET_SYMBOL(rmw_init_options_fini)
   GET_SYMBOL(rmw_shutdown)
+  GET_SYMBOL(rmw_context_fini)
   GET_SYMBOL(rmw_get_serialization_format)
   GET_SYMBOL(rmw_create_node)
   GET_SYMBOL(rmw_destroy_node)
