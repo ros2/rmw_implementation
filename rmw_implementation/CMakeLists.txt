@@ -61,9 +61,6 @@ else()
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
-  if(NOT WIN32)
-    ament_export_libraries(pthread)
-  endif()
 
   install(
     TARGETS ${PROJECT_NAME}

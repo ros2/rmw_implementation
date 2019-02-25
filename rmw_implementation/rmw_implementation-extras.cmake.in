@@ -78,3 +78,6 @@ else()
   list(APPEND rmw_implementation_INCLUDE_DIRS ${${selected_rmw_implementation}_INCLUDE_DIRS})
   list(APPEND rmw_implementation_LIBRARIES ${${selected_rmw_implementation}_LIBRARIES})
 endif()
+
+find_package(Threads REQUIRED)
+list(APPEND rmw_implementation_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
