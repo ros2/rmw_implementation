@@ -185,6 +185,7 @@ extern "C"
 #define ARG_VALUES_4(t4, ...) v4, EXPAND(ARG_VALUES_3(__VA_ARGS__))
 #define ARG_VALUES_5(t5, ...) v5, EXPAND(ARG_VALUES_4(__VA_ARGS__))
 #define ARG_VALUES_6(t6, ...) v6, EXPAND(ARG_VALUES_5(__VA_ARGS__))
+#define ARG_VALUES_7(t7, ...) v7, EXPAND(ARG_VALUES_6(__VA_ARGS__))
 
 #define ARGS_0(...) __VA_ARGS__
 #define ARGS_1(t1) t1 v1
@@ -193,6 +194,7 @@ extern "C"
 #define ARGS_4(t4, ...) t4 v4, EXPAND(ARGS_3(__VA_ARGS__))
 #define ARGS_5(t5, ...) t5 v5, EXPAND(ARGS_4(__VA_ARGS__))
 #define ARGS_6(t6, ...) t6 v6, EXPAND(ARGS_5(__VA_ARGS__))
+#define ARGS_7(t7, ...) t7 v7, EXPAND(ARGS_6(__VA_ARGS__))
 
 #define CALL_SYMBOL(symbol_name, ReturnType, error_value, ArgTypes, arg_values) \
   if (!symbol_ ## symbol_name) { \
@@ -354,6 +356,26 @@ RMW_INTERFACE_FN(rmw_send_response,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *))
 
+RMW_INTERFACE_FN(rmw_create_publisher_event,
+  rmw_event_t *, nullptr,
+  1, ARG_TYPES(const rmw_publisher_t *))
+
+RMW_INTERFACE_FN(rmw_create_subscription_event,
+  rmw_event_t *, nullptr,
+  1, ARG_TYPES(const rmw_subscription_t *))
+
+RMW_INTERFACE_FN(rmw_create_service_event,
+  rmw_event_t *, nullptr,
+  1, ARG_TYPES(const rmw_service_t *))
+
+RMW_INTERFACE_FN(rmw_create_client_event,
+  rmw_event_t *, nullptr,
+  1, ARG_TYPES(const rmw_client_t *))
+
+RMW_INTERFACE_FN(rmw_destroy_event,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_event_t *))
+
 RMW_INTERFACE_FN(rmw_create_guard_condition,
   rmw_guard_condition_t *, nullptr,
   1, ARG_TYPES(rmw_context_t *))
@@ -376,9 +398,9 @@ RMW_INTERFACE_FN(rmw_destroy_wait_set,
 
 RMW_INTERFACE_FN(rmw_wait,
   rmw_ret_t, RMW_RET_ERROR,
-  6, ARG_TYPES(
-    rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *,
-    rmw_clients_t *, rmw_wait_set_t *, const rmw_time_t *))
+  7, ARG_TYPES(
+    rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *, rmw_clients_t *,
+    rmw_events_t *, rmw_wait_set_t *, const rmw_time_t *))
 
 RMW_INTERFACE_FN(rmw_get_publisher_names_and_types_by_node,
   rmw_ret_t, RMW_RET_ERROR,
@@ -476,6 +498,11 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_service)
   GET_SYMBOL(rmw_take_request)
   GET_SYMBOL(rmw_send_response)
+  GET_SYMBOL(rmw_create_publisher_event)
+  GET_SYMBOL(rmw_create_subscription_event)
+  GET_SYMBOL(rmw_create_service_event)
+  GET_SYMBOL(rmw_create_client_event)
+  GET_SYMBOL(rmw_destroy_event)
   GET_SYMBOL(rmw_create_guard_condition)
   GET_SYMBOL(rmw_destroy_guard_condition)
   GET_SYMBOL(rmw_trigger_guard_condition)
