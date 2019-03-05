@@ -376,6 +376,10 @@ RMW_INTERFACE_FN(rmw_destroy_event,
   rmw_ret_t, RMW_RET_ERROR,
   1, ARG_TYPES(rmw_event_t *))
 
+RMW_INTERFACE_FN(rmw_take_event,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_event_t *, void *, bool *))
+
 RMW_INTERFACE_FN(rmw_create_guard_condition,
   rmw_guard_condition_t *, nullptr,
   1, ARG_TYPES(rmw_context_t *))
@@ -503,6 +507,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_service_event)
   GET_SYMBOL(rmw_create_client_event)
   GET_SYMBOL(rmw_destroy_event)
+  GET_SYMBOL(rmw_take_event)
   GET_SYMBOL(rmw_create_guard_condition)
   GET_SYMBOL(rmw_destroy_guard_condition)
   GET_SYMBOL(rmw_trigger_guard_condition)
