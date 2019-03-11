@@ -358,11 +358,11 @@ RMW_INTERFACE_FN(rmw_send_response,
 
 RMW_INTERFACE_FN(rmw_create_publisher_event,
   rmw_event_t *, nullptr,
-  1, ARG_TYPES(const rmw_publisher_t *))
+  2, ARG_TYPES(const rmw_publisher_t *, const rmw_event_type_t))
 
 RMW_INTERFACE_FN(rmw_create_subscription_event,
   rmw_event_t *, nullptr,
-  1, ARG_TYPES(const rmw_subscription_t *))
+  2, ARG_TYPES(const rmw_subscription_t *, const rmw_event_type_t))
 
 RMW_INTERFACE_FN(rmw_create_service_event,
   rmw_event_t *, nullptr,
