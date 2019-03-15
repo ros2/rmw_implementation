@@ -525,6 +525,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_gid_for_publisher)
   GET_SYMBOL(rmw_compare_gids_equal)
   GET_SYMBOL(rmw_service_server_is_available)
+  GET_SYMBOL(rmw_set_log_severity)
 }
 
 void * symbol_rmw_init = nullptr;
