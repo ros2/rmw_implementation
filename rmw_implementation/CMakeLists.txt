@@ -14,6 +14,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
+find_package(rcpputils REQUIRED)
 find_package(rcutils REQUIRED)
 
 find_package(rmw_implementation_cmake REQUIRED)
@@ -61,6 +62,7 @@ else()
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
     "Poco"
+    "rcpputils"
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
