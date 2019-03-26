@@ -39,11 +39,11 @@ message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
 option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
-    "Force use of dynamic loading (via poco), even if there is only one implementation available"
-    OFF)
+  "Force use of dynamic loading (via poco), even if there is only one implementation available"
+  OFF)
 
 # Nominally use dynamic loading if poco is available.
-set(RMW_IMPLEMENTATION_SUPPORTS_POCO Poco_FOUND)
+set(RMW_IMPLEMENTATION_SUPPORTS_POCO ${Poco_FOUND})
 # Determine if we're going to actually support dynamic loading.
 if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
   # Force usage.
@@ -52,12 +52,11 @@ if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
   endif()
   set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
 elseif(NOT RMW_IMPLEMENTATIONS MATCHES ";")
-  message(STATUS "Only a single rmw implementation found; disabling dynamic loading")
   set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
 endif()
 
 if(NOT RMW_IMPLEMENTATION_SUPPORTS_POCO)
-  message(STATUS "Dynamic loading DISABLED; directly referencing '${RMW_IMPLEMENTATION}'")
+  message(STATUS "Dynamic loading disabled; directly referencing '${RMW_IMPLEMENTATION}'")
   message(STATUS "")
 
 else()
