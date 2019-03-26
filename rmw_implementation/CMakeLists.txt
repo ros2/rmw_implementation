@@ -38,17 +38,30 @@ message(STATUS "")
 message(STATUS "Using default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
-# if only a single rmw impl. is available or poco is not available
+set(RMW_IMPLEMENTATION_FORCE_POCO OFF CACHE BOOL
+    "Force using poco for loading shared libraries, even if there is only one \
+     implementation available")
+
+set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
+# if poco is not forced and only a single rmw impl. is available or poco is not available
 # this package will directly reference the default rmw impl.
-if(NOT RMW_IMPLEMENTATIONS MATCHES ";" OR NOT Poco_FOUND)
-  set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
+if(RMW_IMPLEMENTATION_FORCE_POCO OR (RMW_IMPLEMENTATIONS MATCHES ";" AND POCO_FOUND))
+  set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
+endif()
+
+if(NOT RMW_IMPLEMENTATION_SUPPORTS_POCO)
+  message(STATUS "Not using poco for runtime override; directly referencing '${RMW_IMPLEMENTATION}'")
+  message(STATUS "")
 
 else()
-  set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
-  find_package(rmw REQUIRED)
-
   message(STATUS "Support runtime override with any of the available rmw implementations")
   message(STATUS "")
+  if(NOT Poco_FOUND)
+    message(FATAL_ERROR "Configuration desired poco, but it is not found!")
+  endif()
+
+  find_package(rmw REQUIRED)
+
   link_directories(${Poco_LIBRARY_DIR})
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
