@@ -35,20 +35,36 @@ foreach(impl IN LISTS RMW_IMPLEMENTATIONS)
 endforeach()
 
 message(STATUS "")
-message(STATUS "Using default rmw implementation: '${RMW_IMPLEMENTATION}'")
+message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
-# if only a single rmw impl. is available or poco is not available
-# this package will directly reference the default rmw impl.
-if(NOT RMW_IMPLEMENTATIONS MATCHES ";" OR NOT Poco_FOUND)
+option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
+  "Force use of dynamic loading (via poco), even if there is only one implementation available"
+  OFF)
+
+# Nominally use dynamic loading if poco is available.
+set(RMW_IMPLEMENTATION_SUPPORTS_POCO ${Poco_FOUND})
+# Determine if we're going to actually support dynamic loading.
+if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
+  # Force usage.
+  if(NOT Poco_FOUND)
+    message(FATAL_ERROR "Dynamic loading forced, but poco is not found!")
+  endif()
+  set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
+elseif(NOT RMW_IMPLEMENTATIONS MATCHES ";")
   set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
+endif()
+
+if(NOT RMW_IMPLEMENTATION_SUPPORTS_POCO)
+  message(STATUS "Dynamic loading disabled; directly referencing '${RMW_IMPLEMENTATION}'")
+  message(STATUS "")
 
 else()
-  set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
+  message(STATUS "Dynamic loading enabled with any of the available rmw implementations")
+  message(STATUS "")
+
   find_package(rmw REQUIRED)
 
-  message(STATUS "Support runtime override with any of the available rmw implementations")
-  message(STATUS "")
   link_directories(${Poco_LIBRARY_DIR})
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
