@@ -35,30 +35,34 @@ foreach(impl IN LISTS RMW_IMPLEMENTATIONS)
 endforeach()
 
 message(STATUS "")
-message(STATUS "Using default rmw implementation: '${RMW_IMPLEMENTATION}'")
+message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
-set(RMW_IMPLEMENTATION_FORCE_POCO OFF CACHE BOOL
-    "Force using poco for loading shared libraries, even if there is only one \
-     implementation available")
+option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
+    "Force use of dynamic loading (via poco), even if there is only one implementation available"
+    OFF)
 
-set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
-# if poco is not forced and only a single rmw impl. is available or poco is not available
-# this package will directly reference the default rmw impl.
-if(RMW_IMPLEMENTATION_FORCE_POCO OR (RMW_IMPLEMENTATIONS MATCHES ";" AND POCO_FOUND))
+# Nominally use dynamic loading if poco is available.
+set(RMW_IMPLEMENTATION_SUPPORTS_POCO Poco_FOUND)
+# Determine if we're going to actually support dynamic loading.
+if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
+  # Force usage.
+  if(NOT Poco_FOUND)
+    message(FATAL_ERROR "Dynamic loading forced, but poco is not found!")
+  endif()
   set(RMW_IMPLEMENTATION_SUPPORTS_POCO TRUE)
+elseif(NOT RMW_IMPLEMENTATIONS MATCHES ";")
+  message(STATUS "Only a single rmw implementation found; disabling dynamic loading")
+  set(RMW_IMPLEMENTATION_SUPPORTS_POCO FALSE)
 endif()
 
 if(NOT RMW_IMPLEMENTATION_SUPPORTS_POCO)
-  message(STATUS "Not using poco for runtime override; directly referencing '${RMW_IMPLEMENTATION}'")
+  message(STATUS "Dynamic loading DISABLED; directly referencing '${RMW_IMPLEMENTATION}'")
   message(STATUS "")
 
 else()
-  message(STATUS "Support runtime override with any of the available rmw implementations")
+  message(STATUS "Dynamic loading enabled with any of the available rmw implementations")
   message(STATUS "")
-  if(NOT Poco_FOUND)
-    message(FATAL_ERROR "Configuration desired poco, but it is not found!")
-  endif()
 
   find_package(rmw REQUIRED)
 
