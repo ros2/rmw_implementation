@@ -276,7 +276,7 @@ RMW_INTERFACE_FN(rmw_destroy_publisher,
 
 RMW_INTERFACE_FN(rmw_publish,
   rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_publisher_t *, const void *))
+  3, ARG_TYPES(const rmw_publisher_t *, const void *, const rmw_publisher_allocation_t * allocation))
 
 RMW_INTERFACE_FN(rmw_publisher_count_matched_subscriptions,
   rmw_ret_t, RMW_RET_ERROR,
@@ -328,11 +328,11 @@ RMW_INTERFACE_FN(rmw_subscription_count_matched_publishers,
 
 RMW_INTERFACE_FN(rmw_take,
   rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(const rmw_subscription_t *, void *, bool *))
+  4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_take_with_info,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *))
+  5, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *, rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_take_serialized_message,
   rmw_ret_t, RMW_RET_ERROR,
