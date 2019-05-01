@@ -264,6 +264,10 @@ RMW_INTERFACE_FN(rmw_init_publisher_allocation,
     const rosidl_message_bounds_t *,
     rmw_publisher_allocation_t *))
 
+RMW_INTERFACE_FN(rmw_fini_publisher_allocation,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_publisher_allocation_t *))
+
 RMW_INTERFACE_FN(rmw_create_publisher,
   rmw_publisher_t *, nullptr,
   4, ARG_TYPES(
@@ -313,6 +317,10 @@ RMW_INTERFACE_FN(rmw_init_subscription_allocation,
     const rosidl_message_type_support_t *,
     const rosidl_message_bounds_t *,
     rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_fini_subscription_allocation,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
@@ -487,6 +495,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_node)
   GET_SYMBOL(rmw_node_get_graph_guard_condition)
   GET_SYMBOL(rmw_init_publisher_allocation);
+  GET_SYMBOL(rmw_fini_publisher_allocation);
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_publish)
@@ -497,6 +506,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_serialize)
   GET_SYMBOL(rmw_deserialize)
   GET_SYMBOL(rmw_init_subscription_allocation)
+  GET_SYMBOL(rmw_fini_subscription_allocation)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
