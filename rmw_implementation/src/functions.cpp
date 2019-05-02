@@ -264,6 +264,17 @@ RMW_INTERFACE_FN(rmw_node_get_graph_guard_condition,
   const rmw_guard_condition_t *, nullptr,
   1, ARG_TYPES(const rmw_node_t *))
 
+RMW_INTERFACE_FN(rmw_init_publisher_allocation,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rosidl_message_type_support_t *,
+    const rosidl_message_bounds_t *,
+    rmw_publisher_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_fini_publisher_allocation,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_publisher_allocation_t *))
+
 RMW_INTERFACE_FN(rmw_create_publisher,
   rmw_publisher_t *, nullptr,
   4, ARG_TYPES(
@@ -276,7 +287,7 @@ RMW_INTERFACE_FN(rmw_destroy_publisher,
 
 RMW_INTERFACE_FN(rmw_publish,
   rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_publisher_t *, const void *))
+  3, ARG_TYPES(const rmw_publisher_t *, const void *, rmw_publisher_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_publisher_count_matched_subscriptions,
   rmw_ret_t, RMW_RET_ERROR,
@@ -288,7 +299,16 @@ RMW_INTERFACE_FN(rmw_publisher_get_actual_qos,
 
 RMW_INTERFACE_FN(rmw_publish_serialized_message,
   rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_publisher_t *, const rmw_serialized_message_t *))
+  3,
+  ARG_TYPES(const rmw_publisher_t *, const rmw_serialized_message_t *,
+  rmw_publisher_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_get_serialized_message_size,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rosidl_message_type_support_t *,
+    const rosidl_message_bounds_t *,
+    size_t *))
 
 RMW_INTERFACE_FN(rmw_publisher_assert_liveliness,
   rmw_ret_t, RMW_RET_ERROR,
@@ -301,6 +321,17 @@ RMW_INTERFACE_FN(rmw_serialize,
 RMW_INTERFACE_FN(rmw_deserialize,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_serialized_message_t *, const rosidl_message_type_support_t *, void *))
+
+RMW_INTERFACE_FN(rmw_init_subscription_allocation,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rosidl_message_type_support_t *,
+    const rosidl_message_bounds_t *,
+    rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_fini_subscription_allocation,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
@@ -318,20 +349,25 @@ RMW_INTERFACE_FN(rmw_subscription_count_matched_publishers,
 
 RMW_INTERFACE_FN(rmw_take,
   rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(const rmw_subscription_t *, void *, bool *))
+  4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_take_with_info,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *))
+  5,
+  ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_message_info_t *,
+  rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_take_serialized_message,
   rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(const rmw_subscription_t *, rmw_serialized_message_t *, bool *))
+  4,
+  ARG_TYPES(const rmw_subscription_t *, rmw_serialized_message_t *, bool *,
+  rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_take_serialized_message_with_info,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(
-    const rmw_subscription_t *, rmw_serialized_message_t *, bool *, rmw_message_info_t *))
+  5, ARG_TYPES(
+    const rmw_subscription_t *, rmw_serialized_message_t *, bool *, rmw_message_info_t *,
+    rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_create_client,
   rmw_client_t *, nullptr,
@@ -474,6 +510,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_node)
   GET_SYMBOL(rmw_node_assert_liveliness)
   GET_SYMBOL(rmw_node_get_graph_guard_condition)
+  GET_SYMBOL(rmw_init_publisher_allocation);
+  GET_SYMBOL(rmw_fini_publisher_allocation);
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_publish)
@@ -481,8 +519,11 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publisher_get_actual_qos);
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
+  GET_SYMBOL(rmw_get_serialized_message_size)
   GET_SYMBOL(rmw_serialize)
   GET_SYMBOL(rmw_deserialize)
+  GET_SYMBOL(rmw_init_subscription_allocation)
+  GET_SYMBOL(rmw_fini_subscription_allocation)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
