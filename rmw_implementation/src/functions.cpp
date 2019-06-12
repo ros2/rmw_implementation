@@ -347,6 +347,10 @@ RMW_INTERFACE_FN(rmw_subscription_count_matched_publishers,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, size_t *))
 
+RMW_INTERFACE_FN(rmw_subscription_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_subscription_t *, rmw_qos_profile_t *))
+
 RMW_INTERFACE_FN(rmw_take,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_subscription_allocation_t *))
@@ -527,6 +531,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
+  GET_SYMBOL(rmw_subscription_get_actual_qos);
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
