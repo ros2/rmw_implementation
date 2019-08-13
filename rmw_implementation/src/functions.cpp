@@ -275,6 +275,17 @@ RMW_INTERFACE_FN(rmw_fini_publisher_allocation,
   rmw_ret_t, RMW_RET_ERROR,
   1, ARG_TYPES(rmw_publisher_allocation_t *))
 
+RMW_INTERFACE_FN(rmw_allocate_loaned_message,
+  void *, nullptr,
+  3, ARG_TYPES(
+    const rmw_publisher_t *,
+    const rosidl_message_type_support_t *,
+    size_t))
+
+RMW_INTERFACE_FN(rmw_deallocate_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, void*))
+
 RMW_INTERFACE_FN(rmw_create_publisher,
   rmw_publisher_t *, nullptr,
   5, ARG_TYPES(
@@ -522,6 +533,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_node_get_graph_guard_condition)
   GET_SYMBOL(rmw_init_publisher_allocation);
   GET_SYMBOL(rmw_fini_publisher_allocation);
+  GET_SYMBOL(rmw_allocate_loaned_message);
+  GET_SYMBOL(rmw_deallocate_loaned_message);
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_publish)
