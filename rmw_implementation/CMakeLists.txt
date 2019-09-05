@@ -12,6 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
 find_package(rcutils REQUIRED)
 
@@ -19,6 +20,8 @@ find_package(rcutils REQUIRED)
 find_package(poco_vendor)
 find_package(Poco COMPONENTS Foundation)
 find_package(rmw_implementation_cmake REQUIRED)
+
+ament_python_install_package(${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
