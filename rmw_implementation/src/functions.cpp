@@ -35,12 +35,19 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
+namespace {
+
 Poco::SharedLibrary *
 get_library()
 {
   static Poco::SharedLibrary * lib = nullptr;
   if (!lib) {
-    const char * cenv_var = getenv("RMW_IMPLEMENTATION");
+    const char * cenv_var{};
+    const char * cenv_err = rcutils_get_env("RMW_IMPLEMENTATION", &cenv_var);
+    if (cenv_err) {
+      RMW_SET_ERROR_MSG(cenv_err);
+      return nullptr;
+    }
     std::string env_var = cenv_var ? cenv_var : "";
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
@@ -89,6 +96,8 @@ get_symbol(const char * symbol_name)
     return nullptr;
   }
   return lib->getSymbol(symbol_name);
+}
+
 }
 
 #ifdef __cplusplus
