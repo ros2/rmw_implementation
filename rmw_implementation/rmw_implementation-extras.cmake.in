@@ -58,8 +58,8 @@ else()
       "time.\n\nCurrently available middlewares:\n"
       "'${available_rmw_implementations}'")
   endif()
+  message(STATUS "Using RMW implementation '${requested_rmw_implementation}' as default")
 
-  set(selected_rmw_implementation "@PROJECT_NAME@")
   # no need to find_package @PROJECT_NAME@
   # since this code is already part of a find_package call of that package
 endif()
