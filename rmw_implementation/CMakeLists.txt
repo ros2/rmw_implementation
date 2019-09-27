@@ -54,7 +54,6 @@ else()
   find_package(Poco REQUIRED COMPONENTS Foundation)
   find_package(rmw REQUIRED)
 
-  link_directories(${Poco_LIBRARY_DIR})
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
