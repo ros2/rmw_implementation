@@ -384,6 +384,21 @@ RMW_INTERFACE_FN(rmw_take_serialized_message_with_info,
     const rmw_subscription_t *, rmw_serialized_message_t *, bool *, rmw_message_info_t *,
     rmw_subscription_allocation_t *))
 
+RMW_INTERFACE_FN(rmw_take_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_subscription_t *, void **, bool *, rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_take_loaned_message_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_subscription_t *, void **, bool *, rmw_message_info_t *,
+    rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_return_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_subscription_t *, void *))
+
 RMW_INTERFACE_FN(rmw_take_loaned_message_sequence,
   rmw_ret_t, RMW_RET_ERROR,
   5, ARG_TYPES(
@@ -579,6 +594,9 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
   GET_SYMBOL(rmw_take_serialized_message_with_info)
+  GET_SYMBOL(rmw_take_loaned_message)
+  GET_SYMBOL(rmw_take_loaned_message_with_info)
+  GET_SYMBOL(rmw_return_loaned_message)
   GET_SYMBOL(rmw_take_loaned_message_sequence)
   GET_SYMBOL(rmw_take_loaned_message_sequence_with_info)
   GET_SYMBOL(rmw_loaned_message_sequence_at)
