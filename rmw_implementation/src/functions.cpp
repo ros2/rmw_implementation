@@ -534,6 +534,24 @@ RMW_INTERFACE_FN(rmw_set_log_severity,
   rmw_ret_t, RMW_RET_ERROR,
   1, ARG_TYPES(rmw_log_severity_t))
 
+RMW_INTERFACE_FN(rmw_get_publishers_info_by_topic,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_node_t *,
+    rcutils_allocator_t *,
+    const char *,
+    bool,
+    rmw_topic_info_array_t *))
+
+RMW_INTERFACE_FN(rmw_get_subscriptions_info_by_topic,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_node_t *,
+    rcutils_allocator_t *,
+    const char *,
+    bool,
+    rmw_topic_info_array_t *))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -607,6 +625,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_compare_gids_equal)
   GET_SYMBOL(rmw_service_server_is_available)
   GET_SYMBOL(rmw_set_log_severity)
+  GET_SYMBOL(rmw_get_publishers_info_by_topic)
+  GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
 }
 
 void * symbol_rmw_init = nullptr;
