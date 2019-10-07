@@ -18,9 +18,9 @@ import ament_index_python
 
 
 def get_available_rmw_implementations():
-    """Return a list of all available RMW implementations as registered in the ament index."""
+    """Return the set of all available RMW implementations as registered in the ament index."""
     rmw_implementations = ament_index_python.get_resources('rmw_typesupport')
-    return [name for name in rmw_implementations if name != 'rmw_implementation']
+    return {name for name in rmw_implementations if name != 'rmw_implementation'}
 
 
 __all__ = [
