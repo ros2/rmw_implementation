@@ -277,9 +277,9 @@ RMW_INTERFACE_FN(rmw_fini_publisher_allocation,
 
 RMW_INTERFACE_FN(rmw_create_publisher,
   rmw_publisher_t *, nullptr,
-  4, ARG_TYPES(
+  5, ARG_TYPES(
     const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
-    const rmw_qos_profile_t *))
+    const rmw_qos_profile_t *, const rmw_publisher_options_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_publisher,
   rmw_ret_t, RMW_RET_ERROR,
@@ -337,7 +337,7 @@ RMW_INTERFACE_FN(rmw_create_subscription,
   rmw_subscription_t *, nullptr,
   5, ARG_TYPES(
     const rmw_node_t *, const rosidl_message_type_support_t *, const char *,
-    const rmw_qos_profile_t *, bool))
+    const rmw_qos_profile_t *, const rmw_subscription_options_t *))
 
 RMW_INTERFACE_FN(rmw_destroy_subscription,
   rmw_ret_t, RMW_RET_ERROR,
