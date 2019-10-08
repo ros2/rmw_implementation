@@ -62,6 +62,7 @@ else()
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
     "Poco"
+    "rcutils"
     "rcpputils"
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
