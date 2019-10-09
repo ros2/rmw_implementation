@@ -18,6 +18,7 @@
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
+#include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
@@ -35,7 +36,8 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
-namespace {
+namespace
+{
 
 Poco::SharedLibrary *
 get_library()
@@ -98,7 +100,7 @@ get_symbol(const char * symbol_name)
   return lib->getSymbol(symbol_name);
 }
 
-}
+}  // namespace
 
 #ifdef __cplusplus
 extern "C"
