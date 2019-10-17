@@ -62,8 +62,8 @@ else()
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
     "Poco"
-    "rcutils"
     "rcpputils"
+    "rcutils"
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
