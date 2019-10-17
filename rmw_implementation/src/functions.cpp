@@ -18,7 +18,6 @@
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
-#include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
@@ -39,18 +38,34 @@
 namespace
 {
 
+// TODO(eric.cousineau): Use rcutils_get_env pending debugging usage on
+// Windows.
+std::string get_env_var(const char * env_var)
+{
+  char * value = nullptr;
+#ifndef _WIN32
+  value = getenv(env_var);
+#else
+  size_t value_size;
+  _dupenv_s(&value, &value_size, env_var);
+#endif
+  std::string value_str = "";
+  if (value) {
+    value_str = value;
+#ifdef _WIN32
+    free(value);
+#endif
+  }
+  // printf("get_env_var(%s) = %s\n", env_var, value_str.c_str());
+  return value_str;
+}
+
 Poco::SharedLibrary *
 get_library()
 {
   static Poco::SharedLibrary * lib = nullptr;
   if (!lib) {
-    const char * cenv_var{};
-    const char * cenv_err = rcutils_get_env("RMW_IMPLEMENTATION", &cenv_var);
-    if (cenv_err) {
-      RMW_SET_ERROR_MSG(cenv_err);
-      return nullptr;
-    }
-    std::string env_var = cenv_var ? cenv_var : "";
+    std::string env_var = get_env_var("RMW_IMPLEMENTATION");
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
     }
