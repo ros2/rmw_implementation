@@ -249,8 +249,9 @@ RMW_INTERFACE_FN(rmw_get_serialization_format,
 
 RMW_INTERFACE_FN(rmw_create_node,
   rmw_node_t *, nullptr,
-  5, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *))
+  6, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *,
+    bool))
 
 RMW_INTERFACE_FN(rmw_destroy_node,
   rmw_ret_t, RMW_RET_ERROR,
