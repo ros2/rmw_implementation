@@ -285,9 +285,24 @@ RMW_INTERFACE_FN(rmw_destroy_publisher,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(rmw_node_t *, rmw_publisher_t *))
 
+RMW_INTERFACE_FN(rmw_borrow_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rmw_publisher_t *,
+    const rosidl_message_type_support_t *,
+    void **))
+
+RMW_INTERFACE_FN(rmw_return_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, void *))
+
 RMW_INTERFACE_FN(rmw_publish,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_publisher_t *, const void *, rmw_publisher_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_publish_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_publisher_t *, void *, rmw_publisher_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_publisher_count_matched_subscriptions,
   rmw_ret_t, RMW_RET_ERROR,
@@ -372,6 +387,21 @@ RMW_INTERFACE_FN(rmw_take_serialized_message_with_info,
   5, ARG_TYPES(
     const rmw_subscription_t *, rmw_serialized_message_t *, bool *, rmw_message_info_t *,
     rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_take_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_subscription_t *, void **, bool *, rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_take_loaned_message_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_subscription_t *, void **, bool *, rmw_message_info_t *,
+    rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(rmw_release_loaned_message,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_subscription_t *, void *))
 
 RMW_INTERFACE_FN(rmw_create_client,
   rmw_client_t *, nullptr,
@@ -524,7 +554,10 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_fini_publisher_allocation);
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
+  GET_SYMBOL(rmw_borrow_loaned_message);
+  GET_SYMBOL(rmw_return_loaned_message);
   GET_SYMBOL(rmw_publish)
+  GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
   GET_SYMBOL(rmw_publisher_get_actual_qos);
   GET_SYMBOL(rmw_publish_serialized_message)
@@ -542,6 +575,9 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
   GET_SYMBOL(rmw_take_serialized_message_with_info)
+  GET_SYMBOL(rmw_take_loaned_message)
+  GET_SYMBOL(rmw_take_loaned_message_with_info)
+  GET_SYMBOL(rmw_release_loaned_message)
   GET_SYMBOL(rmw_create_client)
   GET_SYMBOL(rmw_destroy_client)
   GET_SYMBOL(rmw_send_request)
