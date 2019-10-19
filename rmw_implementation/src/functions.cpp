@@ -293,7 +293,7 @@ RMW_INTERFACE_FN(rmw_borrow_loaned_message,
     const rosidl_message_type_support_t *,
     void **))
 
-RMW_INTERFACE_FN(rmw_return_loaned_message,
+RMW_INTERFACE_FN(rmw_return_loaned_message_from_publisher,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_publisher_t *, void *))
 
@@ -400,7 +400,7 @@ RMW_INTERFACE_FN(rmw_take_loaned_message_with_info,
     const rmw_subscription_t *, void **, bool *, rmw_message_info_t *,
     rmw_subscription_allocation_t *))
 
-RMW_INTERFACE_FN(rmw_release_loaned_message,
+RMW_INTERFACE_FN(rmw_return_loaned_message_from_subscription,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, void *))
 
@@ -556,7 +556,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
   GET_SYMBOL(rmw_borrow_loaned_message);
-  GET_SYMBOL(rmw_return_loaned_message);
+  GET_SYMBOL(rmw_return_loaned_message_from_publisher);
   GET_SYMBOL(rmw_publish)
   GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
@@ -578,7 +578,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_take_serialized_message_with_info)
   GET_SYMBOL(rmw_take_loaned_message)
   GET_SYMBOL(rmw_take_loaned_message_with_info)
-  GET_SYMBOL(rmw_release_loaned_message)
+  GET_SYMBOL(rmw_return_loaned_message_from_subscription)
   GET_SYMBOL(rmw_create_client)
   GET_SYMBOL(rmw_destroy_client)
   GET_SYMBOL(rmw_send_request)
