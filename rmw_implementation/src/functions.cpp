@@ -392,17 +392,17 @@ RMW_INTERFACE_FN(rmw_take_serialized_message_with_info,
 RMW_INTERFACE_FN(rmw_take_loaned_message,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
-    const rmw_subscription_t *, void **, bool *, rmw_subscription_allocation_t *))
+    const rmw_subscription_t *, const void **, bool *, rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_take_loaned_message_with_info,
   rmw_ret_t, RMW_RET_ERROR,
   5, ARG_TYPES(
-    const rmw_subscription_t *, void **, bool *, rmw_message_info_t *,
+    const rmw_subscription_t *, const void **, bool *, rmw_message_info_t *,
     rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(rmw_return_loaned_message_from_subscription,
   rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const rmw_subscription_t *, void *))
+  2, ARG_TYPES(const rmw_subscription_t *, const void *))
 
 RMW_INTERFACE_FN(rmw_create_client,
   rmw_client_t *, nullptr,
