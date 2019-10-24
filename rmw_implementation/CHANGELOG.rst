@@ -2,6 +2,17 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.1 (2019-10-23)
+------------------
+* use return_loaned_message_from (`#76 <https://github.com/ros2/rmw_implementation/issues/76>`_)
+* Add localhost boolean parameter to create node function (`#75 <https://github.com/ros2/rmw_implementation/issues/75>`_)
+* Zero copy api (`#69 <https://github.com/ros2/rmw_implementation/issues/69>`_)
+* Add Python API for RMW implementation lookups (`#73 <https://github.com/ros2/rmw_implementation/issues/73>`_)
+* update signature for added pub/sub options (`#74 <https://github.com/ros2/rmw_implementation/issues/74>`_)
+* remove unneeded line from CMakeLists (`#70 <https://github.com/ros2/rmw_implementation/issues/70>`_)
+* Make middleware selection more independent of build-time package availability (`#67 <https://github.com/ros2/rmw_implementation/issues/67>`_)
+* Contributors: Brian Marchi, Dan Rose, Karsten Knese, Michel Hidalgo, William Woodall
+
 0.8.0 (2019-09-25)
 ------------------
 * Add function for getting clients by node (`#62 <https://github.com/ros2/rmw_implementation/issues/62>`_)
