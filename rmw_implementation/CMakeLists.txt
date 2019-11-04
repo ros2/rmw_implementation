@@ -28,9 +28,15 @@ message(STATUS "")
 message(STATUS "Default rmw implementation: '${RMW_IMPLEMENTATION}'")
 message(STATUS "")
 
+option(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING
+  "Force use of dynamic loading (via poco), even if there is only one implementation available"
+  OFF)
+
 get_available_rmw_implementations(available_rmw_implementations)
 list(LENGTH available_rmw_implementations count_available_rmw_implementations)
-if(count_available_rmw_implementations EQUAL 1)
+if(RMW_IMPLEMENTATION_FORCE_DYNAMIC_LOADING)
+  set(rmw_implementation_disable_runtime_selection_default OFF)
+elseif(count_available_rmw_implementations EQUAL 1)
   set(rmw_implementation_disable_runtime_selection_default ON)
 else()
   set(rmw_implementation_disable_runtime_selection_default OFF)
