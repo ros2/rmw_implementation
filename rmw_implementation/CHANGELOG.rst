@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.2 (2019-11-13)
+------------------
+* Add support for Cyclone DDS. (`#71 <https://github.com/ros2/rmw_implementation/issues/71>`_)
+* Contributors: Ruffin
+
 0.8.1 (2019-10-23)
 ------------------
 * use return_loaned_message_from (`#76 <https://github.com/ros2/rmw_implementation/issues/76>`_)
