@@ -191,7 +191,7 @@ RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
   6, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *,
+    rmw_context_t *, const char *, const char *, size_t, const rmw_security_options_t *,
     bool))
 
 RMW_INTERFACE_FN(
