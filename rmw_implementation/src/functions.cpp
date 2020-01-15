@@ -18,6 +18,7 @@
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
+#include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
@@ -35,29 +36,14 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
-namespace
-{
-
-// TODO(eric.cousineau): Use rcutils_get_env pending debugging usage on
-// Windows.
 std::string get_env_var(const char * env_var)
 {
-  char * value = nullptr;
-#ifndef _WIN32
-  value = getenv(env_var);
-#else
-  size_t value_size;
-  _dupenv_s(&value, &value_size, env_var);
-#endif
-  std::string value_str = "";
-  if (value) {
-    value_str = value;
-#ifdef _WIN32
-    free(value);
-#endif
+  const char * value{};
+  const char * err = rcutils_get_env(env_var, &value);
+  if (err) {
+    throw std::runtime_error(err);
   }
-  // printf("get_env_var(%s) = %s\n", env_var, value_str.c_str());
-  return value_str;
+  return value ? value : "";
 }
 
 Poco::SharedLibrary *
@@ -114,8 +100,6 @@ get_symbol(const char * symbol_name)
   }
   return lib->getSymbol(symbol_name);
 }
-
-}  // namespace
 
 #ifdef __cplusplus
 extern "C"
