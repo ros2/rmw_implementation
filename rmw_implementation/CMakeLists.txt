@@ -14,9 +14,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 
-find_package(rcpputils REQUIRED)
-find_package(rcutils REQUIRED)
-
 find_package(rmw_implementation_cmake REQUIRED)
 
 ament_python_install_package(${PROJECT_NAME})
@@ -56,6 +53,8 @@ else()
   # provides FindPoco.cmake and Poco on platforms without it
   find_package(poco_vendor REQUIRED)
   find_package(Poco REQUIRED COMPONENTS Foundation)
+  find_package(rcpputils REQUIRED)
+  find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
 
   add_library(${PROJECT_NAME} SHARED
@@ -70,6 +69,7 @@ else()
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
+  ament_export_dependencies(rcpputils rcutils)
 
   install(
     TARGETS ${PROJECT_NAME}
