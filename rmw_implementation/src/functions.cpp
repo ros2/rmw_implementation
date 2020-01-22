@@ -13,21 +13,17 @@
 // limitations under the License.
 
 #include <cstddef>
-#include <cstdio>
-#include <cstring>
 
-#include <list>
 #include <string>
-
-#include <fstream>
-#include <sstream>
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
+#include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
 #include "Poco/SharedLibrary.h"
 
+#include "rcpputils/find_library.hpp"
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
 #include "rmw/names_and_types.h"
@@ -37,84 +33,18 @@
 #include "rmw/get_topic_names_and_types.h"
 #include "rmw/rmw.h"
 
-std::string get_env_var(const char * env_var)
-{
-  char * value = nullptr;
-#ifndef _WIN32
-  value = getenv(env_var);
-#else
-  size_t value_size;
-  _dupenv_s(&value, &value_size, env_var);
-#endif
-  std::string value_str = "";
-  if (value) {
-    value_str = value;
-#ifdef _WIN32
-    free(value);
-#endif
-  }
-  // printf("get_env_var(%s) = %s\n", env_var, value_str.c_str());
-  return value_str;
-}
-
-std::list<std::string> split(const std::string & value, const char delimiter)
-{
-  std::list<std::string> list;
-  std::istringstream ss(value);
-  std::string s;
-  while (std::getline(ss, s, delimiter)) {
-    list.push_back(s);
-  }
-  // printf("split(%s) = %zu\n", value.c_str(), list.size());
-  return list;
-}
-
-bool is_file_exist(const char * filename)
-{
-  std::ifstream h(filename);
-  // printf("is_file_exist(%s) = %s\n", filename, h.good() ? "true" : "false");
-  return h.good();
-}
-
-std::string find_library_path(const std::string & library_name)
-{
-  const char * env_var;
-  char separator;
-  const char * filename_prefix;
-  const char * filename_extension;
-#ifdef _WIN32
-  env_var = "PATH";
-  separator = ';';
-  filename_prefix = "";
-  filename_extension = ".dll";
-#elif __APPLE__
-  env_var = "DYLD_LIBRARY_PATH";
-  separator = ':';
-  filename_prefix = "lib";
-  filename_extension = ".dylib";
-#else
-  env_var = "LD_LIBRARY_PATH";
-  separator = ':';
-  filename_prefix = "lib";
-  filename_extension = ".so";
-#endif
-  std::string search_path = get_env_var(env_var);
-  std::list<std::string> search_paths = split(search_path, separator);
-
-  std::string filename = filename_prefix;
-  filename += library_name + filename_extension;
-
-  for (auto it : search_paths) {
-    std::string path = it + "/" + filename;
-    if (is_file_exist(path.c_str())) {
-      return path;
-    }
-  }
-  return "";
-}
-
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
+
+std::string get_env_var(const char * env_var)
+{
+  const char * value{};
+  const char * err = rcutils_get_env(env_var, &value);
+  if (err) {
+    throw std::runtime_error(err);
+  }
+  return value ? value : "";
+}
 
 Poco::SharedLibrary *
 get_library()
@@ -125,7 +55,7 @@ get_library()
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
     }
-    std::string library_path = find_library_path(env_var);
+    std::string library_path = rcpputils::find_library_path(env_var);
     if (library_path.empty()) {
       RMW_SET_ERROR_MSG(
         ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());

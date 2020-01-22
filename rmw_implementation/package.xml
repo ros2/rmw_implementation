@@ -10,7 +10,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
 
-  <build_depend>rcutils</build_depend>
+  <depend>rcpputils</depend>
+  <depend>rcutils</depend>
   <build_depend>rmw</build_depend>
   <!--
   Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
