@@ -64,5 +64,6 @@ else()
   # since this code is already part of a find_package call of that package
 endif()
 
-find_package(Threads REQUIRED)
+find_package(Threads)
+
 list(APPEND rmw_implementation_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
