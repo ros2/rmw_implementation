@@ -64,6 +64,12 @@ else()
   # since this code is already part of a find_package call of that package
 endif()
 
-find_package(Threads)
+if(CMAKE_CROSSCOMPILING)
+  find_package(Threads QUIET)
+else()
+  find_package(Threads REQUIRED)
+endif()
 
-list(APPEND rmw_implementation_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
+if(Threads_FOUND)
+  list(APPEND rmw_implementation_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
+endif()
