@@ -568,7 +568,8 @@ RMW_INTERFACE_FN(
     bool,
     rmw_topic_endpoint_info_array_t *))
 
-RMW_INTERFACE_FN(rmw_use_node_name_in_security_directory_lookup,
+RMW_INTERFACE_FN(
+  rmw_use_node_name_in_security_directory_lookup,
   bool, true,
   0, ARG_TYPES(void))
 
