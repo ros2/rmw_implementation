@@ -8,6 +8,8 @@
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <buildtool_depend>rmw_implementation_cmake</buildtool_depend>
 
   <depend>rcpputils</depend>
   <depend>rcutils</depend>
@@ -19,11 +21,11 @@
   <build_depend>rmw_connext_cpp</build_depend>
   <build_depend>rmw_cyclonedds_cpp</build_depend>
   <build_depend>rmw_fastrtps_cpp</build_depend>
+  <build_depend>rmw_implementation_cmake</build_depend>
   <!-- end of group dependencies added for bloom -->
 
   <depend>libpoco-dev</depend>
   <depend>poco_vendor</depend>
-  <depend>rmw_implementation_cmake</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
