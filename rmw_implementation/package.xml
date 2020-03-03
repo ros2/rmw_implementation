@@ -27,8 +27,6 @@
   <depend>libpoco-dev</depend>
   <depend>poco_vendor</depend>
 
-  <exec_depend>ament_index_python</exec_depend>
-
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
