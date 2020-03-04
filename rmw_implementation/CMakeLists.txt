@@ -52,6 +52,7 @@ else()
   find_package(rcpputils REQUIRED)
   find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
+  find_package(rosidl_runtime_c REQUIRED)
 
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
@@ -59,7 +60,8 @@ else()
     "Poco"
     "rcpputils"
     "rcutils"
-    "rmw")
+    "rmw"
+    "rosidl_runtime_c")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
   configure_rmw_library(${PROJECT_NAME})
