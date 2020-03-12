@@ -13,15 +13,15 @@
 // limitations under the License.
 
 #include <cstddef>
+#include <stdexcept>
 
 #include <string>
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
 #include "rcutils/get_env.h"
+#include "rcutils/shared_library.h"
 #include "rcutils/types/string_array.h"
-
-#include "Poco/SharedLibrary.h"
 
 #include "rcpputils/find_library.hpp"
 #include "rmw/error_handling.h"
@@ -46,11 +46,22 @@ std::string get_env_var(const char * env_var)
   return value ? value : "";
 }
 
-Poco::SharedLibrary *
+rcutils_shared_library_t *
 get_library()
 {
-  static Poco::SharedLibrary * lib = nullptr;
+  static rcutils_shared_library_t * lib = nullptr;
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
   if (!lib) {
+    lib = static_cast<rcutils_shared_library_t *>(allocator.allocate(
+            sizeof(rcutils_shared_library_t), allocator.state));
+    if (!lib) {
+      RMW_SET_ERROR_MSG("failed to allocate memory");
+      return nullptr;
+    }
+
+    *lib = rcutils_get_zero_initialized_shared_library();
+
     std::string env_var = get_env_var("RMW_IMPLEMENTATION");
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
@@ -61,17 +72,9 @@ get_library()
         ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
       return nullptr;
     }
-    try {
-      lib = new Poco::SharedLibrary(library_path);
-    } catch (Poco::LibraryLoadException & e) {
-      RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation. Exception: " +
-        e.displayText()).c_str());
-      return nullptr;
-    } catch (...) {
-      RMW_SET_ERROR_MSG("failed to load shared library of rmw implementation");
-      RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation: " + library_path).c_str());
+    rcutils_ret_t ret = rcutils_load_shared_library(lib, library_path.c_str());
+    if (ret != RCUTILS_RET_OK) {
+      RMW_SET_ERROR_MSG(("Cannot open library " + library_path).c_str());
       return nullptr;
     }
   }
@@ -81,16 +84,19 @@ get_library()
 void *
 get_symbol(const char * symbol_name)
 {
-  Poco::SharedLibrary * lib = get_library();
+  rcutils_shared_library_t * lib = get_library();
+
   if (!lib) {
-    // error message set by get_library()
     return nullptr;
   }
-  if (!lib->hasSymbol(symbol_name)) {
+
+  void * lib_symbol = rcutils_get_symbol(lib, symbol_name);
+
+  if(!lib_symbol){
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
     char * msg = rcutils_format_string(
       allocator,
-      "failed to resolve symbol '%s' in shared library '%s'", symbol_name, lib->getPath().c_str());
+      "failed to resolve symbol '%s' in shared library '%s'", symbol_name, lib->library_path);
     if (msg) {
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
@@ -99,7 +105,7 @@ get_symbol(const char * symbol_name)
     }
     return nullptr;
   }
-  return lib->getSymbol(symbol_name);
+  return lib_symbol;
 }
 
 #ifdef __cplusplus

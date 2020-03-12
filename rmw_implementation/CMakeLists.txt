@@ -46,9 +46,6 @@ if(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION)
 else()
   message(STATUS "Runtime selection of RMW enabled")
 
-  # provides FindPoco.cmake and Poco on platforms without it
-  find_package(poco_vendor REQUIRED)
-  find_package(Poco REQUIRED COMPONENTS Foundation)
   find_package(rcpputils REQUIRED)
   find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
@@ -56,7 +53,6 @@ else()
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
-    "Poco"
     "rcpputils"
     "rcutils"
     "rmw")
