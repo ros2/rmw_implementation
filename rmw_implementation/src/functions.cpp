@@ -191,9 +191,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
-  6, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, const rmw_security_options_t *,
-    bool))
+  5, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, bool))
 
 RMW_INTERFACE_FN(
   rmw_destroy_node,
@@ -517,6 +516,13 @@ RMW_INTERFACE_FN(
   rmw_get_node_names,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *, rcutils_string_array_t *))
+
+RMW_INTERFACE_FN(
+  rmw_get_node_names_with_context_names,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_node_t *, rcutils_string_array_t *,
+    rcutils_string_array_t *, rcutils_string_array_t *))
 
 RMW_INTERFACE_FN(
   rmw_count_publishers,
