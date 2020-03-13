@@ -32,7 +32,6 @@
 #include "rmw/get_topic_endpoint_info.h"
 #include "rmw/get_topic_names_and_types.h"
 #include "rmw/rmw.h"
-#include "rmw/security.h"
 
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
@@ -574,11 +573,6 @@ RMW_INTERFACE_FN(
     bool,
     rmw_topic_endpoint_info_array_t *))
 
-RMW_INTERFACE_FN(
-  rmw_use_node_name_in_security_directory_lookup,
-  bool, true,
-  0, ARG_TYPES(void))
-
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -648,6 +642,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)
   GET_SYMBOL(rmw_get_node_names)
+  GET_SYMBOL(rmw_get_node_names_with_context_names)
   GET_SYMBOL(rmw_count_publishers)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
@@ -656,7 +651,6 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_set_log_severity)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
-  GET_SYMBOL(rmw_use_node_name_in_security_directory_lookup)
 }
 
 void * symbol_rmw_init = nullptr;
