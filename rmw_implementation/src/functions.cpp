@@ -50,18 +50,8 @@ rcutils_shared_library_t *
 get_library()
 {
   static rcutils_shared_library_t * lib = nullptr;
-  rcutils_allocator_t allocator = rcutils_get_default_allocator();
 
   if (!lib) {
-    lib = static_cast<rcutils_shared_library_t *>(allocator.allocate(
-            sizeof(rcutils_shared_library_t), allocator.state));
-    if (!lib) {
-      RMW_SET_ERROR_MSG("failed to allocate memory");
-      return nullptr;
-    }
-
-    *lib = rcutils_get_zero_initialized_shared_library();
-
     std::string env_var = get_env_var("RMW_IMPLEMENTATION");
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
@@ -72,8 +62,13 @@ get_library()
         ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
       return nullptr;
     }
+
+    lib = new rcutils_shared_library_t;
+    *lib = rcutils_get_zero_initialized_shared_library();
+
     rcutils_ret_t ret = rcutils_load_shared_library(lib, library_path.c_str());
     if (ret != RCUTILS_RET_OK) {
+      delete lib;
       RMW_SET_ERROR_MSG(("Cannot open library " + library_path).c_str());
       return nullptr;
     }
