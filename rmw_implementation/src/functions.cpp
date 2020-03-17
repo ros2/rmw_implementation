@@ -268,6 +268,11 @@ RMW_INTERFACE_FN(
   2, ARG_TYPES(const rmw_publisher_t *, rmw_qos_profile_t *))
 
 RMW_INTERFACE_FN(
+  rmw_publisher_event_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(rmw_event_t *, const rmw_publisher_t *, rmw_event_type_t))
+
+RMW_INTERFACE_FN(
   rmw_publish_serialized_message,
   rmw_ret_t, RMW_RET_ERROR,
   3,
@@ -332,6 +337,11 @@ RMW_INTERFACE_FN(
   rmw_subscription_get_actual_qos,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(
+  rmw_subscription_event_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(rmw_event_t *, const rmw_subscription_t *, rmw_event_type_t))
 
 RMW_INTERFACE_FN(
   rmw_take,
@@ -422,11 +432,6 @@ RMW_INTERFACE_FN(
   rmw_send_response,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *))
-
-RMW_INTERFACE_FN(
-  rmw_event_type_is_supported,
-  bool, false,
-  1, ARG_TYPES(rmw_event_type_t))
 
 RMW_INTERFACE_FN(
   rmw_take_event,
@@ -589,6 +594,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
   GET_SYMBOL(rmw_publisher_get_actual_qos);
+  GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
   GET_SYMBOL(rmw_get_serialized_message_size)
@@ -600,6 +606,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
   GET_SYMBOL(rmw_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_subscription_event_init)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
@@ -615,7 +622,6 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_service)
   GET_SYMBOL(rmw_take_request)
   GET_SYMBOL(rmw_send_response)
-  GET_SYMBOL(rmw_event_type_is_supported)
   GET_SYMBOL(rmw_take_event)
   GET_SYMBOL(rmw_create_guard_condition)
   GET_SYMBOL(rmw_destroy_guard_condition)
