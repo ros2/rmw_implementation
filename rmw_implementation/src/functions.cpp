@@ -69,6 +69,11 @@ get_library()
       lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
     } catch (const std::runtime_error & e) {
       RMW_SET_ERROR_MSG(
+        ("failed to allocate memory " + library_path + ": " + std::string(
+          e.what())).c_str());
+      return nullptr;
+    } catch (const std::bad_alloc & e) {
+      RMW_SET_ERROR_MSG(
         ("Cannot open library " + library_path + ": " + std::string(
           e.what())).c_str());
       return nullptr;
