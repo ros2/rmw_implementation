@@ -90,7 +90,8 @@ get_symbol(const char * symbol_name)
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
     char * msg = rcutils_format_string(
       allocator,
-      "failed to resolve symbol '%s' in shared library", symbol_name);
+      "failed to resolve symbol '%s' in shared library '%s'", symbol_name,
+      lib->get_library_path().c_str());
     if (msg) {
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
