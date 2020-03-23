@@ -15,15 +15,17 @@
 #include <cstddef>
 #include <stdexcept>
 
+#include <memory>
 #include <string>
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
 #include "rcutils/get_env.h"
-#include "rcutils/shared_library.h"
 #include "rcutils/types/string_array.h"
 
 #include "rcpputils/find_library.hpp"
+#include "rcpputils/shared_library.hpp"
+
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
 #include "rmw/names_and_types.h"
@@ -46,10 +48,10 @@ std::string get_env_var(const char * env_var)
   return value ? value : "";
 }
 
-rcutils_shared_library_t *
+std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
-  static rcutils_shared_library_t * lib = nullptr;
+  static std::shared_ptr<rcpputils::SharedLibrary> lib;
 
   if (!lib) {
     std::string env_var = get_env_var("RMW_IMPLEMENTATION");
@@ -63,13 +65,12 @@ get_library()
       return nullptr;
     }
 
-    lib = new rcutils_shared_library_t;
-    *lib = rcutils_get_zero_initialized_shared_library();
-
-    rcutils_ret_t ret = rcutils_load_shared_library(lib, library_path.c_str());
-    if (ret != RCUTILS_RET_OK) {
-      delete lib;
-      RMW_SET_ERROR_MSG(("Cannot open library " + library_path).c_str());
+    try {
+      lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
+    } catch (const std::runtime_error & e) {
+      RMW_SET_ERROR_MSG(
+        ("Cannot open library " + library_path + ": " + std::string(
+          e.what())).c_str());
       return nullptr;
     }
   }
@@ -79,19 +80,17 @@ get_library()
 void *
 get_symbol(const char * symbol_name)
 {
-  rcutils_shared_library_t * lib = get_library();
+  std::shared_ptr<rcpputils::SharedLibrary> lib = get_library();
 
   if (!lib) {
     return nullptr;
   }
 
-  void * lib_symbol = rcutils_get_symbol(lib, symbol_name);
-
-  if(!lib_symbol){
+  if (!lib->has_symbol(symbol_name)) {
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
     char * msg = rcutils_format_string(
       allocator,
-      "failed to resolve symbol '%s' in shared library '%s'", symbol_name, lib->library_path);
+      "failed to resolve symbol '%s' in shared library", symbol_name);
     if (msg) {
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
@@ -100,7 +99,7 @@ get_symbol(const char * symbol_name)
     }
     return nullptr;
   }
-  return lib_symbol;
+  return lib->get_symbol(symbol_name);
 }
 
 #ifdef __cplusplus
