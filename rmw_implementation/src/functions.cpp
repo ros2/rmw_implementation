@@ -69,7 +69,7 @@ get_library()
       lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
     } catch (const std::runtime_error & e) {
       RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation." + library_path +
+        ("failed to load shared library of rmw implementation: " + library_path +
         " Exception: " + std::string(e.what())).c_str());
       return nullptr;
     } catch (const std::bad_alloc & e) {
