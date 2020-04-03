@@ -74,8 +74,8 @@ get_library()
       return nullptr;
     } catch (const std::bad_alloc & e) {
       RMW_SET_ERROR_MSG(
-        ("Cannot open library " + library_path + ": " + std::string(
-          e.what())).c_str());
+        ("failed to load shared library of rmw implementation " + library_path + ": " +
+        std::string(e.what())).c_str());
       return nullptr;
     }
   }
