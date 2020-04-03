@@ -88,6 +88,7 @@ get_symbol(const char * symbol_name)
   std::shared_ptr<rcpputils::SharedLibrary> lib = get_library();
 
   if (!lib) {
+    // error message set by get_library()
     return nullptr;
   }
 
