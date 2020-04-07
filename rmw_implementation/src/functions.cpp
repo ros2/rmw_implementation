@@ -197,9 +197,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
-  6, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *,
-    bool))
+  5, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, bool))
 
 RMW_INTERFACE_FN(
   rmw_destroy_node,
@@ -275,6 +274,11 @@ RMW_INTERFACE_FN(
   2, ARG_TYPES(const rmw_publisher_t *, rmw_qos_profile_t *))
 
 RMW_INTERFACE_FN(
+  rmw_publisher_event_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(rmw_event_t *, const rmw_publisher_t *, rmw_event_type_t))
+
+RMW_INTERFACE_FN(
   rmw_publish_serialized_message,
   rmw_ret_t, RMW_RET_ERROR,
   3,
@@ -339,6 +343,11 @@ RMW_INTERFACE_FN(
   rmw_subscription_get_actual_qos,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(
+  rmw_subscription_event_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(rmw_event_t *, const rmw_subscription_t *, rmw_event_type_t))
 
 RMW_INTERFACE_FN(
   rmw_take,
@@ -515,6 +524,13 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *, rcutils_string_array_t *))
 
 RMW_INTERFACE_FN(
+  rmw_get_node_names_with_security_contexts,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_node_t *, rcutils_string_array_t *,
+    rcutils_string_array_t *, rcutils_string_array_t *))
+
+RMW_INTERFACE_FN(
   rmw_count_publishers,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_node_t *, const char *, size_t *))
@@ -591,6 +607,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
   GET_SYMBOL(rmw_publisher_get_actual_qos);
+  GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
   GET_SYMBOL(rmw_get_serialized_message_size)
@@ -602,6 +619,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
   GET_SYMBOL(rmw_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_subscription_event_init)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
@@ -631,6 +649,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)
   GET_SYMBOL(rmw_get_node_names)
+  GET_SYMBOL(rmw_get_node_names_with_security_contexts)
   GET_SYMBOL(rmw_count_publishers)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
