@@ -13,9 +13,7 @@
 // limitations under the License.
 
 #include <cstddef>
-#include <stdexcept>
 
-#include <memory>
 #include <string>
 
 #include "rcutils/allocator.h"
@@ -23,9 +21,9 @@
 #include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
-#include "rcpputils/find_library.hpp"
-#include "rcpputils/shared_library.hpp"
+#include "Poco/SharedLibrary.h"
 
+#include "rcpputils/find_library.hpp"
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
 #include "rmw/names_and_types.h"
@@ -48,11 +46,10 @@ std::string get_env_var(const char * env_var)
   return value ? value : "";
 }
 
-std::shared_ptr<rcpputils::SharedLibrary>
+Poco::SharedLibrary *
 get_library()
 {
-  static std::shared_ptr<rcpputils::SharedLibrary> lib;
-
+  static Poco::SharedLibrary * lib = nullptr;
   if (!lib) {
     std::string env_var = get_env_var("RMW_IMPLEMENTATION");
     if (env_var.empty()) {
@@ -64,18 +61,17 @@ get_library()
         ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
       return nullptr;
     }
-
     try {
-      lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
-    } catch (const std::runtime_error & e) {
+      lib = new Poco::SharedLibrary(library_path);
+    } catch (Poco::LibraryLoadException & e) {
       RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation: " + library_path +
-        " Exception: " + std::string(e.what())).c_str());
+        ("failed to load shared library of rmw implementation. Exception: " +
+        e.displayText()).c_str());
       return nullptr;
-    } catch (const std::bad_alloc & e) {
+    } catch (...) {
+      RMW_SET_ERROR_MSG("failed to load shared library of rmw implementation");
       RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation " + library_path + ": " +
-        std::string(e.what())).c_str());
+        ("failed to load shared library of rmw implementation: " + library_path).c_str());
       return nullptr;
     }
   }
@@ -85,19 +81,16 @@ get_library()
 void *
 get_symbol(const char * symbol_name)
 {
-  std::shared_ptr<rcpputils::SharedLibrary> lib = get_library();
-
+  Poco::SharedLibrary * lib = get_library();
   if (!lib) {
     // error message set by get_library()
     return nullptr;
   }
-
-  if (!lib->has_symbol(symbol_name)) {
+  if (!lib->hasSymbol(symbol_name)) {
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
     char * msg = rcutils_format_string(
       allocator,
-      "failed to resolve symbol '%s' in shared library '%s'", symbol_name,
-      lib->get_library_path().c_str());
+      "failed to resolve symbol '%s' in shared library '%s'", symbol_name, lib->getPath().c_str());
     if (msg) {
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
@@ -106,7 +99,7 @@ get_symbol(const char * symbol_name)
     }
     return nullptr;
   }
-  return lib->get_symbol(symbol_name);
+  return lib->getSymbol(symbol_name);
 }
 
 #ifdef __cplusplus
