@@ -524,7 +524,7 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *, rcutils_string_array_t *))
 
 RMW_INTERFACE_FN(
-  rmw_get_node_names_with_security_contexts,
+  rmw_get_node_names_with_enclaves,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
     const rmw_node_t *, rcutils_string_array_t *,
@@ -649,7 +649,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)
   GET_SYMBOL(rmw_get_node_names)
-  GET_SYMBOL(rmw_get_node_names_with_security_contexts)
+  GET_SYMBOL(rmw_get_node_names_with_enclaves)
   GET_SYMBOL(rmw_count_publishers)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
