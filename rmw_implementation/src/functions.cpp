@@ -346,6 +346,13 @@ RMW_INTERFACE_FN(
   4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(
+  rmw_take_sequence,
+  rmw_ret_t, RMW_RET_ERROR,
+  6, ARG_TYPES(
+    const rmw_subscription_t *, size_t, rmw_message_sequence_t *,
+    rmw_message_info_sequence_t *, size_t *, rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(
   rmw_take_with_info,
   rmw_ret_t, RMW_RET_ERROR,
   5,
