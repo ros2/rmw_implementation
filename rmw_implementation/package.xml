@@ -21,8 +21,9 @@
   <build_depend>rmw_connext_cpp</build_depend>
   <build_depend>rmw_cyclonedds_cpp</build_depend>
   <build_depend>rmw_fastrtps_cpp</build_depend>
-  <build_depend>rmw_implementation_cmake</build_depend>
   <!-- end of group dependencies added for bloom -->
+
+  <depend>rmw_implementation_cmake</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
