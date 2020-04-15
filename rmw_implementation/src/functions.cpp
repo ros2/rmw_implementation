@@ -24,6 +24,7 @@
 #include "rcutils/types/string_array.h"
 
 #include "rcpputils/find_library.hpp"
+#include "rcpputils/get_env.hpp"
 #include "rcpputils/shared_library.hpp"
 
 #include "rmw/error_handling.h"
@@ -38,23 +39,13 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
-std::string get_env_var(const char * env_var)
-{
-  const char * value{};
-  const char * err = rcutils_get_env(env_var, &value);
-  if (err) {
-    throw std::runtime_error(err);
-  }
-  return value ? value : "";
-}
-
 std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
   static std::shared_ptr<rcpputils::SharedLibrary> lib;
 
   if (!lib) {
-    std::string env_var = get_env_var("RMW_IMPLEMENTATION");
+    std::string env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
     }
