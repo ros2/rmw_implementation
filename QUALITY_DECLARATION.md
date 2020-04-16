@@ -12,13 +12,11 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 `rmw_implementation` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning), and is at or above a stable version, i.e. `>= 1.0.0`.
 
+**TODO** The current version is 0.8.2.
+
 ### Version Stability [1.ii]
 
 ### Public API Declaration [1.iii]
-
-All symbols in the installed headers are considered part of the public API.
-
-All installed headers are in the `include` directory of the package, headers in any other folders are not installed and considered private.
 
 **`rmw_implementation` doesn't expose a public API.**
 
@@ -40,7 +38,7 @@ All changes occur through a pull request
 
 ### Contributor Origin [2.ii]
 
-Must have confirmation of contributor origin (e.g. DCO, CLA, etc.).
+Must have confirmation of contributor origin. DCO is activated
 
 ### Peer Review Policy [2.iii]
 
@@ -48,7 +46,7 @@ All pull request have two peer reviews
 
 ### Continuous Integration [2.iv]
 
-all pull request must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers)
+All pull request must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers)
 
 ### Documentation Policy [2.v]
 
@@ -81,19 +79,13 @@ There is an automated test which runs a linter (ament_copyright) that ensures ea
 
 ### Feature Testing [4.i]
 
-Each feature in `rmw_implementation` has corresponding tests which simulate typical usage, and they are located in the `test` directory.
-New features are required to have tests before being added.
+`rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis).
 
 ### Public API Testing [4.ii]
 
-<!-- ### Public API Testing
-
-Each part of the public API have tests, and new additions or changes to the public API require tests before being added.
-The tests aim to cover both typical usage and corner cases, but are quantified by contributing to code coverage. -->
+`rmw_implementation` doesn't expose a public API.
 
 ### Coverage [4.iii]
-
-TODO fix link
 
 `rmw_implementation` follows the recommendations for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#coverage), and opts to use branch coverage instead of line coverage.
 
@@ -115,8 +107,6 @@ TODO FIXME
 
 ### Linters and Static Analysis [4.v]
 
-TODO fix link
-
 `rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis).
 
 TODO any qualifications on what "passing" means for certain linters
@@ -134,6 +124,7 @@ TODO any qualifications on what "passing" means for certain linters
  - rcpputils
  - rcutils
  - rmw
+ - rmw_implementation_cmake
 
 It has one "buildtool" dependency, which do not affect the resulting quality of the package, because they do not contribute to the public library API.
 It also has several test dependencies, which do not affect the resulting quality of the package, because they are only used to build and run the test code.
@@ -141,5 +132,3 @@ It also has several test dependencies, which do not affect the resulting quality
 ## Platform Support [6]
 
 `rmw_implementation` supports all of the tier 1 platforms as described in [REP-2000](https://www.ros.org/reps/rep-2000.html#support-tiers), and tests each change against all of them.
-
-TODO make additional statements about non-tier 1 platforms?
