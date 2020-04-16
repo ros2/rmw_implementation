@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include <cstddef>
+#include <stdexcept>
 
+#include <memory>
 #include <string>
 
 #include "rcutils/allocator.h"
@@ -21,9 +23,10 @@
 #include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
-#include "Poco/SharedLibrary.h"
-
 #include "rcpputils/find_library.hpp"
+#include "rcpputils/get_env.hpp"
+#include "rcpputils/shared_library.hpp"
+
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
 #include "rmw/names_and_types.h"
@@ -36,22 +39,13 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
-std::string get_env_var(const char * env_var)
-{
-  const char * value{};
-  const char * err = rcutils_get_env(env_var, &value);
-  if (err) {
-    throw std::runtime_error(err);
-  }
-  return value ? value : "";
-}
-
-Poco::SharedLibrary *
+std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
-  static Poco::SharedLibrary * lib = nullptr;
+  static std::shared_ptr<rcpputils::SharedLibrary> lib;
+
   if (!lib) {
-    std::string env_var = get_env_var("RMW_IMPLEMENTATION");
+    std::string env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
     if (env_var.empty()) {
       env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
     }
@@ -61,17 +55,18 @@ get_library()
         ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
       return nullptr;
     }
+
     try {
-      lib = new Poco::SharedLibrary(library_path);
-    } catch (Poco::LibraryLoadException & e) {
+      lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
+    } catch (const std::runtime_error & e) {
       RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation. Exception: " +
-        e.displayText()).c_str());
+        ("failed to load shared library of rmw implementation: " + library_path +
+        " Exception: " + std::string(e.what())).c_str());
       return nullptr;
-    } catch (...) {
-      RMW_SET_ERROR_MSG("failed to load shared library of rmw implementation");
+    } catch (const std::bad_alloc & e) {
       RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation: " + library_path).c_str());
+        ("failed to load shared library of rmw implementation " + library_path + ": " +
+        std::string(e.what())).c_str());
       return nullptr;
     }
   }
@@ -81,16 +76,19 @@ get_library()
 void *
 get_symbol(const char * symbol_name)
 {
-  Poco::SharedLibrary * lib = get_library();
+  std::shared_ptr<rcpputils::SharedLibrary> lib = get_library();
+
   if (!lib) {
     // error message set by get_library()
     return nullptr;
   }
-  if (!lib->hasSymbol(symbol_name)) {
+
+  if (!lib->has_symbol(symbol_name)) {
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
     char * msg = rcutils_format_string(
       allocator,
-      "failed to resolve symbol '%s' in shared library '%s'", symbol_name, lib->getPath().c_str());
+      "failed to resolve symbol '%s' in shared library '%s'", symbol_name,
+      lib->get_library_path().c_str());
     if (msg) {
       RMW_SET_ERROR_MSG(msg);
       allocator.deallocate(msg, allocator.state);
@@ -99,7 +97,7 @@ get_symbol(const char * symbol_name)
     }
     return nullptr;
   }
-  return lib->getSymbol(symbol_name);
+  return lib->get_symbol(symbol_name);
 }
 
 #ifdef __cplusplus
@@ -190,9 +188,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
-  6, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, const rmw_node_security_options_t *,
-    bool))
+  5, ARG_TYPES(
+    rmw_context_t *, const char *, const char *, size_t, bool))
 
 RMW_INTERFACE_FN(
   rmw_destroy_node,
@@ -268,6 +265,11 @@ RMW_INTERFACE_FN(
   2, ARG_TYPES(const rmw_publisher_t *, rmw_qos_profile_t *))
 
 RMW_INTERFACE_FN(
+  rmw_publisher_event_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(rmw_event_t *, const rmw_publisher_t *, rmw_event_type_t))
+
+RMW_INTERFACE_FN(
   rmw_publish_serialized_message,
   rmw_ret_t, RMW_RET_ERROR,
   3,
@@ -332,6 +334,11 @@ RMW_INTERFACE_FN(
   rmw_subscription_get_actual_qos,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_subscription_t *, rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(
+  rmw_subscription_event_init,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(rmw_event_t *, const rmw_subscription_t *, rmw_event_type_t))
 
 RMW_INTERFACE_FN(
   rmw_take,
@@ -508,6 +515,13 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(const rmw_node_t *, rcutils_string_array_t *, rcutils_string_array_t *))
 
 RMW_INTERFACE_FN(
+  rmw_get_node_names_with_enclaves,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_node_t *, rcutils_string_array_t *,
+    rcutils_string_array_t *, rcutils_string_array_t *))
+
+RMW_INTERFACE_FN(
   rmw_count_publishers,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_node_t *, const char *, size_t *))
@@ -584,6 +598,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
   GET_SYMBOL(rmw_publisher_get_actual_qos);
+  GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
   GET_SYMBOL(rmw_get_serialized_message_size)
@@ -595,6 +610,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_destroy_subscription)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
   GET_SYMBOL(rmw_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_subscription_event_init)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
@@ -624,6 +640,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_topic_names_and_types)
   GET_SYMBOL(rmw_get_service_names_and_types)
   GET_SYMBOL(rmw_get_node_names)
+  GET_SYMBOL(rmw_get_node_names_with_enclaves)
   GET_SYMBOL(rmw_count_publishers)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
