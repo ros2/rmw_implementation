@@ -18,7 +18,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Public API Declaration [1.iii]
 
-**`rmw_implementation` doesn't expose a public API.**
+**`rmw_implementation` does not expose a public API.**
 
 ### API Stability Within a Released ROS Distribution [1.iv]/[1.vi]
 
@@ -61,7 +61,7 @@ There is documentation for all of the features, and new features require documen
 
 ### Public API Documentation [3.ii]
 
-`rmw_implementation` doesn't expose a public API.
+`rmw_implementation` does not expose a public API.
 
 ### License [3.iii]
 
@@ -79,31 +79,19 @@ There is an automated test which runs a linter (ament_copyright) that ensures ea
 
 ### Feature Testing [4.i]
 
-`rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis).
+There are currently no public features undergoing tests.
 
 ### Public API Testing [4.ii]
 
-`rmw_implementation` doesn't expose a public API.
+`rmw_implementation` does not expose a public API. There are currently no tests for the public API.
 
 ### Coverage [4.iii]
 
-`rmw_implementation` follows the recommendations for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#coverage), and opts to use branch coverage instead of line coverage.
-
-This includes:
-
-- tracking and reporting branch coverage statistics
-- achieving and maintaining branch coverage at or above 95%
-- no lines are manually skipped in coverage calculations
-
-Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.
-
-Current coverage statistics can be viewed here:
-
-TODO FIXME
-
-![](https://codecov.io/gh/ahcorde/rmw_implementation/branch/ahcorde_code_coverage/graphs/sunburst.svg)
+`rmw_implementation` does not currently track test coverage.
 
 ### Performance [4.iv]
+
+`rmw_implementation` does not currently have performance tests.
 
 ### Linters and Static Analysis [4.v]
 
