@@ -61,10 +61,11 @@ else()
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
+  ament_export_targets(${PROJECT_NAME})
   ament_export_dependencies(rcpputils rcutils)
 
   install(
-    TARGETS ${PROJECT_NAME}
+    TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
