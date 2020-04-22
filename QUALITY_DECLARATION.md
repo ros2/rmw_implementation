@@ -2,7 +2,7 @@ This document is a declaration of software quality for the `rmw_implementation` 
 
 # `rmw_implementation` Quality Declaration
 
-The package `rmw_implementation` claims to be in the **Quality Level 1** category.
+The package `rmw_implementation` claims to be in the **Quality Level 4** category.
 
 Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 1 in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
@@ -12,9 +12,9 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 `rmw_implementation` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning), and is at or above a stable version, i.e. `>= 1.0.0`.
 
-**TODO** The current version is 0.8.2.
-
 ### Version Stability [1.ii]
+
+`rmw_implementation` is not yet at a stable version, i.e. >= 1.0.0.
 
 ### Public API Declaration [1.iii]
 
@@ -34,19 +34,25 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Change Requests [2.i]
 
-All changes occur through a pull request
+This package requires that all changes occurr through a pull request.
 
 ### Contributor Origin [2.ii]
 
-Must have confirmation of contributor origin. DCO is activated
+This package has a confirmation of contributor origin policy, which can be found in [CONTRIBUTING](./CONTRIBUTING.md).
 
 ### Peer Review Policy [2.iii]
 
-All pull request have two peer reviews
+Following the recommended guidelines for ROS Core packages, all pull request have at least 1 peer review.
 
 ### Continuous Integration [2.iv]
 
 All pull request must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers)
+
+Currently nightly results can be seen here:
+* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/rmw_implementation/)
+* [linux-arm64_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rmw_implementation/)
+* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
+* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
 
 ### Documentation Policy [2.v]
 
@@ -56,8 +62,7 @@ All pull request must resolve related documentation changes before merging
 
 ### Feature Documentation [3.i]
 
-`rmw_implementation` has a [feature list](TODO) and each item in the list links to the corresponding feature documentation.
-There is documentation for all of the features, and new features require documentation before being added.
+`rmw_implementation` does not have any feature documentation and it will need to be added for higher quality levels.
 
 ### Public API Documentation [3.ii]
 
@@ -65,7 +70,7 @@ There is documentation for all of the features, and new features require documen
 
 ### License [3.iii]
 
-The license for `rmw_implementation` is Apache 2.0, and a summary is in each source file, the type is declared in the `package.xml` manifest file, and a full copy of the license is in the [LICENSE](./LICENSE) file.
+The license for `rmw_implementation` is Apache 2.0, and a summary is in each source file, the type is declared in the [package.xml](./package.xml) manifest file, and a full copy of the license is in the [LICENSE](./LICENSE) file.
 
 There is an automated test which runs a linter (ament_copyright) that ensures each file has a license statement.
 
@@ -74,6 +79,8 @@ There is an automated test which runs a linter (ament_copyright) that ensures ea
 The copyright holders each provide a statement of copyright in each source code file in `rmw_implementation`.
 
 There is an automated test which runs a linter (ament_copyright) that ensures each file has at least one copyright statement.
+
+Most recent test results can be found [here](http://build.ros2.org/view/Epr/job/Epr__class_loader__ubuntu_bionic_amd64/lastBuild/testReport/rmw_implementation/)
 
 ## Testing [4]
 
@@ -97,15 +104,15 @@ There are currently no public features undergoing tests.
 
 `rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis).
 
-TODO any qualifications on what "passing" means for certain linters
+Currently nightly results can be seen here:
+* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/rmw_implementation/)
+* [linux-arm64_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rmw_implementation/)
+* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
+* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
 
 ## Dependencies [5]
 
-### Direct Runtime ROS Dependencies [5.i]
-
-### Optional Direct Runtime ROS Dependencies [5.ii]
-
-### Direct Runtime non-ROS Dependency [5.iii]
+### Direct Runtime ROS Dependencies [5.i/5.ii]
 
 `rmw_implementation` has run-time and build-time dependencies that need to be considered for this declaration.
 
@@ -114,9 +121,67 @@ TODO any qualifications on what "passing" means for certain linters
  - rmw
  - rmw_implementation_cmake
 
+### Direct Runtime non-ROS Dependency [5.iii]
+
+`rosidl_typesupport_cpp` does not have any runtime non-ROS dependencies.
+
 It has one "buildtool" dependency, which do not affect the resulting quality of the package, because they do not contribute to the public library API.
 It also has several test dependencies, which do not affect the resulting quality of the package, because they are only used to build and run the test code.
 
 ## Platform Support [6]
 
 `rmw_implementation` supports all of the tier 1 platforms as described in [REP-2000](https://www.ros.org/reps/rep-2000.html#support-tiers), and tests each change against all of them.
+
+Currently nightly results can be seen here:
+* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/rmw_implementation/)
+* [linux-arm64_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rmw_implementation/)
+* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
+* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
+
+## Vulnerability Disclosure Policy [7.i]
+
+This package does not yet have a Vulnerability Disclosure Policy
+
+# Current status Summary
+
+The chart below compares the requirements in the REP-2004 with the current state of the rcutils package.
+
+|Number|  Requirement| Current state |
+|--|--|--|
+|1| **Version policy** |---|
+|1.i|Version Policy available | ✓ |
+|1.ii|Stable version |x|
+|1.iii|Declared public API|None|
+|1.iv|API stability policy|None|
+|1.v|ABI stability policy|None|
+|1.vi_|API/ABI stable within ros distribution|None|
+|2| **Change control process** |---|
+|2.i| All changes occur on change request |✓|
+|2.ii| Contributor origin (DCO, CLA, etc) |x|
+|2.iii| Peer review policy |✓|
+|2.iv| CI policy for change requests |x|
+|2.v| Documentation policy for change requests |☓|
+|3| **Documentation** | --- |
+|3.i| Per feature documentation | None |
+|3.ii| Per public API item documentation | None |
+|3.iii| Declared License(s) | ✓ |
+|3.iv| Copyright in source files| ✓ |
+|3.v.a| Quality declaration linked to README | ✓ |
+|3.v.b| Centralized declaration available for peer review |✓|
+|4| Testing | --- |
+|4.i| Feature items tests | None |
+|4.ii| Public API tests | None |
+|4.iii.a| Using coverage | None |
+|4.iii.a| Coverage policy | None |
+|4.iv.a| Performance tests (if applicable) | ? |
+|4.iv.b| Performance tests policy| None |
+|4.v.a| Code style enforcement (linters)| ✓ |
+|4.v.b| Use of static analysis tools | None |
+|5| Dependencies | --- |
+|5.i| Must not have ROS lower level dependencies | ✓ |
+|5.ii| Optional ROS lower level dependencies| ✓ |
+|5.iii| Justifies quality use of non-ROS dependencies |✓|
+|6| Platform support | --- |
+|6.i| Support targets Tier1 ROS platforms| ✓ |
+|7| Security | --- |
+|7.i| Vulnerability Disclosure Policy | ? |
