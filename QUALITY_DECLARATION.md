@@ -10,7 +10,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Version Scheme [1.i]
 
-`rmw_implementation` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning), and is at or above a stable version, i.e. `>= 1.0.0`.
+`rmw_implementation` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning).
 
 ### Version Stability [1.ii]
 
@@ -56,7 +56,7 @@ Currently nightly results can be seen here:
 
 ### Documentation Policy [2.v]
 
-All pull request must resolve related documentation changes before merging
+`rmw_implementation` does not expose a public API. There is no need to add documentation to new changes. In the case that this package has a public API the documetation of new functionality will be required.
 
 ## Documentation [3]
 
