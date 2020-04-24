@@ -45,7 +45,7 @@ This package has a confirmation of contributor origin policy, which can be found
 
 ### Peer Review Policy [2.iii]
 
-Following the recommended guidelines for ROS Core packages, all pull request have at least 1 peer review.
+All pull request will be peer-reviewed, check [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.
 
 ### Continuous Integration [2.iv]
 
@@ -59,13 +59,13 @@ Currently nightly results can be seen here:
 
 ### Documentation Policy [2.v]
 
-`rmw_implementation` does not expose a public API. There is no need to add documentation to new changes. In the case that this package has a public API the documetation of new functionality will be required.
+`rmw_implementation` does not expose a public API. There is no need to add documentation to new changes. In the case that this package adds public API features the documentation of new functionality will be required.
 
 ## Documentation [3]
 
 ### Feature Documentation [3.i]
 
-`rmw_implementation` does not have any feature documentation and it will need to be added for higher quality levels.
+`rmw_implementation` does not have any feature documentation and it will be needed to reach higher quality levels.
 
 ### Public API Documentation [3.ii]
 
@@ -154,19 +154,19 @@ The chart below compares the requirements in the REP-2004 with the current state
 |1| **Version policy** |---|
 |1.i|Version Policy available | ✓ |
 |1.ii|Stable version |x|
-|1.iii|Declared public API|None|
-|1.iv|API stability policy|None|
-|1.v|ABI stability policy|None|
-|1.vi_|API/ABI stable within ros distribution|None|
+|1.iii|Declared public API|Not required|
+|1.iv|API stability policy|✓|
+|1.v|ABI stability policy|✓|
+|1.vi_|API/ABI stable within ros distribution|✓|
 |2| **Change control process** |---|
 |2.i| All changes occur on change request |✓|
-|2.ii| Contributor origin (DCO, CLA, etc) |x|
+|2.ii| Contributor origin (DCO, CLA, etc) |✓|
 |2.iii| Peer review policy |✓|
-|2.iv| CI policy for change requests |x|
-|2.v| Documentation policy for change requests |☓|
+|2.iv| CI policy for change requests |✓|
+|2.v| Documentation policy for change requests |✓|
 |3| **Documentation** | --- |
-|3.i| Per feature documentation | None |
-|3.ii| Per public API item documentation | None |
+|3.i| Per feature documentation | ✓ |
+|3.ii| Per public API item documentation | Not required |
 |3.iii| Declared License(s) | ✓ |
 |3.iv| Copyright in source files| ✓ |
 |3.v.a| Quality declaration linked to README | ✓ |
@@ -176,7 +176,7 @@ The chart below compares the requirements in the REP-2004 with the current state
 |4.ii| Public API tests | None |
 |4.iii.a| Using coverage | None |
 |4.iii.a| Coverage policy | None |
-|4.iv.a| Performance tests (if applicable) | ? |
+|4.iv.a| Performance tests (if applicable) | x |
 |4.iv.b| Performance tests policy| None |
 |4.v.a| Code style enforcement (linters)| ✓ |
 |4.v.b| Use of static analysis tools | None |
@@ -187,4 +187,4 @@ The chart below compares the requirements in the REP-2004 with the current state
 |6| Platform support | --- |
 |6.i| Support targets Tier1 ROS platforms| ✓ |
 |7| Security | --- |
-|7.i| Vulnerability Disclosure Policy | ? |
+|7.i| Vulnerability Disclosure Policy | x |

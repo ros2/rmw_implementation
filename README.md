@@ -1,6 +1,6 @@
 # rmw_implementation
 
-The decision which ROS middleware implementation should be used for C++.
+Implementation of ROS middleware functions used in C++.
 
 ## Quality Declaration
 
