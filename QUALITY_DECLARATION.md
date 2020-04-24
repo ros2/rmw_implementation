@@ -20,14 +20,17 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 **`rmw_implementation` does not expose a public API.**
 
-### API Stability Within a Released ROS Distribution [1.iv]/[1.vi]
+### API Stability Policy [1.iv]
 
-`rmw_implementation` will not break public API within a released ROS distribution, i.e. no major releases once the ROS distribution is released.
+`rmw_implementation` will not break public API within a released ROS distribution, i.e. no major releases once the ROS distribution is released.
 
-### ABI Stability Within a Released ROS Distribution [1.v]/[1.vi]
+### ABI Stability Policy [1.v]
 
-`rmw_implementation` will maintain ABI stability within a ROS distribution.
+`rmw_implementation` contains C code and therefore must be concerned with ABI stability, and will maintain ABI stability within a ROS distribution.
 
+### ABI and ABI Stability Within a Released ROS Distribution [1.vi]
+
+`rmw_implementation` will not break API nor ABI within a released ROS distribution, i.e. no major releases once the ROS distribution is released.
 ## Change Control Process [2]
 
 `rmw_implementation` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process).
