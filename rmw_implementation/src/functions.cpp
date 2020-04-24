@@ -413,7 +413,7 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_take_response,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(const rmw_client_t *, rmw_request_id_t *, void *, bool *))
+  4, ARG_TYPES(const rmw_client_t *, rmw_service_info_t *, void *, bool *))
 
 RMW_INTERFACE_FN(
   rmw_create_service,
@@ -430,7 +430,7 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_take_request,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *, bool *))
+  4, ARG_TYPES(const rmw_service_t *, rmw_service_info_t *, void *, bool *))
 
 RMW_INTERFACE_FN(
   rmw_send_response,
