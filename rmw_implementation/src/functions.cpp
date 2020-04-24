@@ -211,7 +211,7 @@ RMW_INTERFACE_FN(
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(
     const rosidl_message_type_support_t *,
-    const rosidl_message_bounds_t *,
+    const rosidl_runtime_c__Sequence__bound *,
     rmw_publisher_allocation_t *))
 
 RMW_INTERFACE_FN(
@@ -282,7 +282,7 @@ RMW_INTERFACE_FN(
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(
     const rosidl_message_type_support_t *,
-    const rosidl_message_bounds_t *,
+    const rosidl_runtime_c__Sequence__bound *,
     size_t *))
 
 RMW_INTERFACE_FN(
@@ -305,7 +305,7 @@ RMW_INTERFACE_FN(
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(
     const rosidl_message_type_support_t *,
-    const rosidl_message_bounds_t *,
+    const rosidl_runtime_c__Sequence__bound *,
     rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(
