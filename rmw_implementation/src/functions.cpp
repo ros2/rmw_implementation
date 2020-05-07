@@ -197,11 +197,6 @@ RMW_INTERFACE_FN(
   1, ARG_TYPES(rmw_node_t *))
 
 RMW_INTERFACE_FN(
-  rmw_node_assert_liveliness,
-  rmw_ret_t, RMW_RET_ERROR,
-  1, ARG_TYPES(const rmw_node_t *))
-
-RMW_INTERFACE_FN(
   rmw_node_get_graph_guard_condition,
   const rmw_guard_condition_t *, nullptr,
   1, ARG_TYPES(const rmw_node_t *))
@@ -593,7 +588,6 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_serialization_format)
   GET_SYMBOL(rmw_create_node)
   GET_SYMBOL(rmw_destroy_node)
-  GET_SYMBOL(rmw_node_assert_liveliness)
   GET_SYMBOL(rmw_node_get_graph_guard_condition)
   GET_SYMBOL(rmw_init_publisher_allocation);
   GET_SYMBOL(rmw_fini_publisher_allocation);
