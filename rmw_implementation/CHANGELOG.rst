@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2020-05-12)
+------------------
+* Remove MANUAL_BY_NODE liveliness API (`#101 <https://github.com/ros2/rmw_implementation/issues/101>`_)
+* Contributors: Ivan Santiago Paunovic
+
 0.9.0 (2020-04-25)
 ------------------
 * Rename rosidl_message_bounds_t (`#98 <https://github.com/ros2/rmw_implementation/issues/98>`_)
