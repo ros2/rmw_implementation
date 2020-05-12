@@ -65,7 +65,7 @@ Currently nightly results can be seen here:
 
 ### Feature Documentation [3.i]
 
-`rmw_implementation` does not have any feature documentation and it will be needed to reach higher quality levels.
+`rmw_implementation` features are documented in the repository level [README](README.md).
 
 ### Public API Documentation [3.ii]
 
@@ -89,11 +89,11 @@ Most recent test results can be found [here](http://build.ros2.org/view/Epr/job/
 
 ### Feature Testing [4.i]
 
-There are currently no public features undergoing tests.
+`rmw_implementation` features enable ROS middleware configuration. Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/master/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/master/test_communication) packages, provide coverage.
 
 ### Public API Testing [4.ii]
 
-`rmw_implementation` does not expose a public API. There are currently no tests for the public API.
+`rmw_implementation` does not expose a public API.
 
 ### Coverage [4.iii]
 
