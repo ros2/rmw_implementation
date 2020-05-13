@@ -14,7 +14,8 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Version Stability [1.ii]
 
-`rmw_implementation` is not yet at a stable version, i.e. >= 1.0.0.
+`rmw_implementation` is at a stable version, i.e. `>= 1.0.0`.
+The current version can be found in its [package.xml](rmw_implementation/package.xml), and its change history can be found in its [CHANGELOG](rmw_implementation/CHANGELOG.rst).
 
 ### Public API Declaration [1.iii]
 
