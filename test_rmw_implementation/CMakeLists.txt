@@ -31,6 +31,8 @@ if(BUILD_TESTING)
       test/test_init_shutdown.cpp
       ENV ${rmw_implementation_env_var}
     )
+    target_compile_definitions(test_init_shutdown${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_init_shutdown${target_suffix}
       osrf_testing_tools_cpp rcutils rmw rmw_implementation
     )
