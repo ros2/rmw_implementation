@@ -35,6 +35,11 @@ TEST(TestInitShutdown, init_shutdown) {
 
   ret = rmw_init(&options, &context);
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    rmw_ret_t ret = rmw_context_fini(&context);
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+  });
 
   ret = rmw_shutdown(&context);
   EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
