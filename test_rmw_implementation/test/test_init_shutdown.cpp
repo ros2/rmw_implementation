@@ -21,8 +21,16 @@
 
 #include "rmw/rmw.h"
 
+#ifdef RMW_IMPLEMENTATION
+# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
+# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
+#else
+# define CLASSNAME(NAME, SUFFIX) NAME
+#endif
 
-TEST(TestInitShutdown, init_shutdown) {
+class CLASSNAME (TestInitShutdown, RMW_IMPLEMENTATION) : public ::testing::Test {};
+
+TEST_F(TestInitShutdown, init_shutdown) {
   rmw_context_t context = rmw_get_zero_initialized_context();
   rmw_init_options_t options = rmw_get_zero_initialized_init_options();
   rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
