@@ -68,10 +68,12 @@ TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), shutdown_with_bad_argume
   rcutils_reset_error();
 
   rmw_context_t context = rmw_get_zero_initialized_context();
-  EXPECT_NE(RMW_RET_OK, rmw_shutdown(&context));
+  rmw_ret_t ret = rmw_shutdown(&context);
+  EXPECT_TRUE((RMW_RET_INCORRECT_RMW_IMPLEMENTATION == ret) ||
+              (RMW_RET_INVALID_ARGUMENT == ret));
   rcutils_reset_error();
 
-  rmw_ret_t ret = rmw_init(&options, &context);
+  ret = rmw_init(&options, &context);
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
