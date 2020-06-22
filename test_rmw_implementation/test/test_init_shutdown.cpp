@@ -69,8 +69,9 @@ TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), shutdown_with_bad_argume
 
   rmw_context_t context = rmw_get_zero_initialized_context();
   rmw_ret_t ret = rmw_shutdown(&context);
-  EXPECT_TRUE((RMW_RET_INCORRECT_RMW_IMPLEMENTATION == ret) ||
-              (RMW_RET_INVALID_ARGUMENT == ret));
+  EXPECT_TRUE(
+    (RMW_RET_INCORRECT_RMW_IMPLEMENTATION == ret) ||
+    (RMW_RET_INVALID_ARGUMENT == ret));
   rcutils_reset_error();
 
   ret = rmw_init(&options, &context);
