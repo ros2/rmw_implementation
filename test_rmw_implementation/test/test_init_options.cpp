@@ -73,7 +73,7 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_with_bad_arguments) 
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
 
-  // Initialization and finalization still succeed.
+  // Initialization and finalization should still succeed.
   ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   ret = rmw_init_options_fini(&options);
@@ -111,7 +111,7 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), copy_with_bad_arguments) 
   src_options.implementation_identifier = implementation_identifier;
   rcutils_reset_error();
 
-  // Initialization and finalization still succeed.
+  // Initialization and finalization should still succeed.
   ret = rmw_init_options_init(&dst_options, rcutils_get_default_allocator());
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   ret = rmw_init_options_fini(&dst_options);
@@ -141,7 +141,7 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), fini_with_bad_arguments) 
   ret = rmw_init_options_fini(&options);
   EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
 
-  // Initialization and finalization still succeed.
+  // Initialization and finalization should still succeed.
   ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   ret = rmw_init_options_fini(&options);
