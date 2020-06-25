@@ -142,7 +142,9 @@ Currently nightly results can be seen here:
 * [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
 * [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
 
-## Vulnerability Disclosure Policy [7.i]
+## Security [7]
+
+### Vulnerability Disclosure Policy [7.i]
 
 This package conforms to the Vulnerability Disclosure Policy in [REP-2006](https://www.ros.org/reps/rep-2006.html).
 
@@ -172,7 +174,7 @@ The chart below compares the requirements in the REP-2004 with the current state
 |3.iv| Copyright in source files| ✓ |
 |3.v.a| Quality declaration linked to README | ✓ |
 |3.v.b| Centralized declaration available for peer review |✓|
-|4| Testing | --- |
+|4| **Testing** | --- |
 |4.i| Feature items tests | None |
 |4.ii| Public API tests | None |
 |4.iii.a| Using coverage | None |
@@ -181,11 +183,11 @@ The chart below compares the requirements in the REP-2004 with the current state
 |4.iv.b| Performance tests policy| None |
 |4.v.a| Code style enforcement (linters)| ✓ |
 |4.v.b| Use of static analysis tools | None |
-|5| Dependencies | --- |
+|5| **Dependencies** | --- |
 |5.i| Must not have ROS lower level dependencies | ✓ |
 |5.ii| Optional ROS lower level dependencies| ✓ |
 |5.iii| Justifies quality use of non-ROS dependencies |✓|
 |6| Platform support | --- |
 |6.i| Support targets Tier1 ROS platforms| ✓ |
-|7| Security | --- |
+|7| **Security** | --- |
 |7.i| Vulnerability Disclosure Policy | ✓ |
