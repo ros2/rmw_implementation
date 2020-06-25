@@ -127,7 +127,7 @@ Currently nightly results can be seen here:
 
 ### Direct Runtime non-ROS Dependency [5.iii]
 
-`rosidl_typesupport_cpp` does not have any runtime non-ROS dependencies.
+`rmw_implementation` does not have any runtime non-ROS dependencies.
 
 It has one "buildtool" dependency, which do not affect the resulting quality of the package, because they do not contribute to the public library API.
 It also has several test dependencies, which do not affect the resulting quality of the package, because they are only used to build and run the test code.
