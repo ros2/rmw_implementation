@@ -15,7 +15,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 ### Version Stability [1.ii]
 
 `rmw_implementation` is at a stable version, i.e. `>= 1.0.0`.
-The current version can be found in its [package.xml](rmw_implementation/package.xml), and its change history can be found in its [CHANGELOG](rmw_implementation/CHANGELOG.rst).
+The current version can be found in its [package.xml](./package.xml), and its change history can be found in its [CHANGELOG](./CHANGELOG.rst).
 
 ### Public API Declaration [1.iii]
 
@@ -32,6 +32,7 @@ The current version can be found in its [package.xml](rmw_implementation/package
 ### ABI and ABI Stability Within a Released ROS Distribution [1.vi]
 
 `rmw_implementation` will not break API nor ABI within a released ROS distribution, i.e. no major releases once the ROS distribution is released.
+
 ## Change Control Process [2]
 
 `rmw_implementation` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process).
@@ -42,7 +43,7 @@ This package requires that all changes occurr through a pull request.
 
 ### Contributor Origin [2.ii]
 
-This package has a confirmation of contributor origin policy, which can be found in [CONTRIBUTING](./CONTRIBUTING.md).
+This package has a confirmation of contributor origin policy, which can be found in [CONTRIBUTING](../CONTRIBUTING.md).
 
 ### Peer Review Policy [2.iii]
 
@@ -74,7 +75,7 @@ Currently nightly results can be seen here:
 
 ### License [3.iii]
 
-The license for `rmw_implementation` is Apache 2.0, and a summary is in each source file, the type is declared in the [package.xml](rmw_implementation/package.xml) manifest file, and a full copy of the license is in the [LICENSE](./LICENSE) file.
+The license for `rmw_implementation` is Apache 2.0, and a summary is in each source file, the type is declared in the [package.xml](./package.xml) manifest file, and a full copy of the license is in the [LICENSE](../LICENSE) file.
 
 There is an automated test which runs a linter (ament_copyright) that ensures each file has a license statement.
 
@@ -150,7 +151,7 @@ This package conforms to the Vulnerability Disclosure Policy in [REP-2006](https
 
 # Current status Summary
 
-The chart below compares the requirements in the REP-2004 with the current state of the rcutils package.
+The chart below compares the requirements in the REP-2004 with the current state of the rmw_implementation package.
 
 |Number|  Requirement| Current state |
 |--|--|--|
