@@ -36,6 +36,16 @@ if(BUILD_TESTING)
     ament_target_dependencies(test_init_shutdown${target_suffix}
       osrf_testing_tools_cpp rcutils rmw rmw_implementation
     )
+
+    ament_add_gtest(test_init_options${target_suffix}
+      test/test_init_options.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_init_options${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_init_options${target_suffix}
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation
+    )
   endmacro()
 
   call_for_each_rmw_implementation(test_api)
