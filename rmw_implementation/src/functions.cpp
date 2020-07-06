@@ -188,8 +188,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_create_node,
   rmw_node_t *, nullptr,
-  5, ARG_TYPES(
-    rmw_context_t *, const char *, const char *, size_t, bool))
+  3, ARG_TYPES(
+    rmw_context_t *, const char *, const char *))
 
 RMW_INTERFACE_FN(
   rmw_destroy_node,
