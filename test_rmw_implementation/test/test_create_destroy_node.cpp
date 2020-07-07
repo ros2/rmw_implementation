@@ -74,41 +74,27 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_wi
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-#ifndef NDEBUG
   const char * const invalid_name = "foo bar";
 
-  EXPECT_DEATH({
-      node = rmw_create_node(
-          &context,
-          nullptr,
-          node_namespace,
-          domain_id,
-          localhost_only);}, "");
+  node = rmw_create_node(
+    &context, nullptr, node_namespace, domain_id, localhost_only);
+  EXPECT_EQ(nullptr, node);
+  rmw_reset_error();
 
-  EXPECT_DEATH({
-    node = rmw_create_node(
-      &context,
-      invalid_name,
-      node_namespace,
-      domain_id,
-      localhost_only);}, "");
+  node = rmw_create_node(
+    &context, invalid_name, node_namespace, domain_id, localhost_only);
+  EXPECT_EQ(nullptr, node);
+  rmw_reset_error();
 
-  EXPECT_DEATH({
-      node = rmw_create_node(
-          &context,
-          node_name,
-          nullptr,
-          domain_id,
-          localhost_only);}, "");
+  node = rmw_create_node(
+    &context, node_name, nullptr, domain_id, localhost_only);
+  EXPECT_EQ(nullptr, node);
+  rmw_reset_error();
 
-  EXPECT_DEATH({
-    node = rmw_create_node(
-      &context,
-      node_name,
-      invalid_name,
-      domain_id,
-      localhost_only);}, "");
-#endif
+  node = rmw_create_node(
+    &context, node_name, invalid_name, domain_id, localhost_only);
+  EXPECT_EQ(nullptr, node);
+  rmw_reset_error();
 
   const char * implementation_identifier = context.implementation_identifier;
   context.implementation_identifier = "not-an-rmw-implementation-identifier";
