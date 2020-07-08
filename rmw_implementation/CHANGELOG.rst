@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2020-07-08)
+------------------
 * Remove domain_id and localhost_only from node API (`#114 <https://github.com/ros2/rmw_implementation/issues/114>`_)
 * Move the quality declaration into the rmw_implementation subdirectory. (`#111 <https://github.com/ros2/rmw_implementation/issues/111>`_)
 * Contributors: Chris Lalancette, Ivan Santiago Paunovic
