@@ -16,6 +16,7 @@
 
 #include "rcutils/allocator.h"
 #include "rcutils/error_handling.h"
+#include "rcutils/strdup.h"
 
 #include "rmw/rmw.h"
 
@@ -34,6 +35,8 @@ protected:
     options = rmw_get_zero_initialized_init_options();
     rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+    options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
+    ASSERT_STREQ("/", options.enclave);
   }
 
   void TearDown() override
@@ -61,6 +64,12 @@ TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), init_with_bad_arguments)
   options.implementation_identifier = "not-a-real-rmw-implementation-identifier";
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, rmw_init(&options, &context));
   options.implementation_identifier = implementation_identifier;
+  rcutils_reset_error();
+
+  char * enclave = options.enclave;
+  options.enclave = nullptr;
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_init(&options, &context));
+  options.enclave = enclave;
   rcutils_reset_error();
 
   // Initialization, shutdown, and finalization should still succeed
