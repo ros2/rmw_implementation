@@ -60,46 +60,37 @@ protected:
 TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
-  const size_t domain_id = RMW_DEFAULT_DOMAIN_ID;
-  const bool localhost_only = false;
 
-  rmw_node_t * node = rmw_create_node(
-    nullptr, node_name, node_namespace, domain_id, localhost_only);
+  rmw_node_t * node = rmw_create_node(nullptr, node_name, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
   rmw_context_t invalid_context = rmw_get_zero_initialized_context();
-  node = rmw_create_node(
-    &invalid_context, node_name, node_namespace, domain_id, localhost_only);
+  node = rmw_create_node(&invalid_context, node_name, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
   const char * const invalid_name = "foo bar";
 
-  node = rmw_create_node(
-    &context, nullptr, node_namespace, domain_id, localhost_only);
+  node = rmw_create_node(&context, nullptr, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-  node = rmw_create_node(
-    &context, invalid_name, node_namespace, domain_id, localhost_only);
+  node = rmw_create_node(&context, invalid_name, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-  node = rmw_create_node(
-    &context, node_name, nullptr, domain_id, localhost_only);
+  node = rmw_create_node(&context, node_name, nullptr);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-  node = rmw_create_node(
-    &context, node_name, invalid_name, domain_id, localhost_only);
+  node = rmw_create_node(&context, node_name, invalid_name);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
   const char * implementation_identifier = context.implementation_identifier;
   context.implementation_identifier = "not-an-rmw-implementation-identifier";
-  node = rmw_create_node(
-    &context, node_name, node_namespace, domain_id, localhost_only);
+  node = rmw_create_node(&context, node_name, node_namespace);
   EXPECT_EQ(nullptr, node);
   context.implementation_identifier = implementation_identifier;
   rmw_reset_error();
@@ -107,8 +98,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_wi
   rmw_ret_t ret = rmw_shutdown(&context);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  node = rmw_create_node(
-    &context, node_name, node_namespace, domain_id, localhost_only);
+  node = rmw_create_node(&context, node_name, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 }
@@ -120,10 +110,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), destroy_w
 
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
-  const size_t domain_id = RMW_DEFAULT_DOMAIN_ID;
-  const bool localhost_only = false;
-  rmw_node_t * node = rmw_create_node(
-    &context, node_name, node_namespace, domain_id, localhost_only);
+  rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
   ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
 
   const char * implementation_identifier = node->implementation_identifier;
@@ -140,10 +127,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), destroy_w
 TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_and_destroy) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
-  const size_t domain_id = RMW_DEFAULT_DOMAIN_ID;
-  const bool localhost_only = false;
-  rmw_node_t * node = rmw_create_node(
-    &context, node_name, node_namespace, domain_id, localhost_only);
+  rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
   ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
