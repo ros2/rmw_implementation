@@ -70,13 +70,13 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_wi
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-  const char * const invalid_name = "foo bar";
+  const char * const name_with_spaces = "foo bar";
 
   node = rmw_create_node(&context, nullptr, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-  node = rmw_create_node(&context, invalid_name, node_namespace);
+  node = rmw_create_node(&context, name_with_spaces, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
@@ -84,7 +84,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_wi
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
-  node = rmw_create_node(&context, node_name, invalid_name);
+  node = rmw_create_node(&context, node_name, name_with_spaces);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
 
