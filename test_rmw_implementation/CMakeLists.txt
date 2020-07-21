@@ -23,39 +23,42 @@ if(BUILD_TESTING)
   find_package(rmw_implementation_cmake REQUIRED)
 
   macro(test_api)
-    find_package(${rmw_implementation} REQUIRED)
-    message(STATUS "Creating API tests for '${rmw_implementation}'")
-    set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
+    # TODO(hidmic): run tests for all available RMW implementations
+    if("${rmw_implementation}" MATCHES ".*fastrtps.*")
+      find_package(${rmw_implementation} REQUIRED)
+      message(STATUS "Creating API tests for '${rmw_implementation}'")
+      set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
 
-    ament_add_gtest(test_init_shutdown${target_suffix}
-      test/test_init_shutdown.cpp
-      ENV ${rmw_implementation_env_var}
-    )
-    target_compile_definitions(test_init_shutdown${target_suffix}
-      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
-    ament_target_dependencies(test_init_shutdown${target_suffix}
-      osrf_testing_tools_cpp rcutils rmw rmw_implementation
-    )
+      ament_add_gtest(test_init_shutdown${target_suffix}
+        test/test_init_shutdown.cpp
+        ENV ${rmw_implementation_env_var}
+      )
+      target_compile_definitions(test_init_shutdown${target_suffix}
+        PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+      ament_target_dependencies(test_init_shutdown${target_suffix}
+        osrf_testing_tools_cpp rcutils rmw rmw_implementation
+      )
 
-    ament_add_gtest(test_init_options${target_suffix}
-      test/test_init_options.cpp
-      ENV ${rmw_implementation_env_var}
-    )
-    target_compile_definitions(test_init_options${target_suffix}
-      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
-    ament_target_dependencies(test_init_options${target_suffix}
-      osrf_testing_tools_cpp rcutils rmw rmw_implementation
-    )
+      ament_add_gtest(test_init_options${target_suffix}
+        test/test_init_options.cpp
+        ENV ${rmw_implementation_env_var}
+      )
+      target_compile_definitions(test_init_options${target_suffix}
+        PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+      ament_target_dependencies(test_init_options${target_suffix}
+        osrf_testing_tools_cpp rcutils rmw rmw_implementation
+      )
 
-    ament_add_gtest(test_create_destroy_node${target_suffix}
-      test/test_create_destroy_node.cpp
-      ENV ${rmw_implementation_env_var}
-    )
-    target_compile_definitions(test_create_destroy_node${target_suffix}
-      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
-    ament_target_dependencies(test_create_destroy_node${target_suffix}
-      osrf_testing_tools_cpp rcutils rmw rmw_implementation
-    )
+      ament_add_gtest(test_create_destroy_node${target_suffix}
+        test/test_create_destroy_node.cpp
+        ENV ${rmw_implementation_env_var}
+      )
+      target_compile_definitions(test_create_destroy_node${target_suffix}
+        PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+      ament_target_dependencies(test_create_destroy_node${target_suffix}
+        osrf_testing_tools_cpp rcutils rmw rmw_implementation
+      )
+    endif()
   endmacro()
 
   call_for_each_rmw_implementation(test_api)
