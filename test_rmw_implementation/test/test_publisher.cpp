@@ -42,8 +42,8 @@ protected:
     context = rmw_get_zero_initialized_context();
     ret = rmw_init(&init_options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
-    const char * const node_name = "my_test_node";
-    const char * const node_namespace = "/my_test_ns";
+    constexpr const char * node_name = "my_test_node";
+    constexpr const char * node_namespace = "/my_test_ns";
     node = rmw_create_node(&context, node_name, node_namespace);
     ASSERT_NE(nullptr, node) << rcutils_get_error_string().str;
   }
@@ -65,37 +65,9 @@ protected:
   rmw_node_t * node;
 };
 
-class CLASSNAME (TestPublisherUse, RMW_IMPLEMENTATION) :
-  public CLASSNAME (TestPublisher, RMW_IMPLEMENTATION)
-{
-protected:
-  using Base = CLASSNAME (TestPublisher, RMW_IMPLEMENTATION);
-
-  void SetUp() override
-  {
-    Base::SetUp();
-    rmw_publisher_options_t options = rmw_get_default_publisher_options();
-    pub = rmw_create_publisher(node, ts, topic_name, qos_profile, &options);
-    ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
-  }
-
-  void TearDown() override
-  {
-    rmw_ret_t ret = rmw_destroy_publisher(node, pub);
-    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    Base::TearDown();
-  }
-
-  rmw_publisher_t * pub;
-  const char * const topic_name{"/test"};
-  const rosidl_message_type_support_t * ts{
-    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes)};
-  const rmw_qos_profile_t * qos_profile{&rmw_qos_profile_default};
-};
-
 TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
-  const char * const topic_name = "/test";
+  constexpr const char * topic_name = "/test";
   const rosidl_message_type_support_t * ts =
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
   rmw_publisher_t * pub =
@@ -103,19 +75,25 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy) {
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
   rmw_ret_t ret = rmw_destroy_publisher(node, pub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
 
-  const char * const native_topic_name = "test";
+TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy_native) {
+  rmw_publisher_options_t options = rmw_get_default_publisher_options();
+  constexpr const char * topic_name = "test";
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
   rmw_qos_profile_t native_qos_profile = rmw_qos_profile_default;
   native_qos_profile.avoid_ros_namespace_conventions = true;
-  pub = rmw_create_publisher(node, ts, native_topic_name, &native_qos_profile, &options);
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &native_qos_profile, &options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
-  ret = rmw_destroy_publisher(node, pub);
+  rmw_ret_t ret = rmw_destroy_publisher(node, pub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
-  const char * const topic_name = "/test";
+  constexpr const char * topic_name = "/test";
   const rosidl_message_type_support_t * ts =
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
   rmw_publisher_t * pub =
@@ -135,29 +113,29 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
   rmw_reset_error();
 
   pub = rmw_create_publisher(node, ts, nullptr, &rmw_qos_profile_default, &options);
-  ASSERT_EQ(nullptr, pub);
+  EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
-  const char * const topic_name_with_spaces = "foo bar";
+  constexpr const char * topic_name_with_spaces = "/foo bar";
   pub = rmw_create_publisher(node, ts, topic_name_with_spaces, &rmw_qos_profile_default, &options);
-  ASSERT_EQ(nullptr, pub);
+  EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
-  const char * const relative_topic_name = "foo";
+  constexpr const char * relative_topic_name = "foo";
   pub = rmw_create_publisher(node, ts, relative_topic_name, &rmw_qos_profile_default, &options);
-  ASSERT_EQ(nullptr, pub);
+  EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
   pub = rmw_create_publisher(node, ts, topic_name, nullptr, &options);
-  ASSERT_EQ(nullptr, pub);
+  EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
   pub = rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_unknown, &options);
-  ASSERT_EQ(nullptr, pub);
+  EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
   pub = rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, nullptr);
-  ASSERT_EQ(nullptr, pub);
+  EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
   // Creating and destroying a publisher still succeeds.
@@ -169,7 +147,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
 
 TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
-  const char * const topic_name = "/test";
+  constexpr const char * topic_name = "/test";
   const rosidl_message_type_support_t * ts =
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
   rmw_publisher_t * pub =
@@ -200,7 +178,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_bad_arguments)
 
 TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_defaults) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
-  const char * const topic_name = "/test";
+  constexpr const char * topic_name = "/test";
   const rosidl_message_type_support_t * ts =
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
   rmw_publisher_t * pub =
@@ -209,6 +187,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
   rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
   rmw_ret_t ret = rmw_publisher_get_actual_qos(pub, &qos_profile);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  // Check that a valid QoS policy has been put in place for each system default one.
   EXPECT_NE(rmw_qos_profile_system_default.history, qos_profile.history);
   EXPECT_NE(rmw_qos_profile_unknown.history, qos_profile.history);
   EXPECT_NE(rmw_qos_profile_system_default.reliability, qos_profile.reliability);
@@ -222,6 +201,34 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
   ret = rmw_destroy_publisher(node, pub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
+
+class CLASSNAME (TestPublisherUse, RMW_IMPLEMENTATION) :
+  public CLASSNAME (TestPublisher, RMW_IMPLEMENTATION)
+{
+ protected:
+  using Base = CLASSNAME (TestPublisher, RMW_IMPLEMENTATION);
+
+  void SetUp() override
+  {
+    Base::SetUp();
+    rmw_publisher_options_t options = rmw_get_default_publisher_options();
+    pub = rmw_create_publisher(node, ts, topic_name, qos_profile, &options);
+    ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  }
+
+  void TearDown() override
+  {
+    rmw_ret_t ret = rmw_destroy_publisher(node, pub);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    Base::TearDown();
+  }
+
+  rmw_publisher_t * pub;
+  const char * const topic_name{"/test"};
+  const rosidl_message_type_support_t * ts{
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes)};
+  const rmw_qos_profile_t * qos_profile{&rmw_qos_profile_default};
+};
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos_with_bad_arguments) {
   rmw_qos_profile_t actual_qos_profile = rmw_qos_profile_unknown;
