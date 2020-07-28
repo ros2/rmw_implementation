@@ -202,11 +202,11 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestPublisherUse, RMW_IMPLEMENTATION) :
-  public CLASSNAME (TestPublisher, RMW_IMPLEMENTATION)
+class CLASSNAME (TestPublisherUse, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestPublisher, RMW_IMPLEMENTATION)
 {
- protected:
-  using Base = CLASSNAME (TestPublisher, RMW_IMPLEMENTATION);
+protected:
+  using Base = CLASSNAME(TestPublisher, RMW_IMPLEMENTATION);
 
   void SetUp() override
   {
