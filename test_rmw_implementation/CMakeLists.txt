@@ -21,6 +21,7 @@ if(BUILD_TESTING)
   find_package(rmw REQUIRED)
   find_package(rmw_implementation REQUIRED)
   find_package(rmw_implementation_cmake REQUIRED)
+  find_package(test_msgs REQUIRED)
 
   macro(test_api)
     find_package(${rmw_implementation} REQUIRED)
@@ -55,6 +56,16 @@ if(BUILD_TESTING)
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_create_destroy_node${target_suffix}
       osrf_testing_tools_cpp rcutils rmw rmw_implementation
+    )
+
+    ament_add_gtest(test_publisher${target_suffix}
+      test/test_publisher.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_publisher${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_publisher${target_suffix}
+      rcutils rmw rmw_implementation test_msgs
     )
   endmacro()
 
