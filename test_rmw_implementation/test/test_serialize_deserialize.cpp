@@ -44,14 +44,15 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_b
   ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&input_message));
   rcutils_allocator_t failing_allocator = get_failing_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
-  ASSERT_EQ(RMW_RET_OK, rmw_serialized_message_init(
-    &serialized_message, 0lu, &failing_allocator)) << rmw_get_error_string().str;
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &failing_allocator)) << rmw_get_error_string().str;
 
   EXPECT_NE(RMW_RET_OK, rmw_serialize(&input_message, ts, &serialized_message));
   rmw_reset_error();
 
-  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message))
-    << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+    rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_c_message) {
@@ -63,8 +64,9 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
-  ASSERT_EQ(RMW_RET_OK, rmw_serialized_message_init(
-    &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
 
   // Make input_message not equal to output_message.
   input_message.bool_value = !output_message.bool_value;
@@ -82,8 +84,8 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(input_message.int16_value, output_message.int16_value);
   EXPECT_EQ(input_message.uint32_value, output_message.uint32_value);
 
-  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message))
-    << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+    rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_message) {
@@ -93,8 +95,9 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   test_msgs::msg::BasicTypes output_message{};
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
-  ASSERT_EQ(RMW_RET_OK, rmw_serialized_message_init(
-    &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
 
   // Make input_message not equal to output_message.
   input_message.bool_value = !output_message.bool_value;
@@ -110,6 +113,6 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(input_message, output_message);
 
-  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message))
-    << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+    rmw_get_error_string().str;
 }
