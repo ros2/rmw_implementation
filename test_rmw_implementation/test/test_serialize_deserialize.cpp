@@ -49,6 +49,9 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_b
 
   EXPECT_NE(RMW_RET_OK, rmw_serialize(&input_message, ts, &serialized_message));
   rmw_reset_error();
+
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message))
+    << rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_c_message) {
@@ -63,6 +66,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   ASSERT_EQ(RMW_RET_OK, rmw_serialized_message_init(
     &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
 
+  // Make input_message not equal to output_message.
   input_message.bool_value = !output_message.bool_value;
   input_message.int16_value = output_message.int16_value - 1;
   input_message.uint32_value = output_message.uint32_value + 1000000;
@@ -77,6 +81,9 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(input_message.bool_value, output_message.bool_value);
   EXPECT_EQ(input_message.int16_value, output_message.int16_value);
   EXPECT_EQ(input_message.uint32_value, output_message.uint32_value);
+
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message))
+    << rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_message) {
@@ -89,9 +96,11 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   ASSERT_EQ(RMW_RET_OK, rmw_serialized_message_init(
     &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
 
+  // Make input_message not equal to output_message.
   input_message.bool_value = !output_message.bool_value;
   input_message.int16_value = output_message.int16_value - 1;
   input_message.uint32_value = output_message.uint32_value + 1000000;
+
   rmw_ret_t ret = rmw_serialize(&input_message, ts, &serialized_message);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_NE(nullptr, serialized_message.buffer);
@@ -100,4 +109,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   ret = rmw_deserialize(&serialized_message, ts, &output_message);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(input_message, output_message);
+
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message))
+    << rmw_get_error_string().str;
 }
