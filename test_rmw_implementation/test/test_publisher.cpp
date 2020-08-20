@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
 
@@ -177,6 +179,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_bad_arguments)
 }
 
 TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_defaults) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
@@ -185,7 +188,11 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
     rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_system_default, &options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
   rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-  rmw_ret_t ret = rmw_publisher_get_actual_qos(pub, &qos_profile);
+  rmw_ret_t ret;
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_get_actual_qos(pub, &qos_profile);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   // Check that a valid QoS policy has been put in place for each system default one.
   EXPECT_NE(rmw_qos_profile_system_default.history, qos_profile.history);
@@ -239,11 +246,23 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos_with_bad_
   ret = rmw_publisher_get_actual_qos(pub, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publisher_get_actual_qos(pub, &actual_qos_profile);
+  pub->implementation_identifier = implementation_identifier;
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
+  rmw_reset_error();
 }
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
   rmw_qos_profile_t actual_qos_profile = rmw_qos_profile_unknown;
-  rmw_ret_t ret = rmw_publisher_get_actual_qos(pub, &actual_qos_profile);
+  rmw_ret_t ret;
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_get_actual_qos(pub, &actual_qos_profile);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(rmw_qos_profile_default.history, actual_qos_profile.history);
   EXPECT_EQ(rmw_qos_profile_default.depth, actual_qos_profile.depth);

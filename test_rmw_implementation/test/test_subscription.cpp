@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
 
@@ -176,6 +178,7 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), destroy_with_bad_argumen
 }
 
 TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), get_actual_qos_from_system_defaults) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
   rmw_subscription_options_t options = rmw_get_default_subscription_options();
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
@@ -184,7 +187,11 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), get_actual_qos_from_syst
     rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_system_default, &options);
   ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
   rmw_qos_profile_t qos_profile = rmw_qos_profile_unknown;
-  rmw_ret_t ret = rmw_subscription_get_actual_qos(sub, &qos_profile);
+  rmw_ret_t ret;
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_get_actual_qos(sub, &qos_profile);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   // Check that a valid QoS policy has been put in place for each system default one.
   EXPECT_NE(rmw_qos_profile_system_default.history, qos_profile.history);
@@ -248,8 +255,13 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), get_actual_qos_with_b
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), get_actual_qos) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
   rmw_qos_profile_t actual_qos_profile = rmw_qos_profile_unknown;
-  rmw_ret_t ret = rmw_subscription_get_actual_qos(sub, &actual_qos_profile);
+  rmw_ret_t ret;
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_get_actual_qos(sub, &actual_qos_profile);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(rmw_qos_profile_default.history, actual_qos_profile.history);
   EXPECT_EQ(rmw_qos_profile_default.depth, actual_qos_profile.depth);
