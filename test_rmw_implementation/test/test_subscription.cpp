@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
 
@@ -21,6 +23,9 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
+
+#include "./config.hpp"
+#include "./testing_macros.hpp"
 
 #ifdef RMW_IMPLEMENTATION
 # define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
@@ -280,8 +285,14 @@ TEST_F(
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_matched_subscriptions) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
+
+  rmw_ret_t ret;
   size_t publisher_count = 0u;
-  rmw_ret_t ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
 
@@ -289,21 +300,49 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_matched_subscri
   rmw_publisher_t * pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &options);
   ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
 
-  ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+    if (RMW_RET_OK == ret && 1u == publisher_count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(1u, publisher_count);
 
   ret = rmw_destroy_publisher(node, pub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+    if (RMW_RET_OK == ret && 0u == publisher_count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_mismatched_subscriptions) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
+
+  rmw_ret_t ret;
   size_t publisher_count = 0u;
-  rmw_ret_t ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
 
@@ -315,14 +354,28 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_mismatched_subs
     rmw_create_publisher(node, ts, topic_name, &other_qos_profile, &options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
 
-  ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+    if (RMW_RET_OK == ret && 0u != publisher_count) {  // Early return on failure.
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
 
   ret = rmw_destroy_publisher(node, pub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_subscription_count_matched_publishers(sub, &publisher_count);
+  });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
 }

@@ -34,6 +34,7 @@ if(BUILD_TESTING)
     )
     target_compile_definitions(test_init_shutdown${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+
     ament_target_dependencies(test_init_shutdown${target_suffix}
       osrf_testing_tools_cpp rcutils rmw rmw_implementation
     )
@@ -65,7 +66,7 @@ if(BUILD_TESTING)
     target_compile_definitions(test_publisher${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_publisher${target_suffix}
-      rcutils rmw rmw_implementation test_msgs
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
     )
 
     ament_add_gtest(test_subscription${target_suffix}
@@ -75,7 +76,7 @@ if(BUILD_TESTING)
     target_compile_definitions(test_subscription${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_subscription${target_suffix}
-      rcutils rmw rmw_implementation test_msgs
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
     )
 
     ament_add_gtest(test_serialize_deserialize${target_suffix}
