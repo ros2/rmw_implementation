@@ -258,9 +258,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos) {
   EXPECT_EQ(qos_profile.durability, actual_qos_profile.durability);
 }
 
-TEST_F(
-  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
-  count_matched_subscriptions_with_bad_arguments) {
+TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscriptions_with_bad_args) {
   size_t subscription_count = 0u;
   rmw_ret_t ret = rmw_publisher_count_matched_subscriptions(nullptr, &subscription_count);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
