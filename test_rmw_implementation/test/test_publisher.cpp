@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
 
@@ -21,6 +23,9 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
+
+#include "./config.hpp"
+#include "./testing_macros.hpp"
 
 #ifdef RMW_IMPLEMENTATION
 # define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
@@ -211,8 +216,10 @@ protected:
   void SetUp() override
   {
     Base::SetUp();
+    // Relax QoS policies to force mismatch.
+    qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
     rmw_publisher_options_t options = rmw_get_default_publisher_options();
-    pub = rmw_create_publisher(node, ts, topic_name, qos_profile, &options);
+    pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &options);
     ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
   }
 
@@ -223,11 +230,11 @@ protected:
     Base::TearDown();
   }
 
-  rmw_publisher_t * pub;
+  rmw_publisher_t * pub{nullptr};
   const char * const topic_name = "/test";
   const rosidl_message_type_support_t * ts{
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes)};
-  const rmw_qos_profile_t * qos_profile{&rmw_qos_profile_default};
+  rmw_qos_profile_t qos_profile{rmw_qos_profile_default};
 };
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos_with_bad_arguments) {
@@ -245,8 +252,121 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos) {
   rmw_qos_profile_t actual_qos_profile = rmw_qos_profile_unknown;
   rmw_ret_t ret = rmw_publisher_get_actual_qos(pub, &actual_qos_profile);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  EXPECT_EQ(rmw_qos_profile_default.history, actual_qos_profile.history);
-  EXPECT_EQ(rmw_qos_profile_default.depth, actual_qos_profile.depth);
-  EXPECT_EQ(rmw_qos_profile_default.reliability, actual_qos_profile.reliability);
-  EXPECT_EQ(rmw_qos_profile_default.durability, actual_qos_profile.durability);
+  EXPECT_EQ(qos_profile.history, actual_qos_profile.history);
+  EXPECT_EQ(qos_profile.depth, actual_qos_profile.depth);
+  EXPECT_EQ(qos_profile.reliability, actual_qos_profile.reliability);
+  EXPECT_EQ(qos_profile.durability, actual_qos_profile.durability);
+}
+
+TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscriptions_with_bad_args) {
+  size_t subscription_count = 0u;
+  rmw_ret_t ret = rmw_publisher_count_matched_subscriptions(nullptr, &subscription_count);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+
+  ret = rmw_publisher_count_matched_subscriptions(pub, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  pub->implementation_identifier = implementation_identifier;
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
+  rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscriptions) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
+
+  rmw_ret_t ret;
+  size_t subscription_count = 0u;
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(0u, subscription_count);
+
+  rmw_subscription_options_t options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub = rmw_create_subscription(node, ts, topic_name, &qos_profile, &options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+
+  // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 1u == subscription_count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(1u, subscription_count);
+
+  ret = rmw_destroy_subscription(node, sub);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 0u == subscription_count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(0u, subscription_count);
+}
+
+TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscriptions) {
+  osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
+
+  rmw_ret_t ret;
+  size_t subscription_count = 0u;
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(0u, subscription_count);
+
+  // Tighten QoS policies to force mismatch.
+  rmw_qos_profile_t other_qos_profile = qos_profile;
+  other_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+  rmw_subscription_options_t options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &other_qos_profile, &options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+
+  // TODO(hidmic): revisit when https://github.com/ros2/rmw/issues/264 is resolved.
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 0u != subscription_count) {  // Early return on failure.
+      break;
+    }
+  }
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(0u, subscription_count);
+
+  ret = rmw_destroy_subscription(node, sub);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(0u, subscription_count);
 }
