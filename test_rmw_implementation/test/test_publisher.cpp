@@ -201,8 +201,6 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
   EXPECT_NE(rmw_qos_profile_unknown.durability, qos_profile.durability);
   EXPECT_NE(rmw_qos_profile_system_default.liveliness, qos_profile.liveliness);
   EXPECT_NE(rmw_qos_profile_unknown.liveliness, qos_profile.liveliness);
-  EXPECT_NE(rmw_qos_profile_system_default.liveliness, qos_profile.liveliness);
-  EXPECT_NE(rmw_qos_profile_unknown.liveliness, qos_profile.liveliness);
   ret = rmw_destroy_publisher(node, pub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
