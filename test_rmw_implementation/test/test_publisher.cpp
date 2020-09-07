@@ -244,6 +244,13 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos_with_bad_
   ret = rmw_publisher_get_actual_qos(pub, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publisher_get_actual_qos(pub, &actual_qos_profile);
+  pub->implementation_identifier = implementation_identifier;
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
+  rmw_reset_error();
 }
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos) {
