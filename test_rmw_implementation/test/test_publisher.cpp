@@ -429,5 +429,6 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   pub->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
   pub->implementation_identifier = implementation_identifier;
 }
