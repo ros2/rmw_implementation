@@ -391,8 +391,7 @@ protected:
     if (ret == RMW_RET_UNSUPPORTED) {
       rmw_reset_error();
       GTEST_SKIP();
-    }
-    else {
+    } else {
       FAIL() << "Tests not ready";
     }
     ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
