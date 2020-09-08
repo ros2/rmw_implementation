@@ -392,6 +392,9 @@ protected:
       rmw_reset_error();
       GTEST_SKIP();
     }
+    else {
+      FAIL() << "Tests not ready";
+    }
     ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
   }
 
