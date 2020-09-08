@@ -377,35 +377,40 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscri
 }
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), borrow_loaned_message) {
-  rmw_publisher_options_t options = rmw_get_default_publisher_options();
-  constexpr char topic_name[] = "/test";
-  const rosidl_message_type_support_t * ts =
-    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
-  rmw_publisher_t * pub =
-    rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
   void * msg_pointer{nullptr};
   rmw_ret_t ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   if (ret != RMW_RET_UNSUPPORTED) {
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
     msg_pointer = nullptr;
     rmw_ret_t ret = rmw_borrow_loaned_message(nullptr, ts, &msg_pointer);
     EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+
     msg_pointer = nullptr;
     ret = rmw_borrow_loaned_message(pub, nullptr, &msg_pointer);
     EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+
     msg_pointer = nullptr;
     ret = rmw_borrow_loaned_message(pub, ts, nullptr);
     EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+
     msg_pointer = nullptr;
     ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
     EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+
     msg_pointer = nullptr;
-    const char * implementation_identifier = node->implementation_identifier;
+    const char * implementation_identifier = pub->implementation_identifier;
     pub->implementation_identifier = "not-an-rmw-implementation-identifier";
     ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
     EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
     pub->implementation_identifier = implementation_identifier;
   }
+  rmw_reset_error();
 }
