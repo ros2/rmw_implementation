@@ -377,7 +377,6 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscri
 }
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), borrow_loaned_message) {
-  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
   void * msg_pointer{nullptr};
   rmw_ret_t ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   if (ret != RMW_RET_UNSUPPORTED) {
