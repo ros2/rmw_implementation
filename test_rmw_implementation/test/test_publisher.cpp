@@ -396,6 +396,7 @@ protected:
       FAIL() << "Tests not ready";
     }
     ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 
   void TearDown() override
