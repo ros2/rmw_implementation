@@ -450,4 +450,6 @@ TEST_F(
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
   rmw_reset_error();
   pub->implementation_identifier = implementation_identifier;
+
+  test_msgs__msg__BasicTypes__fini(&input_message);
 }
