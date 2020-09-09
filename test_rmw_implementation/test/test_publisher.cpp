@@ -385,15 +385,10 @@ protected:
   void SetUp() override
   {
     Base::SetUp();
-    // Test if Loaning is supported
-    void * msg_pointer{nullptr};
-    rmw_ret_t ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
-    if (ret == RMW_RET_UNSUPPORTED) {
-      rmw_reset_error();
+    // Check if loaning is supported by the implementation
+    if (!pub->can_loan_messages) {
       GTEST_SKIP();
     }
-    ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
-    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 
   void TearDown() override
@@ -421,6 +416,7 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   EXPECT_EQ(nullptr, msg_pointer);
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  // Not null msg_pointer invalid to borrow message
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
