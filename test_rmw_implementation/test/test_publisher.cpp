@@ -418,6 +418,7 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
 
+  EXPECT_EQ(nullptr, msg_pointer);
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
@@ -426,7 +427,7 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  msg_pointer = nullptr;
+  EXPECT_EQ(nullptr, msg_pointer);
   const char * implementation_identifier = pub->implementation_identifier;
   pub->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
