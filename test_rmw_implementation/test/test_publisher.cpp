@@ -391,8 +391,6 @@ protected:
     if (ret == RMW_RET_UNSUPPORTED) {
       rmw_reset_error();
       GTEST_SKIP();
-    } else {
-      FAIL() << "Tests not ready";
     }
     ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -410,12 +408,12 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
 
-  msg_pointer = nullptr;
+  EXPECT_EQ(nullptr, msg_pointer);
   ret = rmw_borrow_loaned_message(pub, nullptr, &msg_pointer);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
 
-  msg_pointer = nullptr;
+  EXPECT_EQ(nullptr, msg_pointer);
   ret = rmw_borrow_loaned_message(pub, ts, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
