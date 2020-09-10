@@ -402,18 +402,18 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   rmw_ret_t ret = rmw_borrow_loaned_message(nullptr, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
-
   EXPECT_EQ(nullptr, msg_pointer);
+
   ret = rmw_borrow_loaned_message(pub, nullptr, &msg_pointer);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
-
   EXPECT_EQ(nullptr, msg_pointer);
+
   ret = rmw_borrow_loaned_message(pub, ts, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
   rmw_reset_error();
-
   EXPECT_EQ(nullptr, msg_pointer);
+
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   // Not null msg_pointer invalid to borrow message
@@ -423,7 +423,7 @@ TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_messag
   ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  EXPECT_EQ(nullptr, msg_pointer);
+  msg_pointer = nullptr;
   const char * implementation_identifier = pub->implementation_identifier;
   pub->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
