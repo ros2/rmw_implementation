@@ -397,7 +397,7 @@ protected:
   }
 };
 
-TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_message_bad_arguments) {
+TEST_F(CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION), borrow_loaned_message_with_bad_arguments) {
   void * msg_pointer = nullptr;
   rmw_ret_t ret = rmw_borrow_loaned_message(nullptr, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
