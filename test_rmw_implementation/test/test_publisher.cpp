@@ -387,6 +387,20 @@ protected:
     Base::SetUp();
     // Check if loaning is supported by the implementation
     if (!pub->can_loan_messages) {
+      void * msg_pointer = nullptr;
+      rmw_publisher_allocation_t * null_allocation{nullptr};
+      rmw_ret_t ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, msg_pointer);
+      ret = rmw_return_loaned_message_from_publisher(pub, &msg_pointer);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, msg_pointer);
+      ret = rmw_publish_loaned_message(pub, &msg_pointer, null_allocation);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, msg_pointer);
       GTEST_SKIP();
     }
   }
