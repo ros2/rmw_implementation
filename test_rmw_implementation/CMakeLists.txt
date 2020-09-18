@@ -91,6 +91,7 @@ if(BUILD_TESTING)
     ament_add_gtest(test_graph_api${target_suffix}
       test/test_graph_api.cpp
       ENV ${rmw_implementation_env_var}
+      TIMEOUT 120
     )
     target_compile_definitions(test_graph_api${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
