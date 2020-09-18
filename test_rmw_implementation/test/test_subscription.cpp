@@ -414,3 +414,18 @@ protected:
     Base::TearDown();
   }
 };
+
+TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message) {
+  // TODO(lobotuerk) add tests for <rmw_take_loaned_message> when we have an implementation
+  FAIL() << "Not implemented";
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message_with_info) {
+  // TODO(lobotuerk) add tests for <rmw_take_loaned_message_with_info> when we have an implementation
+  FAIL() << "Not implemented";
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_return_loaned_message_from_subscription) {
+  // TODO(lobotuerk) add tests for <rmw_return_loaned_message_from_subscription> when we have an implementation
+  FAIL() << "Not implemented";
+}
