@@ -392,7 +392,7 @@ protected:
       bool taken = false;
       void * loaned_message = nullptr;
       rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
-      rmw_subscription_allocation_t * null_allocation{nullptr};
+      rmw_subscription_allocation_t * null_allocation{nullptr}; // still valid allocation
       rmw_ret_t ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
@@ -416,16 +416,16 @@ protected:
 };
 
 TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message) {
-  // TODO(lobotuerk) add tests for <rmw_take_loaned_message> when we have an implementation
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message() when we have an implementation.
   FAIL() << "Not implemented";
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message_with_info) {
-  // TODO(lobotuerk) add tests for <rmw_take_loaned_message_with_info> when we have an implementation
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message_with_info() when we have an implementation.
   FAIL() << "Not implemented";
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_return_loaned_message_from_subscription) {
-  // TODO(lobotuerk) add tests for <rmw_return_loaned_message_from_subscription> when we have an implementation
+  // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription() when we have an implementation.
   FAIL() << "Not implemented";
 }
