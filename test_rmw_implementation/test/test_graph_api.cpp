@@ -86,7 +86,7 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), get_node_names_with_bad_argu
   rcutils_string_array_t node_namespaces = rcutils_get_zero_initialized_string_array();
 
   // A null node is an invalid argument.
-  rmw_ret ret = rmw_get_node_names(nullptr, &node_names, &node_namespaces);
+  rmw_ret_t ret = rmw_get_node_names(nullptr, &node_names, &node_namespaces);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_check_zero_rmw_string_array(&node_names));
@@ -124,16 +124,18 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), get_node_names_with_bad_argu
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_check_zero_rmw_string_array(&node_namespaces));
-  EXPECT_EQ(RMW_RET_OK, rcutils_string_array_fini(&node_names)) << rmw_get_error_string().str;
+  ret = rcutils_string_array_fini(&node_names);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   // A non zero initialized array of node namespaces is an invalid argument.
-  ret = rcutils_string_array_init(&node_namespaces, 1u, &allocator)
-    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rcutils_string_array_init(&node_namespaces, 1u, &allocator);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ret = rmw_get_node_names(node, &node_names, &node_namespaces);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_check_zero_rmw_string_array(&node_names));
-  EXPECT_EQ(RMW_RET_OK, rcutils_string_array_fini(&node_namespaces)) << rmw_get_error_string().str;
+  ret = rcutils_string_array_fini(&node_namespaces);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
 TEST_F(
@@ -270,25 +272,23 @@ TEST_F(
   get_service_names_and_types_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t service_names_and_types = rmw_get_zero_initialized_names_and_types();
-  bool no_demangle = false;
 
   // A null node is an invalid argument.
   rmw_ret_t ret =
-    rmw_get_service_names_and_types(nullptr, &allocator, no_demangle, &service_names_and_types);
+    rmw_get_service_names_and_types(nullptr, &allocator, &service_names_and_types);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&service_names_and_types));
 
   // A null allocator is an invalid argument.
-  ret = rmw_get_service_names_and_types(node, nullptr, no_demangle, &service_names_and_types);
+  ret = rmw_get_service_names_and_types(node, nullptr, &service_names_and_types);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&service_names_and_types));
 
   rcutils_allocator_t invalid_allocator = rcutils_get_zero_initialized_allocator();
   // An invalid (zero initialized) allocator is an invalid argument.
-  ret = rmw_get_service_names_and_types(
-    node, &invalid_allocator, no_demangle, &service_names_and_types);
+  ret = rmw_get_service_names_and_types(node, &invalid_allocator, &service_names_and_types);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&service_names_and_types));
@@ -296,16 +296,16 @@ TEST_F(
   // A non zero initialized array of service names and types is an invalid argument.
   ASSERT_EQ(RMW_RET_OK, rmw_names_and_types_init(&service_names_and_types, 1u, &allocator)) <<
     rmw_get_error_string().str;
-  ret = rmw_get_service_names_and_types(node, &allocator, no_demangle, &service_names_and_types);
+  ret = rmw_get_service_names_and_types(node, &allocator, &service_names_and_types);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
-  EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_fini(&service_names_and_types)) <<
-    rmw_get_error_string().str;
+  ret = rmw_names_and_types_fini(&service_names_and_types);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   // A node from a different implementation cannot be used.
   const char * implementation_identifier = node->implementation_identifier;
   node->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_get_service_names_and_types(node, &allocator, no_demangle, &service_names_and_types);
+  ret = rmw_get_service_names_and_types(node, &allocator, &service_names_and_types);
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
   node->implementation_identifier = implementation_identifier;
   rmw_reset_error();
@@ -424,7 +424,7 @@ TEST_F(
   bool no_demangle = false;
 
   // A null node is an invalid argument.
-  ret = rmw_get_publisher_names_and_types_by_node(
+  rmw_ret_t ret = rmw_get_publisher_names_and_types_by_node(
     nullptr, &allocator, other_node_name, other_node_namespace,
     no_demangle, &topic_names_and_types);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
