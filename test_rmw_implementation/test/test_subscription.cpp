@@ -23,9 +23,10 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
-
 #include "./config.hpp"
 #include "./testing_macros.hpp"
+
+#include "rmw_dds_common/gid_utils.hpp"
 
 #ifdef RMW_IMPLEMENTATION
 # define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
@@ -33,6 +34,8 @@
 #else
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
+
+using rmw_dds_common::operator==;
 
 class CLASSNAME (TestSubscription, RMW_IMPLEMENTATION) : public ::testing::Test
 {
@@ -438,4 +441,29 @@ TEST_F(
   // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription()
   // when we have an implementation.
   FAIL() << "Not implemented";
+}
+
+bool operator==(const test_msgs__msg__BasicTypes & m1, const test_msgs__msg__BasicTypes & m2)
+{
+  return m1.bool_value == m2.bool_value &&
+         m1.byte_value == m2.byte_value &&
+         m1.char_value == m2.char_value &&
+         m1.float32_value == m2.float32_value &&
+         m1.float64_value == m2.float64_value &&
+         m1.int8_value == m2.int8_value &&
+         m1.uint8_value == m2.uint8_value &&
+         m1.int16_value == m2.int16_value &&
+         m1.uint16_value == m2.uint16_value &&
+         m1.int32_value == m2.int32_value &&
+         m1.uint32_value == m2.uint32_value &&
+         m1.int64_value == m2.int64_value &&
+         m1.uint64_value == m2.uint64_value;
+}
+
+bool operator==(const rmw_message_info_t & m1, const rmw_message_info_t & m2)
+{
+  return m1.publisher_gid == m2.publisher_gid &&
+         m1.source_timestamp == m2.source_timestamp &&
+         m1.received_timestamp == m2.received_timestamp &&
+         m1.from_intra_process == m2.from_intra_process;
 }
