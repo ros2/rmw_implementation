@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "./functions.hpp"
+
 #include <cstddef>
 #include <stdexcept>
 
@@ -40,64 +42,89 @@
 #define STRINGIFY(s) STRINGIFY_(s)
 
 std::shared_ptr<rcpputils::SharedLibrary>
+load_library()
+{
+  std::string env_var;
+  try {
+    env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to fetch RMW_IMPLEMENTATION "
+      "from environment due to %s", e.what());
+    return nullptr;
+  }
+
+  if (env_var.empty()) {
+    env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
+  }
+
+  std::string library_path;
+  try {
+    library_path = rcpputils::find_library_path(env_var);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to find shared library due to %s", e.what());
+    return nullptr;
+  }
+
+  if (library_path.empty()) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to find shared library '%s'",
+      env_var.c_str());
+    return nullptr;
+  }
+
+  try {
+    return std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to load shared library '%s' due to %s",
+      library_path.c_str(), e.what());
+    return nullptr;
+  }
+}
+
+std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
   static std::shared_ptr<rcpputils::SharedLibrary> lib;
-
   if (!lib) {
-    std::string env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
-    if (env_var.empty()) {
-      env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
-    }
-    std::string library_path = rcpputils::find_library_path(env_var);
-    if (library_path.empty()) {
-      RMW_SET_ERROR_MSG(
-        ("failed to find shared library of rmw implementation. Searched " + env_var).c_str());
-      return nullptr;
-    }
-
-    try {
-      lib = std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
-    } catch (const std::runtime_error & e) {
-      RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation: " + library_path +
-        " Exception: " + std::string(e.what())).c_str());
-      return nullptr;
-    } catch (const std::bad_alloc & e) {
-      RMW_SET_ERROR_MSG(
-        ("failed to load shared library of rmw implementation " + library_path + ": " +
-        std::string(e.what())).c_str());
-      return nullptr;
-    }
+    lib = load_library();
   }
   return lib;
 }
 
 void *
-get_symbol(const char * symbol_name)
+lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name)
 {
-  std::shared_ptr<rcpputils::SharedLibrary> lib = get_library();
-
   if (!lib) {
-    // error message set by get_library()
+    if (!rmw_error_is_set()) {
+      RMW_SET_ERROR_MSG("no shared library to lookup");
+    }  // else assume library loading failed
     return nullptr;
   }
 
   if (!lib->has_symbol(symbol_name)) {
-    rcutils_allocator_t allocator = rcutils_get_default_allocator();
-    char * msg = rcutils_format_string(
-      allocator,
-      "failed to resolve symbol '%s' in shared library '%s'", symbol_name,
-      lib->get_library_path().c_str());
-    if (msg) {
-      RMW_SET_ERROR_MSG(msg);
-      allocator.deallocate(msg, allocator.state);
-    } else {
-      RMW_SET_ERROR_MSG("failed to allocate memory for error message");
+    try {
+      std::string library_path = lib->get_library_path();
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "failed to resolve symbol '%s' in shared library '%s'",
+        symbol_name, library_path.c_str());
+    } catch (const std::runtime_error &) {
+      RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+        "failed to resolve symbol '%s' in shared library",
+        symbol_name);
     }
     return nullptr;
   }
+
   return lib->get_symbol(symbol_name);
+}
+
+void *
+get_symbol(const char * symbol_name)
+{
+  return lookup_symbol(get_library(), symbol_name);
 }
 
 #ifdef __cplusplus
