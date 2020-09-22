@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_IMPLEMENTATION__VISIBILITY_CONTROL_H_
-#define RMW_IMPLEMENTATION__VISIBILITY_CONTROL_H_
+#ifndef VISIBILITY_CONTROL_H_
+#define VISIBILITY_CONTROL_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -51,8 +51,12 @@ extern "C"
   #define RMW_IMPLEMENTATION_PUBLIC_TYPE
 #endif
 
+#ifndef RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
+#define RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // RMW_IMPLEMENTATION__VISIBILITY_CONTROL_H_
+#endif  // VISIBILITY_CONTROL_H_

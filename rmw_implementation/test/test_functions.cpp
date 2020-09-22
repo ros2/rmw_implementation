@@ -22,7 +22,7 @@
 
 #include "rmw/error_handling.h"
 
-#include "rmw_implementation/functions.hpp"
+#include "../src/functions.hpp"
 
 TEST(Functions, bad_load) {
   const char * rmw_implementation = nullptr;

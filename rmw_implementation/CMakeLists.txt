@@ -52,9 +52,6 @@ else()
 
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
-  target_include_directories(${PROJECT_NAME} PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>")
   ament_target_dependencies(${PROJECT_NAME}
     "rcpputils"
     "rcutils"
@@ -65,6 +62,12 @@ else()
   # Causes the visibility macros to use dllexport rather than dllimport,
   # which is appropriate when building the dll but not consuming it.
   target_compile_definitions(${PROJECT_NAME} PRIVATE "RMW_IMPLEMENTATION_BUILDING_DLL")
+
+  if(BUILD_TESTING)
+    # Causes symbols to be exposed for tests to use.
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+      "RMW_IMPLEMENTATION_DEFAULT_VISIBILITY=RMW_IMPLEMENTATION_PUBLIC")
+  endif()
 
   configure_rmw_library(${PROJECT_NAME})
 
@@ -78,10 +81,6 @@ else()
     ament_target_dependencies(test_functions rcutils rmw)
     target_link_libraries(test_functions ${PROJECT_NAME})
   endif()
-
-  install(
-    DIRECTORY include/
-    DESTINATION include)
 
   install(
     TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}

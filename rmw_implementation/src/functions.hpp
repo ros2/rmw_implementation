@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMW_IMPLEMENTATION__FUNCTIONS_HPP_
-#define RMW_IMPLEMENTATION__FUNCTIONS_HPP_
+#ifndef FUNCTIONS_HPP_
+#define FUNCTIONS_HPP_
 
 #include <memory>
 
 #include "rcpputils/shared_library.hpp"
 
-#include "rmw_implementation/visibility_control.h"
+#include "./visibility_control.h"
 
-RMW_IMPLEMENTATION_PUBLIC
-std::shared_ptr<rcpputils::SharedLibrary>
-load_library();
+RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
+std::shared_ptr<rcpputils::SharedLibrary> load_library();
 
-RMW_IMPLEMENTATION_PUBLIC
-void *
-lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name);
+RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
+void * lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name);
 
-#endif  // RMW_IMPLEMENTATION__FUNCTIONS_HPP_
+#endif  // FUNCTIONS_HPP_
