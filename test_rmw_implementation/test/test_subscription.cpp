@@ -119,6 +119,10 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_bad_argument
   EXPECT_EQ(nullptr, sub);
   rmw_reset_error();
 
+  sub = rmw_create_subscription(node, ts, "", &rmw_qos_profile_default, &options);
+  EXPECT_EQ(nullptr, sub);
+  rmw_reset_error();
+
   constexpr char topic_name_with_spaces[] = "/foo bar";
   sub =
     rmw_create_subscription(node, ts, topic_name_with_spaces, &rmw_qos_profile_default, &options);
