@@ -37,6 +37,12 @@ class CLASSNAME (TestSerializeDeserialize, RMW_IMPLEMENTATION) : public ::testin
 {
 };
 
+TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), get_serialization_format) {
+  const char * serialization_format = rmw_get_serialization_format();
+  EXPECT_NE(nullptr, serialization_format);
+  EXPECT_STREQ(serialization_format, rmw_get_serialization_format());
+}
+
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_bad_arguments) {
   const rosidl_message_type_support_t * ts{
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes)};
