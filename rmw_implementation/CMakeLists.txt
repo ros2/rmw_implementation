@@ -61,6 +61,11 @@ else()
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
+
+  # Causes the visibility macros to use dllexport rather than dllimport,
+  # which is appropriate when building the dll but not consuming it.
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "RMW_IMPLEMENTATION_BUILDING_DLL")
+
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
