@@ -121,6 +121,10 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
   EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
+  pub = rmw_create_publisher(node, ts, "", &rmw_qos_profile_default, &options);
+  EXPECT_EQ(nullptr, pub);
+  rmw_reset_error();
+
   constexpr char topic_name_with_spaces[] = "/foo bar";
   pub = rmw_create_publisher(node, ts, topic_name_with_spaces, &rmw_qos_profile_default, &options);
   EXPECT_EQ(nullptr, pub);
