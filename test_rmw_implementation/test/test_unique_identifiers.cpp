@@ -34,7 +34,7 @@
 
 class CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION) : public ::testing::Test
 {
-  protected:
+protected:
   void SetUp() override
   {
     rmw_init_options_t init_options = rmw_get_zero_initialized_init_options();
@@ -79,7 +79,7 @@ class CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION) : public ::testing
   rmw_publisher_t * pub{nullptr};
 };
 
-TEST_F(CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_gid_with_bad_args) {
+TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_gid_with_bad_args) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -113,7 +113,7 @@ TEST_F(CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_gid_with_bad
   EXPECT_TRUE(gids_are_equal);
 }
 
-TEST_F(CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids_with_bad_args) {
+TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids_with_bad_args) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -147,7 +147,7 @@ TEST_F(CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids_wit
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids) {
+TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -165,10 +165,10 @@ TEST_F(CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids) {
 }
 
 class CLASSNAME (TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION)
-  : public CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION)
 {
 protected:
-  using Base = CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION);
+  using Base = CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION);
   void SetUp() override
   {
     Base::SetUp();
@@ -197,7 +197,7 @@ protected:
   rmw_publisher_t * pub_for_topic0{nullptr};
 };
 
-TEST_F(CLASSNAME (TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION), different_pubs) {
+TEST_F(CLASSNAME(TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION), different_pubs) {
   rmw_gid_t gid_of_pub_for_topic0{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub_for_topic0, &gid_of_pub_for_topic0);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
