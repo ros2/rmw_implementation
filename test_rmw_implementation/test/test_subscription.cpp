@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+#include "osrf_testing_tools_cpp/scope_exit.hpp"
 
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
