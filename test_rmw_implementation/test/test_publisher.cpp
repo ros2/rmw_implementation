@@ -405,6 +405,35 @@ TEST_F(
   test_msgs__msg__BasicTypes__fini(&input_message);
 }
 
+TEST_F(
+  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
+  publish_serialized_message_with_bad_arguments) {
+  rmw_publisher_allocation_t * null_allocation{nullptr};  // still valid allocation
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+
+  rmw_ret_t ret = rmw_publish_serialized_message(nullptr, &serialized_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_publish_serialized_message(pub, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publish_serialized_message(pub, &serialized_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  pub->implementation_identifier = implementation_identifier;
+
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+}
+
 class CLASSNAME (TestPublisherUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
 {
