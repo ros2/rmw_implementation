@@ -23,7 +23,7 @@
 
 using performance_test_fixture::PerformanceTest;
 
-BENCHMARK_DEFINE_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
+BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 {
   rmw_init_options_t options;
   rmw_context_t context;
@@ -57,4 +57,3 @@ BENCHMARK_DEFINE_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
     st.SkipWithError("rmw_init_options_fini failed");
   }
 }
-BENCHMARK_REGISTER_F(PerformanceTest, prefetch_symbols);
