@@ -23,9 +23,10 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
-
 #include "./config.hpp"
 #include "./testing_macros.hpp"
+
+#include "rmw_dds_common/gid_utils.hpp"
 
 #ifdef RMW_IMPLEMENTATION
 # define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
@@ -33,6 +34,8 @@
 #else
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
+
+using rmw_dds_common::operator==;
 
 class CLASSNAME (TestSubscription, RMW_IMPLEMENTATION) : public ::testing::Test
 {
@@ -382,6 +385,55 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_mismatched_subs
   EXPECT_EQ(0u, publisher_count);
 }
 
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_info_with_bad_args) {
+  bool taken = false;
+  test_msgs__msg__BasicTypes output_message{};
+  output_message.bool_value = true;
+  output_message.char_value = 'a';
+  output_message.float32_value = 0.42f;
+  test_msgs__msg__BasicTypes original_message = output_message;
+  rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+  rmw_message_info_t original_info = rmw_get_zero_initialized_message_info();
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  rmw_ret_t ret = rmw_take_with_info(
+    nullptr, &output_message, &taken, &message_info,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, nullptr, &taken, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(message_info, original_info);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &output_message, nullptr, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &output_message, &taken, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_with_info(sub, &output_message, &taken, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+}
+
 class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
 {
@@ -438,4 +490,29 @@ TEST_F(
   // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription()
   // when we have an implementation.
   FAIL() << "Not implemented";
+}
+
+bool operator==(const test_msgs__msg__BasicTypes & m1, const test_msgs__msg__BasicTypes & m2)
+{
+  return m1.bool_value == m2.bool_value &&
+         m1.byte_value == m2.byte_value &&
+         m1.char_value == m2.char_value &&
+         m1.float32_value == m2.float32_value &&
+         m1.float64_value == m2.float64_value &&
+         m1.int8_value == m2.int8_value &&
+         m1.uint8_value == m2.uint8_value &&
+         m1.int16_value == m2.int16_value &&
+         m1.uint16_value == m2.uint16_value &&
+         m1.int32_value == m2.int32_value &&
+         m1.uint32_value == m2.uint32_value &&
+         m1.int64_value == m2.int64_value &&
+         m1.uint64_value == m2.uint64_value;
+}
+
+bool operator==(const rmw_message_info_t & m1, const rmw_message_info_t & m2)
+{
+  return m1.publisher_gid == m2.publisher_gid &&
+         m1.source_timestamp == m2.source_timestamp &&
+         m1.received_timestamp == m2.received_timestamp &&
+         m1.from_intra_process == m2.from_intra_process;
 }
