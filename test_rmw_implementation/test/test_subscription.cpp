@@ -381,3 +381,61 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_mismatched_subs
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
 }
+
+class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
+{
+protected:
+  using Base = CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION);
+
+  void SetUp() override
+  {
+    Base::SetUp();
+    // Check if loaning is supported by the implementation
+    if (!sub->can_loan_messages) {
+      bool taken = false;
+      void * loaned_message = nullptr;
+      rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+      rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+      rmw_ret_t ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, loaned_message);
+      ret = rmw_take_loaned_message_with_info(
+        sub, &loaned_message, &taken, &message_info, null_allocation);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, loaned_message);
+      ret = rmw_return_loaned_message_from_subscription(sub, loaned_message);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, loaned_message);
+      GTEST_SKIP();
+    }
+  }
+
+  void TearDown() override
+  {
+    Base::TearDown();
+  }
+};
+
+TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message) {
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message() when we have an implementation.
+  FAIL() << "Not implemented";
+}
+
+TEST_F(
+  CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message_with_info) {
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message_with_info()
+  // when we have an implementation.
+  FAIL() << "Not implemented";
+}
+
+TEST_F(
+  CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION),
+  rmw_return_loaned_message_from_subscription) {
+  // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription()
+  // when we have an implementation.
+  FAIL() << "Not implemented";
+}
