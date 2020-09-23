@@ -22,9 +22,9 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestInitOptions, RMW_IMPLEMENTATION) : public ::testing::Test {};
+class CLASSNAME (TestPublisherAllocator, RMW_IMPLEMENTATION) : public ::testing::Test {};
 
-TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_fini_publisher_allocation)
+TEST_F(CLASSNAME(TestPublisherAllocator, RMW_IMPLEMENTATION), init_fini_publisher_allocation)
 {
   rmw_ret_t ret = rmw_init_publisher_allocation(nullptr, nullptr, nullptr);
   EXPECT_EQ(ret, RMW_RET_UNSUPPORTED);
