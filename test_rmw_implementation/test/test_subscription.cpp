@@ -390,7 +390,7 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_info_with_b
   test_msgs__msg__BasicTypes output_message{};
   output_message.bool_value = true;
   output_message.char_value = 'a';
-  output_message.float32_value = 0.42;
+  output_message.float32_value = 0.42f;
   test_msgs__msg__BasicTypes original_message = output_message;
   rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
   rmw_message_info_t original_info = rmw_get_zero_initialized_message_info();
