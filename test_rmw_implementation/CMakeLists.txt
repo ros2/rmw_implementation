@@ -87,6 +87,25 @@ if(BUILD_TESTING)
     ament_target_dependencies(test_serialize_deserialize${target_suffix}
       rcutils rmw rmw_implementation test_msgs
     )
+
+    ament_add_gtest(test_publisher_allocator${target_suffix}
+      test/test_publisher_allocator.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_publisher_allocator${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_publisher_allocator${target_suffix}
+      rmw rmw_implementation
+    )
+    ament_add_gtest(test_subscription_allocator${target_suffix}
+      test/test_subscription_allocator.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_subscription_allocator${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_subscription_allocator${target_suffix}
+      rmw rmw_implementation
+    )
   endmacro()
 
   call_for_each_rmw_implementation(test_api)
