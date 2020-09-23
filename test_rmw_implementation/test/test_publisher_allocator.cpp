@@ -32,15 +32,3 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_fini_publisher_alloc
   ret = rmw_fini_publisher_allocation(nullptr);
   EXPECT_EQ(ret, RMW_RET_UNSUPPORTED);
 }
-
-TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), rmw_publish_loaned_message)
-{
-  rmw_ret_t ret = rmw_publish_loaned_message(nullptr, nullptr, nullptr);
-  EXPECT_EQ(ret, RMW_RET_UNSUPPORTED);
-
-  ret = rmw_borrow_loaned_message(nullptr, nullptr, nullptr);
-  EXPECT_EQ(ret, RMW_RET_UNSUPPORTED);
-
-  ret = rmw_return_loaned_message_from_publisher(nullptr, nullptr);
-  EXPECT_EQ(ret, RMW_RET_UNSUPPORTED);
-}
