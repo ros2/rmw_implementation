@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+#include "osrf_testing_tools_cpp/scope_exit.hpp"
 
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
@@ -565,6 +566,61 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence_with_ba
 
   ret = rmw_message_info_sequence_fini(&original_info);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_serialized_with_bad_args) {
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  bool taken = false;
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  rmw_serialized_message_t original_message = serialized_message;
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 1lu, &default_allocator)) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+  });
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &original_message, 1lu, &default_allocator)) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_serialized_message_fini(&original_message)) << rmw_get_error_string().str;
+  });
+
+  rmw_ret_t ret =
+    rmw_take_serialized_message(nullptr, &serialized_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(serialized_message.buffer_length, original_message.buffer_length);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message(sub, nullptr, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message(sub, &serialized_message, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(serialized_message.buffer_length, original_message.buffer_length);
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_serialized_message(sub, &serialized_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(serialized_message.buffer_length, original_message.buffer_length);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&original_message)) << rmw_get_error_string().str;
 }
 
 class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
