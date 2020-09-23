@@ -385,6 +385,55 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_mismatched_subs
   EXPECT_EQ(0u, publisher_count);
 }
 
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_info_with_bad_args) {
+  bool taken = false;
+  test_msgs__msg__BasicTypes output_message{};
+  output_message.bool_value = true;
+  output_message.char_value = 'a';
+  output_message.float32_value = 0.42;
+  test_msgs__msg__BasicTypes original_message = output_message;
+  rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+  rmw_message_info_t original_info = rmw_get_zero_initialized_message_info();
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  rmw_ret_t ret = rmw_take_with_info(
+    nullptr, &output_message, &taken, &message_info,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, nullptr, &taken, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(message_info, original_info);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &output_message, nullptr, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &output_message, &taken, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_with_info(sub, &output_message, &taken, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+}
+
 class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
 {
