@@ -380,6 +380,31 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscri
   EXPECT_EQ(0u, subscription_count);
 }
 
+TEST_F(
+  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
+  publish_message_with_bad_arguments) {
+  test_msgs__msg__BasicTypes input_message{};
+  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&input_message));
+  rmw_publisher_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  rmw_ret_t ret = rmw_publish(nullptr, &input_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_publish(pub, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publish(pub, &input_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  pub->implementation_identifier = implementation_identifier;
+
+  test_msgs__msg__BasicTypes__fini(&input_message);
+}
+
 class CLASSNAME (TestPublisherUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
 {
