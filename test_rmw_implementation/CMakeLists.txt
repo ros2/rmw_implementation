@@ -143,6 +143,7 @@ if(BUILD_TESTING)
     ament_add_gtest(test_client${target_suffix}
       test/test_client.cpp
       ENV ${rmw_implementation_env_var}
+      TIMEOUT 120
     )
     target_compile_definitions(test_client${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")

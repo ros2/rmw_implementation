@@ -18,6 +18,7 @@
 
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
+#include "rcutils/testing/fault_injection.h"
 
 #include "rmw/rmw.h"
 #include "rmw/error_handling.h"
@@ -308,4 +309,56 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
   ret = rmw_destroy_client(node, client);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available)
+{
+  bool is_available;
+  rmw_ret_t ret = rmw_service_server_is_available(nullptr, nullptr, &is_available);
+  EXPECT_EQ(ret, RMW_RET_ERROR) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_service_server_is_available(node, nullptr, &is_available);
+  EXPECT_EQ(ret, RMW_RET_ERROR) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_service_server_is_available(node, client, &is_available);
+  EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
+  EXPECT_FALSE(is_available) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  rmw_service_t * service = rmw_create_service(node, ts, "service_name_test",
+    &rmw_qos_profile_default);
+  ASSERT_NE(nullptr, client) << rcutils_get_error_string().str;
+  ret = rmw_service_server_is_available(node, client, &is_available);
+  EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
+  EXPECT_TRUE(is_available) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_destroy_service(node, service);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_client_with_internal_errors)
+{
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    const rosidl_service_type_support_t * ts =
+      ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+    rmw_client_t * client_fault = rmw_create_client(node, ts, "service_name_test",
+      &rmw_qos_profile_default);
+
+    int64_t count = rcutils_fault_injection_get_count();
+    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
+
+    if (client_fault != nullptr) {
+      rmw_ret_t ret = rmw_destroy_client(node, client_fault);
+      EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+    } else {
+      rmw_reset_error();
+    }
+    rcutils_fault_injection_set_count(count);
+  });
 }
