@@ -329,7 +329,8 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
 
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
-  rmw_service_t * service = rmw_create_service(node, ts, "service_name_test",
+  rmw_service_t * service = rmw_create_service(
+    node, ts, "service_name_test",
     &rmw_qos_profile_default);
   ASSERT_NE(nullptr, client) << rcutils_get_error_string().str;
   ret = rmw_service_server_is_available(node, client, &is_available);
@@ -345,9 +346,10 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_client_with_internal_er
 {
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    const rosidl_service_type_support_t * ts =
-      ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
-    rmw_client_t * client_fault = rmw_create_client(node, ts, "service_name_test",
+    const rosidl_service_type_support_t * ts = ROSIDL_GET_SRV_TYPE_SUPPORT(
+      test_msgs, srv, BasicTypes);
+    rmw_client_t * client_fault = rmw_create_client(
+      node, ts, "service_name_test",
       &rmw_qos_profile_default);
 
     int64_t count = rcutils_fault_injection_get_count();
