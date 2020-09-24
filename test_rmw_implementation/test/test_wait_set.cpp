@@ -95,13 +95,12 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_create_wait_set)
 {
   // Created a valid wait_set
   rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 0);
-  EXPECT_NE(wait_set, nullptr) << rcutils_get_error_string().str;
+  ASSERT_NE(nullptr, wait_set) << rcutils_get_error_string().str;
   rmw_reset_error();
 
   // Destroyed a valid wait_set
   rmw_ret_t ret = rmw_destroy_wait_set(wait_set);
   EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
-  rmw_reset_error();
 
   // Try to create a wait_set using a invalid argument
   wait_set = rmw_create_wait_set(nullptr, 0);
@@ -142,12 +141,10 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_wait)
 
   // Created a valid wait_set
   rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, num_conditions);
-  EXPECT_NE(wait_set, nullptr);
-  rmw_reset_error();
+  ASSERT_NE(nullptr, wait_set);
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     rmw_ret_t ret = rmw_destroy_wait_set(wait_set);
-    rmw_reset_error();
     EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
   });
 
@@ -263,7 +260,7 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_wait)
   rmw_reset_error();
 
   const char * implementation_identifier = wait_set->implementation_identifier;
-  wait_set->implementation_identifier = "rmw_baddss_cpp";
+  wait_set->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_wait(
     subscriptions, guard_conditions, services, clients, events, wait_set,
     &timeout_argument);
@@ -275,21 +272,12 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_wait)
   // Battle test rmw_wait.
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_FAIL_NOW);
-
     ret = rmw_wait(
       subscriptions, guard_conditions, services, clients, events, wait_set,
       &timeout_argument);
-    rmw_reset_error();
 
-    if (RMW_RET_OK == ret) {
-      EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
-    } else {
-      EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-      rmw_reset_error();
-    }
-    rcutils_fault_injection_set_count(count);
+    EXPECT_TRUE(RMW_RET_TIMEOUT == ret || RMW_RET_ERROR == ret);
+    rmw_reset_error();
   });
 }
 
@@ -302,14 +290,14 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_destroy_wait_set)
 
   // Created a valid wait set
   rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
-  EXPECT_NE(wait_set, nullptr);
+  ASSERT_NE(nullptr, wait_set);
   rmw_reset_error();
 
   // Keep the implementation_identifier
   const char * implementation_identifier = wait_set->implementation_identifier;
 
   // Use a invalid implementation_identifier
-  wait_set->implementation_identifier = "rmw_baddss_cpp";
+  wait_set->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_destroy_wait_set(wait_set);
   EXPECT_EQ(ret, RMW_RET_INCORRECT_RMW_IMPLEMENTATION) << rcutils_get_error_string().str;
   rmw_reset_error();
@@ -318,5 +306,4 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_destroy_wait_set)
   wait_set->implementation_identifier = implementation_identifier;
   ret = rmw_destroy_wait_set(wait_set);
   EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
-  rmw_reset_error();
 }
