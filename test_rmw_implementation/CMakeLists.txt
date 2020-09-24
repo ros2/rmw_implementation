@@ -106,6 +106,16 @@ if(BUILD_TESTING)
     ament_target_dependencies(test_subscription_allocator${target_suffix}
       rmw rmw_implementation
     )
+
+    ament_add_gtest(test_wait_set${target_suffix}
+      test/test_wait_set.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_wait_set${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_wait_set${target_suffix}
+      rmw rmw_implementation rcutils
+    )
   endmacro()
 
   call_for_each_rmw_implementation(test_api)
