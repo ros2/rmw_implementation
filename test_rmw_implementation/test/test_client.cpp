@@ -42,7 +42,8 @@ protected:
     rmw_init_options_t init_options = rmw_get_zero_initialized_init_options();
     rmw_ret_t ret = rmw_init_options_init(&init_options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
-    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT({
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
       rmw_ret_t ret = rmw_init_options_fini(&init_options);
       EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     });
