@@ -94,10 +94,7 @@ if(BUILD_TESTING)
 
     add_performance_test(benchmark_prefetch_symbols${target_suffix} benchmark/benchmark_prefetch_symbols.cpp
       ENV ${rmw_implementation_env_var})
-    target_compile_definitions(benchmark_prefetch_symbols${target_suffix}
-      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     if(TARGET benchmark_prefetch_symbols${target_suffix})
-      target_include_directories(benchmark_prefetch_symbols${target_suffix} PUBLIC include)
       ament_target_dependencies(benchmark_prefetch_symbols${target_suffix}
         rcutils rmw rmw_implementation
       )

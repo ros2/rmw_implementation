@@ -23,7 +23,7 @@
 
 using performance_test_fixture::PerformanceTest;
 
-BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
+BENCHMARK_F(PerformanceTest, rmw_init)(benchmark::State & st)
 {
   rmw_init_options_t options;
   rmw_context_t context;
@@ -42,15 +42,14 @@ BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
     if (ret != RMW_RET_OK) {
       st.SkipWithError(rcutils_get_error_string().str);
     }
-  }
-
-  ret = rmw_shutdown(&context);
-  if (ret != RMW_RET_OK) {
-    st.SkipWithError("rmw_shutdown failed");
-  }
-  ret = rmw_context_fini(&context);
-  if (ret != RMW_RET_OK) {
-    st.SkipWithError("rmw_context_fini failed");
+    ret = rmw_shutdown(&context);
+    if (ret != RMW_RET_OK) {
+      st.SkipWithError("rmw_shutdown failed");
+    }
+    ret = rmw_context_fini(&context);
+    if (ret != RMW_RET_OK) {
+      st.SkipWithError("rmw_context_fini failed");
+    }
   }
   ret = rmw_init_options_fini(&options);
   if (ret != RMW_RET_OK) {
