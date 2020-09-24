@@ -391,7 +391,7 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_bad_args) {
   test_msgs__msg__BasicTypes output_message{};
   output_message.bool_value = true;
   output_message.char_value = 'a';
-  output_message.float32_value = 0.42;
+  output_message.float32_value = 0.42f;
   test_msgs__msg__BasicTypes original_message = output_message;
   rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
 
