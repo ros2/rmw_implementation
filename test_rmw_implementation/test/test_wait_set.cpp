@@ -264,10 +264,10 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_wait)
   ret = rmw_wait(
     subscriptions, guard_conditions, services, clients, events, wait_set,
     &timeout_argument);
+  wait_set->implementation_identifier = implementation_identifier;
   EXPECT_EQ(ret, RMW_RET_INCORRECT_RMW_IMPLEMENTATION) << rcutils_get_error_string().str;
   rmw_reset_error();
 
-  wait_set->implementation_identifier = implementation_identifier;
 
   // Battle test rmw_wait.
   RCUTILS_FAULT_INJECTION_TEST(
@@ -299,11 +299,11 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_destroy_wait_set)
   // Use a invalid implementation_identifier
   wait_set->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_destroy_wait_set(wait_set);
+  wait_set->implementation_identifier = implementation_identifier;
   EXPECT_EQ(ret, RMW_RET_INCORRECT_RMW_IMPLEMENTATION) << rcutils_get_error_string().str;
   rmw_reset_error();
 
   // Restored the identifier and destroy the wait_set
-  wait_set->implementation_identifier = implementation_identifier;
   ret = rmw_destroy_wait_set(wait_set);
   EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
 }
