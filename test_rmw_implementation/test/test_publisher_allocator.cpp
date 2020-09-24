@@ -26,8 +26,7 @@ class CLASSNAME (TestPublisherAllocator, RMW_IMPLEMENTATION) : public ::testing:
 
 TEST_F(CLASSNAME(TestPublisherAllocator, RMW_IMPLEMENTATION), init_fini_publisher_allocation)
 {
-  if (rmw_init_publisher_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED)
-  {
+  if (rmw_init_publisher_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
     // Add tests here when the implementation it's supported
     GTEST_SKIP();
   } else {

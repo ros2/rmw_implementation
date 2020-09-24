@@ -26,8 +26,7 @@ class CLASSNAME (TestSubscriptionAllocator, RMW_IMPLEMENTATION) : public ::testi
 
 TEST_F(CLASSNAME(TestSubscriptionAllocator, RMW_IMPLEMENTATION), init_fini_subscription_allocation)
 {
-  if (rmw_init_subscription_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED)
-  {
+  if (rmw_init_subscription_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
     // Add tests here when the implementation it's supported
     GTEST_SKIP();
   } else {
