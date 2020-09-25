@@ -327,7 +327,13 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
 TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_good_args)
 {
   bool is_available;
-  rmw_ret_t  ret = rmw_service_server_is_available(node, client, &is_available);
+  rmw_ret_t ret;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_service_server_is_available(node, client, &is_available);
+    if (RMW_RET_OK == ret && is_available) {
+      break;
+    }
+  }
   EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
   EXPECT_FALSE(is_available) << rmw_get_error_string().str;
   rmw_reset_error();
