@@ -121,6 +121,10 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
   EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
+  pub = rmw_create_publisher(node, ts, "", &rmw_qos_profile_default, &options);
+  EXPECT_EQ(nullptr, pub);
+  rmw_reset_error();
+
   constexpr char topic_name_with_spaces[] = "/foo bar";
   pub = rmw_create_publisher(node, ts, topic_name_with_spaces, &rmw_qos_profile_default, &options);
   EXPECT_EQ(nullptr, pub);
@@ -374,4 +378,130 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscri
   });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, subscription_count);
+}
+
+TEST_F(
+  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
+  publish_message_with_bad_arguments) {
+  test_msgs__msg__BasicTypes input_message{};
+  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&input_message));
+  rmw_publisher_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  rmw_ret_t ret = rmw_publish(nullptr, &input_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_publish(pub, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publish(pub, &input_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  pub->implementation_identifier = implementation_identifier;
+
+  test_msgs__msg__BasicTypes__fini(&input_message);
+}
+
+TEST_F(
+  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
+  publish_serialized_message_with_bad_arguments) {
+  rmw_publisher_allocation_t * null_allocation{nullptr};  // still valid allocation
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+
+  rmw_ret_t ret = rmw_publish_serialized_message(nullptr, &serialized_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_publish_serialized_message(pub, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_publish_serialized_message(pub, &serialized_message, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  pub->implementation_identifier = implementation_identifier;
+
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+}
+
+class CLASSNAME (TestPublisherUseLoan, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
+{
+protected:
+  using Base = CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION);
+
+  void SetUp() override
+  {
+    Base::SetUp();
+    // Check if loaning is supported by the implementation
+    if (!pub->can_loan_messages) {
+      void * msg_pointer = nullptr;
+      rmw_publisher_allocation_t * null_allocation{nullptr};
+      rmw_ret_t ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, msg_pointer);
+      ret = rmw_return_loaned_message_from_publisher(pub, &msg_pointer);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, msg_pointer);
+      ret = rmw_publish_loaned_message(pub, &msg_pointer, null_allocation);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, msg_pointer);
+      GTEST_SKIP();
+    }
+  }
+
+  void TearDown() override
+  {
+    Base::TearDown();
+  }
+};
+
+TEST_F(
+  CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION),
+  borrow_loaned_message_with_bad_arguments) {
+  void * msg_pointer = nullptr;
+  rmw_ret_t ret = rmw_borrow_loaned_message(nullptr, ts, &msg_pointer);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  EXPECT_EQ(nullptr, msg_pointer);
+
+  ret = rmw_borrow_loaned_message(pub, nullptr, &msg_pointer);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  EXPECT_EQ(nullptr, msg_pointer);
+
+  ret = rmw_borrow_loaned_message(pub, ts, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  EXPECT_EQ(nullptr, msg_pointer);
+
+  ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  // Not null msg_pointer invalid to borrow message
+  ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  msg_pointer = nullptr;
+  const char * implementation_identifier = pub->implementation_identifier;
+  pub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_borrow_loaned_message(pub, ts, &msg_pointer);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  pub->implementation_identifier = implementation_identifier;
 }
