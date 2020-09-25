@@ -141,7 +141,7 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_wait)
 
   // Created a valid wait_set
   rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, num_conditions);
-  ASSERT_NE(nullptr, wait_set);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     rmw_ret_t ret = rmw_destroy_wait_set(wait_set);
@@ -290,7 +290,7 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_destroy_wait_set)
 
   // Created a valid wait set
   rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
-  ASSERT_NE(nullptr, wait_set);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
   rmw_reset_error();
 
   // Keep the implementation_identifier
