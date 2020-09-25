@@ -14,11 +14,17 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/memory_tools/memory_tools.hpp"
+
 #include "rcutils/allocator.h"
 #include "rcutils/error_handling.h"
+#include "rcutils/macros.h"
 #include "rcutils/strdup.h"
 
+#include "rmw/error_handling.h"
 #include "rmw/rmw.h"
+
+#include "./testing_macros.hpp"
 
 #ifdef RMW_IMPLEMENTATION
 # define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
@@ -169,4 +175,62 @@ TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), init_shutdown) {
   EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   ret = rmw_context_fini(&context);
   EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), init_with_internal_errors) {
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_context_t context = rmw_get_zero_initialized_context();
+    rmw_ret_t ret = rmw_init(&options, &context);
+
+    int64_t count = rcutils_fault_injection_get_count();
+    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
+    if (RMW_RET_OK == ret) {
+      EXPECT_EQ(RMW_RET_OK, rmw_shutdown(&context)) << rmw_get_error_string().str;
+      EXPECT_EQ(RMW_RET_OK, rmw_context_fini(&context)) << rmw_get_error_string().str;
+    } else {
+      rmw_reset_error();
+    }
+    rcutils_fault_injection_set_count(count);
+  });
+}
+
+TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), shutdown_with_internal_errors) {
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_context_t context = rmw_get_zero_initialized_context();
+
+    int64_t count = rcutils_fault_injection_get_count();
+    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
+    ASSERT_EQ(RMW_RET_OK, rmw_init(&options, &context)) << rmw_get_error_string().str;
+    rcutils_fault_injection_set_count(count);
+
+    rmw_ret_t ret = rmw_shutdown(&context);
+
+    count = rcutils_fault_injection_get_count();
+    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
+    if (RMW_RET_OK != ret) {
+      rmw_reset_error();
+
+      EXPECT_EQ(RMW_RET_OK, rmw_shutdown(&context)) << rmw_get_error_string().str;
+    }
+    EXPECT_EQ(RMW_RET_OK, rmw_context_fini(&context)) << rmw_get_error_string().str;
+    rcutils_fault_injection_set_count(count);
+  });
+}
+
+TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), context_fini_with_internal_errors) {
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_context_t context = rmw_get_zero_initialized_context();
+    int64_t count = rcutils_fault_injection_get_count();
+    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
+    EXPECT_EQ(RMW_RET_OK, rmw_init(&options, &context)) << rmw_get_error_string().str;
+    EXPECT_EQ(RMW_RET_OK, rmw_shutdown(&context)) << rmw_get_error_string().str;
+    rcutils_fault_injection_set_count(count);
+
+    if (RMW_RET_OK != rmw_context_fini(&context)) {
+      rmw_reset_error();
+    }
+  });
 }
