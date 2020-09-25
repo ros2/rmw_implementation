@@ -159,10 +159,7 @@ protected:
   void SetUp() override
   {
     Base::SetUp();
-    constexpr char service_name[] = "/test";
-    const rosidl_service_type_support_t * ts =
-      ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
-    client = rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
+    client = rmw_create_client(node, ts, service_name, &qos_profile);
     ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
   }
 
@@ -174,6 +171,10 @@ protected:
   }
 
   rmw_client_t * client{nullptr};
+  const char * const service_name = "/test";
+  const rosidl_service_type_support_t * ts{
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes)};
+  rmw_qos_profile_t qos_profile{rmw_qos_profile_default};
 };
 
 TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_with_null_node) {
@@ -311,7 +312,7 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available)
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_bad_args)
 {
   bool is_available;
   rmw_ret_t ret = rmw_service_server_is_available(nullptr, nullptr, &is_available);
@@ -321,19 +322,24 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
   ret = rmw_service_server_is_available(node, nullptr, &is_available);
   EXPECT_EQ(ret, RMW_RET_ERROR) << rmw_get_error_string().str;
   rmw_reset_error();
+}
 
-  ret = rmw_service_server_is_available(node, client, &is_available);
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_good_args)
+{
+  bool is_available;
+  rmw_ret_t  ret = rmw_service_server_is_available(node, client, &is_available);
   EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
   EXPECT_FALSE(is_available) << rmw_get_error_string().str;
   rmw_reset_error();
 
-  const rosidl_service_type_support_t * ts =
-    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
-  rmw_service_t * service = rmw_create_service(
-    node, ts, "service_name_test",
-    &rmw_qos_profile_default);
+  rmw_service_t * service = rmw_create_service(node, ts, service_name, &qos_profile);
   ASSERT_NE(nullptr, client) << rcutils_get_error_string().str;
-  ret = rmw_service_server_is_available(node, client, &is_available);
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_service_server_is_available(node, client, &is_available);
+    if (RMW_RET_OK == ret && is_available) {
+      break;
+    }
+  }
   EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
   EXPECT_TRUE(is_available) << rmw_get_error_string().str;
   rmw_reset_error();
@@ -349,7 +355,7 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_client_with_internal_er
     const rosidl_service_type_support_t * ts = ROSIDL_GET_SRV_TYPE_SUPPORT(
       test_msgs, srv, BasicTypes);
     rmw_client_t * client_fault = rmw_create_client(
-      node, ts, "service_name_test",
+      node, ts, "/service_name_test",
       &rmw_qos_profile_default);
 
     int64_t count = rcutils_fault_injection_get_count();
