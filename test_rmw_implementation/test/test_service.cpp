@@ -149,39 +149,58 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
-  constexpr char service_name[] = "/test";
-  const rosidl_service_type_support_t * ts =
-    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
-  rmw_service_t * srv =
-    rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
-  ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+class CLASSNAME (TestServiceUse, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestService, RMW_IMPLEMENTATION)
+{
+protected:
+  using Base = CLASSNAME(TestService, RMW_IMPLEMENTATION);
 
-  // Destroying service with invalid arguments fails.
+  void SetUp() override
+  {
+    Base::SetUp();
+    constexpr char service_name[] = "/test";
+    const rosidl_service_type_support_t * ts =
+      ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+    srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
+    ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+  }
+
+  void TearDown() override
+  {
+    rmw_ret_t ret = rmw_destroy_service(node, srv);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    Base::TearDown();
+  }
+
+  rmw_service_t * srv{nullptr};
+};
+
+TEST_F(CLASSNAME(TestServiceUse, RMW_IMPLEMENTATION), destroy_with_null_node) {
   rmw_ret_t ret = rmw_destroy_service(nullptr, srv);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
+}
 
-  ret = rmw_destroy_service(node, nullptr);
+TEST_F(CLASSNAME(TestServiceUse, RMW_IMPLEMENTATION), destroy_null_service) {
+  rmw_ret_t ret = rmw_destroy_service(node, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
+}
 
+TEST_F(CLASSNAME(TestServiceUse, RMW_IMPLEMENTATION), destroy_with_node_of_another_impl) {
   const char * implementation_identifier = node->implementation_identifier;
   node->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_destroy_service(node, srv);
+  rmw_ret_t ret = rmw_destroy_service(node, srv);
   node->implementation_identifier = implementation_identifier;
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
   rmw_reset_error();
+}
 
-  implementation_identifier = srv->implementation_identifier;
+TEST_F(CLASSNAME(TestServiceUse, RMW_IMPLEMENTATION), destroy_service_of_another_impl) {
+  const char * implementation_identifier = srv->implementation_identifier;
   srv->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_destroy_service(node, srv);
+  rmw_ret_t ret = rmw_destroy_service(node, srv);
   srv->implementation_identifier = implementation_identifier;
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
-  rmw_reset_error();
-
-  // Destroying service still succeeds.
-  ret = rmw_destroy_service(node, srv);
-  EXPECT_EQ(RMW_RET_OK, ret);
   rmw_reset_error();
 }

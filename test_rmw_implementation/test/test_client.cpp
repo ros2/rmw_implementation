@@ -149,39 +149,58 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
-  constexpr char service_name[] = "/test";
-  const rosidl_service_type_support_t * ts =
-    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
-  rmw_client_t * client =
-    rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
-  ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+class CLASSNAME (TestClientUse, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestClient, RMW_IMPLEMENTATION)
+{
+protected:
+  using Base = CLASSNAME(TestClient, RMW_IMPLEMENTATION);
 
-  // Destroying client with invalid arguments fails.
+  void SetUp() override
+  {
+    Base::SetUp();
+    constexpr char service_name[] = "/test";
+    const rosidl_service_type_support_t * ts =
+      ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+    client = rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
+    ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+  }
+
+  void TearDown() override
+  {
+    rmw_ret_t ret = rmw_destroy_client(node, client);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    Base::TearDown();
+  }
+
+  rmw_client_t * client{nullptr};
+};
+
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_with_null_node) {
   rmw_ret_t ret = rmw_destroy_client(nullptr, client);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
+}
 
-  ret = rmw_destroy_client(node, nullptr);
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_null_client) {
+  rmw_ret_t ret = rmw_destroy_client(node, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
+}
 
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_with_node_of_another_impl) {
   const char * implementation_identifier = node->implementation_identifier;
   node->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_destroy_client(node, client);
+  rmw_ret_t ret = rmw_destroy_client(node, client);
   node->implementation_identifier = implementation_identifier;
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
   rmw_reset_error();
+}
 
-  implementation_identifier = client->implementation_identifier;
+TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), destroy_client_of_another_impl) {
+  const char * implementation_identifier = client->implementation_identifier;
   client->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_destroy_client(node, client);
+  rmw_ret_t ret = rmw_destroy_client(node, client);
   client->implementation_identifier = implementation_identifier;
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
-  rmw_reset_error();
-
-  // Destroying client still succeeds.
-  ret = rmw_destroy_client(node, client);
-  EXPECT_EQ(RMW_RET_OK, ret);
   rmw_reset_error();
 }
