@@ -211,6 +211,10 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), send_request_with_bad_argument
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
   test_msgs__srv__BasicTypes_Request client_request;
   ASSERT_TRUE(test_msgs__srv__BasicTypes_Request__init(&client_request));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__srv__BasicTypes_Request__fini(&client_request);
+  });
   client_request.bool_value = false;
   client_request.uint8_value = 1;
   client_request.uint32_value = 2;
@@ -247,6 +251,10 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
   test_msgs__srv__BasicTypes_Request client_request;
   ASSERT_TRUE(test_msgs__srv__BasicTypes_Request__init(&client_request));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__srv__BasicTypes_Request__fini(&client_request);
+  });
   client_request.bool_value = false;
   client_request.uint8_value = 1;
   client_request.uint32_value = 2;
@@ -266,28 +274,32 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
 
   ret = rmw_take_response(client, nullptr, &client_request, &taken);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
-  EXPECT_EQ(client_request.bool_value, false);  // Verify post conditions
-  EXPECT_EQ(client_request.uint8_value, (unsigned)1);
-  EXPECT_EQ(client_request.uint32_value, (unsigned)2);
-  EXPECT_EQ(taken, false);
+  EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
+  EXPECT_EQ((unsigned)1, client_request.uint8_value);
+  EXPECT_EQ((unsigned)2, client_request.uint32_value);
+  EXPECT_EQ(false, taken);
   rmw_reset_error();
 
   ret = rmw_take_response(client, &header, nullptr, &taken);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
-  EXPECT_EQ(taken, false);
+  EXPECT_EQ(false, taken);
   rmw_reset_error();
 
   ret = rmw_take_response(client, &header, &client_request, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
-  EXPECT_EQ(client_request.bool_value, false);  // Verify post conditions
-  EXPECT_EQ(client_request.uint8_value, (unsigned)1);
-  EXPECT_EQ(client_request.uint32_value, (unsigned)2);
+  EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
+  EXPECT_EQ((unsigned)1, client_request.uint8_value);
+  EXPECT_EQ((unsigned)2, client_request.uint32_value);
   rmw_reset_error();
 
   const char * implementation_identifier = client->implementation_identifier;
   client->implementation_identifier = "not-an-rmw-implementation-identifier";
   ret = rmw_take_response(client, &header, &client_request, &taken);
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
+  EXPECT_EQ((unsigned)1, client_request.uint8_value);
+  EXPECT_EQ((unsigned)2, client_request.uint32_value);
+  EXPECT_EQ(false, taken);
   rmw_reset_error();
   client->implementation_identifier = implementation_identifier;
 
