@@ -58,11 +58,29 @@ else()
     "rmw")
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
+
+  # Causes the visibility macros to use dllexport rather than dllimport,
+  # which is appropriate when building the dll but not consuming it.
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "RMW_IMPLEMENTATION_BUILDING_DLL")
+
+  if(BUILD_TESTING)
+    # Causes symbols to be exposed for tests to use.
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+      "RMW_IMPLEMENTATION_DEFAULT_VISIBILITY=RMW_IMPLEMENTATION_PUBLIC")
+  endif()
+
   configure_rmw_library(${PROJECT_NAME})
 
   ament_export_libraries(${PROJECT_NAME})
   ament_export_targets(${PROJECT_NAME})
   ament_export_dependencies(rcpputils rcutils)
+
+  if(BUILD_TESTING)
+    find_package(ament_cmake_gtest REQUIRED)
+    ament_add_gtest(test_functions test/test_functions.cpp)
+    ament_target_dependencies(test_functions rcutils rmw)
+    target_link_libraries(test_functions ${PROJECT_NAME})
+  endif()
 
   install(
     TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
