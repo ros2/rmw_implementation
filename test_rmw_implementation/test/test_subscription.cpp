@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
+#include "osrf_testing_tools_cpp/scope_exit.hpp"
 
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
@@ -23,9 +24,10 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
-
 #include "./config.hpp"
 #include "./testing_macros.hpp"
+
+#include "rmw_dds_common/gid_utils.hpp"
 
 #ifdef RMW_IMPLEMENTATION
 # define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
@@ -33,6 +35,8 @@
 #else
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
+
+using rmw_dds_common::operator==;
 
 class CLASSNAME (TestSubscription, RMW_IMPLEMENTATION) : public ::testing::Test
 {
@@ -116,6 +120,10 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_bad_argument
   rmw_reset_error();
 
   sub = rmw_create_subscription(node, ts, nullptr, &rmw_qos_profile_default, &options);
+  EXPECT_EQ(nullptr, sub);
+  rmw_reset_error();
+
+  sub = rmw_create_subscription(node, ts, "", &rmw_qos_profile_default, &options);
   EXPECT_EQ(nullptr, sub);
   rmw_reset_error();
 
@@ -376,4 +384,408 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), count_mismatched_subs
   });
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(0u, publisher_count);
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_bad_args) {
+  bool taken = false;
+  test_msgs__msg__BasicTypes output_message{};
+  output_message.bool_value = true;
+  output_message.char_value = 'a';
+  output_message.float32_value = 0.42f;
+  test_msgs__msg__BasicTypes original_message = output_message;
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  rmw_ret_t ret = rmw_take(nullptr, &output_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(output_message, original_message);
+  rmw_reset_error();
+
+  ret = rmw_take(sub, nullptr, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take(sub, &output_message, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take(sub, &output_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(output_message, original_message);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_info_with_bad_args) {
+  bool taken = false;
+  test_msgs__msg__BasicTypes output_message{};
+  output_message.bool_value = true;
+  output_message.char_value = 'a';
+  output_message.float32_value = 0.42f;
+  test_msgs__msg__BasicTypes original_message = output_message;
+  rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+  rmw_message_info_t original_info = rmw_get_zero_initialized_message_info();
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  rmw_ret_t ret = rmw_take_with_info(
+    nullptr, &output_message, &taken, &message_info,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, nullptr, &taken, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(message_info, original_info);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &output_message, nullptr, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &output_message, &taken, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_with_info(sub, &output_message, &taken, &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(output_message, original_message);
+  EXPECT_EQ(taken, false);
+  EXPECT_EQ(message_info, original_info);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
+  size_t count = 1u;
+  size_t taken = 10u;  // Non-zero value to check variable update
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  rmw_message_sequence_t sequence = rmw_get_zero_initialized_message_sequence();
+  rmw_ret_t ret = rmw_message_sequence_init(&sequence, count, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  rmw_message_info_sequence_t info_sequence = rmw_get_zero_initialized_message_info_sequence();
+  ret = rmw_message_info_sequence_init(&info_sequence, count, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  ret = rmw_take_sequence(sub, count, &sequence, &info_sequence, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(taken, 0u);
+
+  ret = rmw_message_sequence_fini(&sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  ret = rmw_message_info_sequence_fini(&info_sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence_with_bad_args) {
+  size_t count = 1u;
+  size_t taken = 0u;
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  rmw_message_sequence_t sequence = rmw_get_zero_initialized_message_sequence();
+  rmw_message_sequence_t original_sequence = sequence;
+  rmw_ret_t ret = rmw_message_sequence_init(&sequence, count, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_message_sequence_init(&original_sequence, count, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  rmw_message_info_sequence_t info_sequence = rmw_get_zero_initialized_message_info_sequence();
+  rmw_message_info_sequence_t original_info = info_sequence;
+  ret = rmw_message_info_sequence_init(&info_sequence, count, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_message_info_sequence_init(&original_info, count, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+
+  ret = rmw_take_sequence(nullptr, count, &sequence, &info_sequence, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence.size, original_sequence.size);
+  EXPECT_EQ(info_sequence.size, original_info.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+
+  ret = rmw_take_sequence(sub, 0u, &sequence, &info_sequence, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence.size, original_sequence.size);
+  EXPECT_EQ(info_sequence.size, original_info.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+
+  ret = rmw_take_sequence(sub, count, nullptr, &info_sequence, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(info_sequence.size, original_info.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+
+  ret = rmw_take_sequence(sub, count, &sequence, nullptr, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence.size, original_sequence.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+
+  ret = rmw_take_sequence(sub, count, &sequence, &info_sequence, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence.size, original_sequence.size);
+  EXPECT_EQ(info_sequence.size, original_info.size);
+  rmw_reset_error();
+
+  rmw_message_sequence_t sequence_zero_count = rmw_get_zero_initialized_message_sequence();
+  rmw_message_sequence_t original_zero_count = sequence_zero_count;
+  ret = rmw_message_sequence_init(&sequence_zero_count, 0u, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_message_sequence_init(&original_zero_count, 0u, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret =
+    rmw_take_sequence(sub, count, &sequence_zero_count, &info_sequence, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence_zero_count.size, original_zero_count.size);
+  EXPECT_EQ(info_sequence.size, original_info.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+  ret = rmw_message_sequence_fini(&sequence_zero_count);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_message_sequence_fini(&original_zero_count);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  rmw_message_info_sequence_t info_sequence_zero_count =
+    rmw_get_zero_initialized_message_info_sequence();
+  rmw_message_info_sequence_t original_info_zero_count = info_sequence_zero_count;
+  ret = rmw_message_info_sequence_init(&info_sequence_zero_count, 0u, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_message_info_sequence_init(&original_info_zero_count, 0u, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret =
+    rmw_take_sequence(sub, count, &sequence, &info_sequence_zero_count, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence.size, original_sequence.size);
+  EXPECT_EQ(info_sequence_zero_count.size, original_info_zero_count.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+  ret = rmw_message_info_sequence_fini(&info_sequence_zero_count);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_message_info_sequence_fini(&original_info_zero_count);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_sequence(sub, count, &sequence, &info_sequence, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(sequence.size, original_sequence.size);
+  EXPECT_EQ(info_sequence.size, original_info.size);
+  EXPECT_EQ(taken, 0u);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+
+  ret = rmw_message_sequence_fini(&sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  ret = rmw_message_sequence_fini(&original_sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  ret = rmw_message_info_sequence_fini(&info_sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  ret = rmw_message_info_sequence_fini(&original_info);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_serialized_with_bad_args) {
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  bool taken = false;
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  rmw_serialized_message_t original_message = serialized_message;
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 1lu, &default_allocator)) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+  });
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &original_message, 1lu, &default_allocator)) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_serialized_message_fini(&original_message)) << rmw_get_error_string().str;
+  });
+
+  rmw_ret_t ret =
+    rmw_take_serialized_message(nullptr, &serialized_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(serialized_message.buffer_length, original_message.buffer_length);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message(sub, nullptr, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message(sub, &serialized_message, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(serialized_message.buffer_length, original_message.buffer_length);
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_serialized_message(sub, &serialized_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(serialized_message.buffer_length, original_message.buffer_length);
+  EXPECT_EQ(taken, false);
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&original_message)) << rmw_get_error_string().str;
+}
+
+TEST_F(
+  CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION),
+  take_serialized_with_info_with_bad_args) {
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  bool taken = false;
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+
+  rmw_ret_t ret = rmw_take_serialized_message_with_info(
+    nullptr, &serialized_message, &taken,
+    &message_info, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message_with_info(
+    sub, nullptr, &taken, &message_info,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message_with_info(
+    sub, &serialized_message, nullptr, &message_info,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_take_serialized_message_with_info(
+    sub, &serialized_message, &taken, nullptr,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_serialized_message_with_info(
+    sub, &serialized_message, &taken, &message_info,
+    null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
+
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+}
+
+class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
+{
+protected:
+  using Base = CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION);
+
+  void SetUp() override
+  {
+    Base::SetUp();
+    // Check if loaning is supported by the implementation
+    if (!sub->can_loan_messages) {
+      bool taken = false;
+      void * loaned_message = nullptr;
+      rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+      rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+      rmw_ret_t ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, loaned_message);
+      ret = rmw_take_loaned_message_with_info(
+        sub, &loaned_message, &taken, &message_info, null_allocation);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, loaned_message);
+      ret = rmw_return_loaned_message_from_subscription(sub, loaned_message);
+      EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
+      rmw_reset_error();
+      EXPECT_EQ(nullptr, loaned_message);
+      GTEST_SKIP();
+    }
+  }
+
+  void TearDown() override
+  {
+    Base::TearDown();
+  }
+};
+
+TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message) {
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message() when we have an implementation.
+  FAIL() << "Not implemented";
+}
+
+TEST_F(
+  CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message_with_info) {
+  // TODO(lobotuerk): add tests for rmw_take_loaned_message_with_info()
+  // when we have an implementation.
+  FAIL() << "Not implemented";
+}
+
+TEST_F(
+  CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION),
+  rmw_return_loaned_message_from_subscription) {
+  // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription()
+  // when we have an implementation.
+  FAIL() << "Not implemented";
+}
+
+bool operator==(const test_msgs__msg__BasicTypes & m1, const test_msgs__msg__BasicTypes & m2)
+{
+  return m1.bool_value == m2.bool_value &&
+         m1.byte_value == m2.byte_value &&
+         m1.char_value == m2.char_value &&
+         m1.float32_value == m2.float32_value &&
+         m1.float64_value == m2.float64_value &&
+         m1.int8_value == m2.int8_value &&
+         m1.uint8_value == m2.uint8_value &&
+         m1.int16_value == m2.int16_value &&
+         m1.uint16_value == m2.uint16_value &&
+         m1.int32_value == m2.int32_value &&
+         m1.uint32_value == m2.uint32_value &&
+         m1.int64_value == m2.int64_value &&
+         m1.uint64_value == m2.uint64_value;
+}
+
+bool operator==(const rmw_message_info_t & m1, const rmw_message_info_t & m2)
+{
+  return m1.publisher_gid == m2.publisher_gid &&
+         m1.source_timestamp == m2.source_timestamp &&
+         m1.received_timestamp == m2.received_timestamp &&
+         m1.from_intra_process == m2.from_intra_process;
 }

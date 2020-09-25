@@ -22,6 +22,7 @@ if(BUILD_TESTING)
   find_package(rmw_implementation REQUIRED)
   find_package(rmw_implementation_cmake REQUIRED)
   find_package(test_msgs REQUIRED)
+  find_package(rmw_dds_common REQUIRED)
 
   macro(test_api)
     find_package(${rmw_implementation} REQUIRED)
@@ -71,11 +72,12 @@ if(BUILD_TESTING)
     ament_add_gtest(test_subscription${target_suffix}
       test/test_subscription.cpp
       ENV ${rmw_implementation_env_var}
+      TIMEOUT 80
     )
     target_compile_definitions(test_subscription${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_subscription${target_suffix}
-      osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs rmw_dds_common
     )
 
     ament_add_gtest(test_serialize_deserialize${target_suffix}
@@ -105,6 +107,27 @@ if(BUILD_TESTING)
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_subscription_allocator${target_suffix}
       rmw rmw_implementation
+    )
+
+    ament_add_gtest(test_graph_api${target_suffix}
+      test/test_graph_api.cpp
+      ENV ${rmw_implementation_env_var}
+      TIMEOUT 120
+    )
+    target_compile_definitions(test_graph_api${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_graph_api${target_suffix}
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation
+    )
+
+    ament_add_gtest(test_unique_identifiers${target_suffix}
+      test/test_unique_identifiers.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_unique_identifiers${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_unique_identifiers${target_suffix}
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
     )
   endmacro()
 
