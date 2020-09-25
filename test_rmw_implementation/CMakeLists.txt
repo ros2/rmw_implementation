@@ -24,10 +24,6 @@ if(BUILD_TESTING)
   find_package(test_msgs REQUIRED)
   find_package(rmw_dds_common REQUIRED)
 
-  find_package(performance_test_fixture REQUIRED)
-  # Give cppcheck hints about macro definitions coming from outside this package
-  get_target_property(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS performance_test_fixture::performance_test_fixture INTERFACE_INCLUDE_DIRECTORIES)
-
   macro(test_api)
     find_package(${rmw_implementation} REQUIRED)
     message(STATUS "Creating API tests for '${rmw_implementation}'")
@@ -93,14 +89,6 @@ if(BUILD_TESTING)
     ament_target_dependencies(test_serialize_deserialize${target_suffix}
       rcutils rmw rmw_implementation test_msgs
     )
-
-    add_performance_test(benchmark_prefetch_symbols${target_suffix} benchmark/benchmark_prefetch_symbols.cpp
-      ENV ${rmw_implementation_env_var})
-    if(TARGET benchmark_prefetch_symbols${target_suffix})
-      ament_target_dependencies(benchmark_prefetch_symbols${target_suffix}
-        rcutils rmw rmw_implementation
-      )
-    endif()
 
     ament_add_gtest(test_graph_api${target_suffix}
       test/test_graph_api.cpp

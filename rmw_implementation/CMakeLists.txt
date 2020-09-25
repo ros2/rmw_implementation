@@ -80,6 +80,23 @@ else()
     ament_add_gtest(test_functions test/test_functions.cpp)
     ament_target_dependencies(test_functions rcutils rmw)
     target_link_libraries(test_functions ${PROJECT_NAME})
+
+    find_package(performance_test_fixture REQUIRED)
+    # Give cppcheck hints about macro definitions coming from outside this package
+    get_target_property(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS performance_test_fixture::performance_test_fixture INTERFACE_INCLUDE_DIRECTORIES)
+
+    macro(benchmark_rmws)
+      find_package(${rmw_implementation} REQUIRED)
+      message(STATUS "Creating API tests for '${rmw_implementation}'")
+      set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
+
+      add_performance_test(benchmark_symbols${target_suffix} test/benchmark/benchmark_symbols.cpp
+        ENV ${rmw_implementation_env_var})
+      if(TARGET benchmark_symbols${target_suffix})
+        target_link_libraries(benchmark_symbols${target_suffix} ${PROJECT_NAME})
+      endif()
+    endmacro()
+    call_for_each_rmw_implementation(benchmark_rmws)
   endif()
 
   install(
