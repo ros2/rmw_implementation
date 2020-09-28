@@ -23,8 +23,8 @@ using performance_test_fixture::PerformanceTest;
 BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 {
   for (auto _ : st) {
-    std::shared_ptr<rcpputils::SharedLibrary> lib = load_library();
     prefetch_symbols();
+    unload_library();
   }
 }
 

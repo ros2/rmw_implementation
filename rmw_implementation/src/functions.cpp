@@ -41,6 +41,9 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
+static std::shared_ptr<rcpputils::SharedLibrary> g_rmw_lib = nullptr;
+static void * g_symbol_rmw_init = nullptr;
+
 std::shared_ptr<rcpputils::SharedLibrary>
 load_library()
 {
@@ -87,11 +90,10 @@ load_library()
 std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
-  static std::shared_ptr<rcpputils::SharedLibrary> lib;
-  if (!lib) {
-    lib = load_library();
+  if (!g_rmw_lib) {
+    g_rmw_lib = load_library();
   }
-  return lib;
+  return g_rmw_lib;
 }
 
 void *
@@ -125,6 +127,13 @@ void *
 get_symbol(const char * symbol_name)
 {
   return lookup_symbol(get_library(), symbol_name);
+}
+
+void
+unload_library()
+{
+  g_symbol_rmw_init = nullptr;
+  g_rmw_lib.reset();
 }
 
 #ifdef __cplusplus
@@ -679,21 +688,19 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
 }
 
-void * symbol_rmw_init = nullptr;
-
 rmw_ret_t
 rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 {
   prefetch_symbols();
-  if (!symbol_rmw_init) {
-    symbol_rmw_init = get_symbol("rmw_init");
+  if (!g_symbol_rmw_init) {
+    g_symbol_rmw_init = get_symbol("rmw_init");
   }
-  if (!symbol_rmw_init) {
+  if (!g_symbol_rmw_init) {
     return RMW_RET_ERROR;
   }
 
   typedef rmw_ret_t (* FunctionSignature)(const rmw_init_options_t *, rmw_context_t *);
-  FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_rmw_init);
+  FunctionSignature func = reinterpret_cast<FunctionSignature>(g_symbol_rmw_init);
   return func(options, context);
 }
 
