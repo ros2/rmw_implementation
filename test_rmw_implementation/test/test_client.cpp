@@ -268,10 +268,10 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
 
   rmw_ret_t ret = rmw_take_response(nullptr, &header, &client_request, &taken);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
-  EXPECT_EQ(client_request.bool_value, false);  // Verify post conditions
-  EXPECT_EQ(client_request.uint8_value, (unsigned)1);
-  EXPECT_EQ(client_request.uint32_value, (unsigned)2);
-  EXPECT_EQ(taken, false);
+  EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
+  EXPECT_EQ(1u, client_request.uint8_value);
+  EXPECT_EQ(2u, client_request.uint32_value);
+  EXPECT_EQ(false, taken);
   rmw_reset_error();
 
   ret = rmw_take_response(client, nullptr, &client_request, &taken);

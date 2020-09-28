@@ -227,16 +227,16 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), take_request_with_bad_argumen
   rmw_ret_t ret = rmw_take_request(nullptr, &header, &service_request, &taken);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   EXPECT_EQ(false, service_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, service_request.uint8_value);
-  EXPECT_EQ((unsigned)2, service_request.uint32_value);
+  EXPECT_EQ(1u, service_request.uint8_value);
+  EXPECT_EQ(2u, service_request.uint32_value);
   EXPECT_EQ(false, taken);
   rmw_reset_error();
 
   ret = rmw_take_request(srv, nullptr, &service_request, &taken);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   EXPECT_EQ(false, service_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, service_request.uint8_value);
-  EXPECT_EQ((unsigned)2, service_request.uint32_value);
+  EXPECT_EQ(1u, service_request.uint8_value);
+  EXPECT_EQ(2u, service_request.uint32_value);
   EXPECT_EQ(false, taken);
   rmw_reset_error();
 
@@ -248,8 +248,8 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), take_request_with_bad_argumen
   ret = rmw_take_request(srv, &header, &service_request, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   EXPECT_EQ(false, service_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, service_request.uint8_value);
-  EXPECT_EQ((unsigned)2, service_request.uint32_value);
+  EXPECT_EQ(1u, service_request.uint8_value);
+  EXPECT_EQ(2u, service_request.uint32_value);
   rmw_reset_error();
 
   const char * implementation_identifier = srv->implementation_identifier;
@@ -257,8 +257,8 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), take_request_with_bad_argumen
   ret = rmw_take_request(srv, &header, &service_request, &taken);
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
   EXPECT_EQ(false, service_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, service_request.uint8_value);
-  EXPECT_EQ((unsigned)2, service_request.uint32_value);
+  EXPECT_EQ(1u, service_request.uint8_value);
+  EXPECT_EQ(2u, service_request.uint32_value);
   EXPECT_EQ(false, taken);
   rmw_reset_error();
   srv->implementation_identifier = implementation_identifier;
@@ -298,7 +298,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     rmw_ret_t ret = rmw_destroy_service(node, srv);
-    EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   });
   rmw_client_t * client =
     rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
@@ -306,7 +306,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     rmw_ret_t ret = rmw_destroy_client(node, client);
-    EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   });
 
   rmw_ret_t ret = rmw_send_request(client, &request, &sequence_number);
@@ -318,7 +318,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     rmw_ret_t ret = rmw_destroy_wait_set(wait_set);
-    EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   });
   void * array[1];
   array[0] = srv->data;
