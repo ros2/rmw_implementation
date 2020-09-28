@@ -242,7 +242,9 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), send_request_with_bad_argument
   rmw_reset_error();
   client->implementation_identifier = implementation_identifier;
 
-  test_msgs__srv__BasicTypes_Request__fini(&client_request);
+  ret = rmw_destroy_client(node, client);
+  EXPECT_EQ(RMW_RET_OK, ret);
+  rmw_reset_error();
 }
 
 TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_arguments) {
@@ -275,8 +277,8 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
   ret = rmw_take_response(client, nullptr, &client_request, &taken);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, client_request.uint8_value);
-  EXPECT_EQ((unsigned)2, client_request.uint32_value);
+  EXPECT_EQ(1u, client_request.uint8_value);
+  EXPECT_EQ(2u, client_request.uint32_value);
   EXPECT_EQ(false, taken);
   rmw_reset_error();
 
@@ -288,8 +290,8 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
   ret = rmw_take_response(client, &header, &client_request, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, client_request.uint8_value);
-  EXPECT_EQ((unsigned)2, client_request.uint32_value);
+  EXPECT_EQ(1u, client_request.uint8_value);
+  EXPECT_EQ(2u, client_request.uint32_value);
   rmw_reset_error();
 
   const char * implementation_identifier = client->implementation_identifier;
@@ -297,11 +299,13 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
   ret = rmw_take_response(client, &header, &client_request, &taken);
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
   EXPECT_EQ(false, client_request.bool_value);  // Verify post conditions
-  EXPECT_EQ((unsigned)1, client_request.uint8_value);
-  EXPECT_EQ((unsigned)2, client_request.uint32_value);
+  EXPECT_EQ(1u, client_request.uint8_value);
+  EXPECT_EQ(2u, client_request.uint32_value);
   EXPECT_EQ(false, taken);
   rmw_reset_error();
   client->implementation_identifier = implementation_identifier;
 
-  test_msgs__srv__BasicTypes_Request__fini(&client_request);
+  ret = rmw_destroy_client(node, client);
+  EXPECT_EQ(RMW_RET_OK, ret);
+  rmw_reset_error();
 }
