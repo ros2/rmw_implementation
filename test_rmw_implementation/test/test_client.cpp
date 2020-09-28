@@ -243,7 +243,7 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), send_request_with_bad_argument
   client->implementation_identifier = implementation_identifier;
 
   ret = rmw_destroy_client(node, client);
-  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   rmw_reset_error();
 }
 
@@ -306,6 +306,6 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), take_response_with_bad_argumen
   client->implementation_identifier = implementation_identifier;
 
   ret = rmw_destroy_client(node, client);
-  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   rmw_reset_error();
 }

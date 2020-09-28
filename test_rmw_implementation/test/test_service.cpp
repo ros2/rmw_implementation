@@ -264,7 +264,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), take_request_with_bad_argumen
   srv->implementation_identifier = implementation_identifier;
 
   ret = rmw_destroy_service(node, srv);
-  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   rmw_reset_error();
 }
 
@@ -331,6 +331,11 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ASSERT_NE(nullptr, srv_array.services[0]);
+
+  bool taken = false;
+  ret = rmw_take_request(srv, &header, &request, &taken);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_EQ(true, taken);
 
   ret = rmw_send_response(nullptr, &header.request_id, &service_response);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
