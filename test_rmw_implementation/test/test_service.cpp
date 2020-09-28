@@ -289,7 +289,6 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   request.uint8_value = 1;
   request.uint32_value = 2;
   int64_t sequence_number;
-  bool taken = false;
   rmw_service_info_t header;
   rmw_service_t * srv =
     rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
@@ -315,17 +314,31 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   srv_array.service_count = 1u;
   srv_array.services = array;
   rmw_time_t timeout;
-  timeout.sec = 0;
+  timeout.sec = 1;
   timeout.nsec = rmw_intraprocess_discovery_delay.count() * 100;
   ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
   ASSERT_EQ(RMW_RET_OK, ret);
   ASSERT_NE(nullptr, srv_array.services[0]);
 
-  ret = rmw_take_request(srv, &header, &request, &taken);
-  ASSERT_EQ(RMW_RET_OK, ret);
-  ASSERT_EQ(true, taken);
+  ret = rmw_send_response(nullptr, &header.request_id, &service_response);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
 
-  // ret = rmw_take_request(srv, &header.request_id, &service_response);
+  ret = rmw_send_response(srv, nullptr, &service_response);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+
+  ret = rmw_send_response(srv, &header.request_id, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+
+  const char * implementation_identifier = srv->implementation_identifier;
+  srv->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_send_response(srv, &header.request_id, &service_response);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  srv->implementation_identifier = implementation_identifier;
+
   test_msgs__srv__BasicTypes_Request__fini(&request);
   test_msgs__srv__BasicTypes_Response__fini(&service_response);
 }
