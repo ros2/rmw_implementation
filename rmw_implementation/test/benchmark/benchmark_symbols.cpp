@@ -16,14 +16,13 @@
 
 #include "performance_test_fixture/performance_test_fixture.hpp"
 
-#include "../../src/functions.cpp"
+#include "../../src/functions.hpp"
 
 using performance_test_fixture::PerformanceTest;
 
 BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 {
   for (auto _ : st) {
-    std::shared_ptr<rcpputils::SharedLibrary> lib = load_library();
     prefetch_symbols();
   }
 }
