@@ -27,6 +27,18 @@ std::shared_ptr<rcpputils::SharedLibrary> load_library();
 RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
 void * lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name);
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
+void prefetch_symbols(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
 void unload_library();
 

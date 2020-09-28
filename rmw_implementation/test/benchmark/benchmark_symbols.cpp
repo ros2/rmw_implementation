@@ -16,7 +16,7 @@
 
 #include "performance_test_fixture/performance_test_fixture.hpp"
 
-#include "../../src/functions.cpp"
+#include "../../src/functions.hpp"
 
 using performance_test_fixture::PerformanceTest;
 
