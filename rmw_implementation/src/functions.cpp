@@ -42,7 +42,6 @@
 #define STRINGIFY(s) STRINGIFY_(s)
 
 static std::shared_ptr<rcpputils::SharedLibrary> g_rmw_lib = nullptr;
-static void * g_symbol_rmw_init = nullptr;
 
 std::shared_ptr<rcpputils::SharedLibrary>
 load_library()
@@ -127,13 +126,6 @@ void *
 get_symbol(const char * symbol_name)
 {
   return lookup_symbol(get_library(), symbol_name);
-}
-
-void
-unload_library()
-{
-  g_symbol_rmw_init = nullptr;
-  g_rmw_lib.reset();
 }
 
 #ifdef __cplusplus
@@ -688,22 +680,103 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
 }
 
+void * symbol_rmw_init = nullptr;
+
 rmw_ret_t
 rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 {
   prefetch_symbols();
-  if (!g_symbol_rmw_init) {
-    g_symbol_rmw_init = get_symbol("rmw_init");
+  if (!symbol_rmw_init) {
+    symbol_rmw_init = get_symbol("rmw_init");
   }
-  if (!g_symbol_rmw_init) {
+  if (!symbol_rmw_init) {
     return RMW_RET_ERROR;
   }
 
   typedef rmw_ret_t (* FunctionSignature)(const rmw_init_options_t *, rmw_context_t *);
-  FunctionSignature func = reinterpret_cast<FunctionSignature>(g_symbol_rmw_init);
+  FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_rmw_init);
   return func(options, context);
 }
 
 #ifdef __cplusplus
 }
 #endif
+
+void
+unload_library()
+{
+  symbol_rmw_get_implementation_identifier = nullptr;
+  symbol_rmw_init_options_init = nullptr;
+  symbol_rmw_init_options_copy = nullptr;
+  symbol_rmw_init_options_fini = nullptr;
+  symbol_rmw_shutdown = nullptr;
+  symbol_rmw_context_fini = nullptr;
+  symbol_rmw_get_serialization_format = nullptr;
+  symbol_rmw_create_node = nullptr;
+  symbol_rmw_destroy_node = nullptr;
+  symbol_rmw_node_get_graph_guard_condition = nullptr;
+  symbol_rmw_init_publisher_allocation = nullptr;
+  symbol_rmw_fini_publisher_allocation = nullptr;
+  symbol_rmw_create_publisher = nullptr;
+  symbol_rmw_destroy_publisher = nullptr;
+  symbol_rmw_borrow_loaned_message = nullptr;
+  symbol_rmw_return_loaned_message_from_publisher = nullptr;
+  symbol_rmw_publish = nullptr;
+  symbol_rmw_publish_loaned_message = nullptr;
+  symbol_rmw_publisher_count_matched_subscriptions = nullptr;
+  symbol_rmw_publisher_get_actual_qos = nullptr;
+  symbol_rmw_publisher_event_init = nullptr;
+  symbol_rmw_publish_serialized_message = nullptr;
+  symbol_rmw_get_serialized_message_size = nullptr;
+  symbol_rmw_publisher_assert_liveliness = nullptr;
+  symbol_rmw_serialize = nullptr;
+  symbol_rmw_deserialize = nullptr;
+  symbol_rmw_init_subscription_allocation = nullptr;
+  symbol_rmw_fini_subscription_allocation = nullptr;
+  symbol_rmw_create_subscription = nullptr;
+  symbol_rmw_destroy_subscription = nullptr;
+  symbol_rmw_subscription_count_matched_publishers = nullptr;
+  symbol_rmw_subscription_get_actual_qos = nullptr;
+  symbol_rmw_subscription_event_init = nullptr;
+  symbol_rmw_take = nullptr;
+  symbol_rmw_take_sequence = nullptr;
+  symbol_rmw_take_with_info = nullptr;
+  symbol_rmw_take_serialized_message = nullptr;
+  symbol_rmw_take_serialized_message_with_info = nullptr;
+  symbol_rmw_take_loaned_message = nullptr;
+  symbol_rmw_take_loaned_message_with_info = nullptr;
+  symbol_rmw_return_loaned_message_from_subscription = nullptr;
+  symbol_rmw_create_client = nullptr;
+  symbol_rmw_destroy_client = nullptr;
+  symbol_rmw_send_request = nullptr;
+  symbol_rmw_take_response = nullptr;
+  symbol_rmw_create_service = nullptr;
+  symbol_rmw_destroy_service = nullptr;
+  symbol_rmw_take_request = nullptr;
+  symbol_rmw_send_response = nullptr;
+  symbol_rmw_take_event = nullptr;
+  symbol_rmw_create_guard_condition = nullptr;
+  symbol_rmw_destroy_guard_condition = nullptr;
+  symbol_rmw_trigger_guard_condition = nullptr;
+  symbol_rmw_create_wait_set = nullptr;
+  symbol_rmw_destroy_wait_set = nullptr;
+  symbol_rmw_wait = nullptr;
+  symbol_rmw_get_publisher_names_and_types_by_node = nullptr;
+  symbol_rmw_get_subscriber_names_and_types_by_node = nullptr;
+  symbol_rmw_get_service_names_and_types_by_node = nullptr;
+  symbol_rmw_get_client_names_and_types_by_node = nullptr;
+  symbol_rmw_get_topic_names_and_types = nullptr;
+  symbol_rmw_get_service_names_and_types = nullptr;
+  symbol_rmw_get_node_names = nullptr;
+  symbol_rmw_get_node_names_with_enclaves = nullptr;
+  symbol_rmw_count_publishers = nullptr;
+  symbol_rmw_count_subscribers = nullptr;
+  symbol_rmw_get_gid_for_publisher = nullptr;
+  symbol_rmw_compare_gids_equal = nullptr;
+  symbol_rmw_service_server_is_available = nullptr;
+  symbol_rmw_set_log_severity = nullptr;
+  symbol_rmw_get_publishers_info_by_topic = nullptr;
+  symbol_rmw_get_subscriptions_info_by_topic = nullptr;
+  symbol_rmw_init = nullptr;
+  g_rmw_lib.reset();
+}
