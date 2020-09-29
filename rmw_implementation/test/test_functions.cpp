@@ -55,3 +55,8 @@ TEST(Functions, load_and_lookup_with_internal_errors) {
     }
   });
 }
+
+TEST(Functions, nominal_prefetch_and_unload) {
+  prefetch_symbols();
+  unload_library();
+}
