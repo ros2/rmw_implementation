@@ -208,6 +208,25 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
   INITIALIZE_ARRAY(clients, client, number_of_clients);
   INITIALIZE_ARRAY(events, event, number_of_events);
 
+  const char * implementation_identifier = wait_set->implementation_identifier;
+  wait_set->implementation_identifier = "not-an-rmw-implementation-identifier";
+  subscriptions.subscribers[0] = sub->data;
+  guard_conditions.guard_conditions[0] = gc->data;
+  services.services[0] = srv->data;
+  clients.clients[0] = client->data;
+  events.events[0] = &event;
+  ret = rmw_wait(
+    &subscriptions, &guard_conditions, &services, &clients, &events, wait_set,
+    &timeout_argument);
+  wait_set->implementation_identifier = implementation_identifier;
+  EXPECT_EQ(ret, RMW_RET_INCORRECT_RMW_IMPLEMENTATION) << rcutils_get_error_string().str;
+  EXPECT_NE(nullptr, subscriptions.subscribers[0]);  // left unchanged
+  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_NE(nullptr, services.services[0]);
+  EXPECT_NE(nullptr, clients.clients[0]);
+  EXPECT_NE(nullptr, events.events[0]);
+  rmw_reset_error();
+
   // Used a valid wait_set
   ret = rmw_wait(nullptr, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout_argument);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
@@ -221,7 +240,7 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
   subscriptions.subscribers[0] = sub->data;
   ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout_argument);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
   rmw_reset_error();
 
   // Used a valid wait_set and subscription with no timeout
@@ -230,7 +249,7 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set,
     &timeout_argument_zero);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription and guard_conditions with 100ms timeout
@@ -240,8 +259,8 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, nullptr, nullptr, nullptr, wait_set,
     &timeout_argument);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription and guard_conditions with no timeout
@@ -251,8 +270,8 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, nullptr, nullptr, nullptr, wait_set,
     &timeout_argument_zero);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription, guard_conditions and services with 100ms timeout
@@ -263,9 +282,9 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, &services, nullptr, nullptr, wait_set,
     &timeout_argument);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, services.services[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription, guard_conditions and services with no timeout
@@ -276,9 +295,9 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, &services, nullptr, nullptr, wait_set,
     &timeout_argument_zero);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, services.services[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription, guard_conditions, services and clients with 100ms timeout
@@ -290,10 +309,10 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, &services, &clients, nullptr, wait_set,
     &timeout_argument);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
-  EXPECT_NE(nullptr, clients.clients[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, services.services[0]);
+  EXPECT_EQ(nullptr, clients.clients[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription, guard_conditions, services and clients with no timeout
@@ -305,10 +324,10 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, &services, &clients, nullptr, wait_set,
     &timeout_argument_zero);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
-  EXPECT_NE(nullptr, clients.clients[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, services.services[0]);
+  EXPECT_EQ(nullptr, clients.clients[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription, guard_conditions, services, clients and events with 100ms
@@ -322,11 +341,11 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, &services, &clients, &events, wait_set,
     &timeout_argument);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
-  EXPECT_NE(nullptr, clients.clients[0]);
-  EXPECT_NE(nullptr, events.events[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, services.services[0]);
+  EXPECT_EQ(nullptr, clients.clients[0]);
+  EXPECT_EQ(nullptr, events.events[0]);
   rmw_reset_error();
 
   // Used a valid wait_set, subscription, guard_conditions, services, clients and events with no
@@ -340,30 +359,11 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     &subscriptions, &guard_conditions, &services, &clients, &events, wait_set,
     &timeout_argument_zero);
   EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
-  EXPECT_NE(nullptr, clients.clients[0]);
-  EXPECT_NE(nullptr, events.events[0]);
-  rmw_reset_error();
-
-  const char * implementation_identifier = wait_set->implementation_identifier;
-  wait_set->implementation_identifier = "not-an-rmw-implementation-identifier";
-  subscriptions.subscribers[0] = sub->data;
-  guard_conditions.guard_conditions[0] = gc->data;
-  services.services[0] = srv->data;
-  clients.clients[0] = client->data;
-  events.events[0] = &event;
-  ret = rmw_wait(
-    &subscriptions, &guard_conditions, &services, &clients, &events, wait_set,
-    &timeout_argument);
-  wait_set->implementation_identifier = implementation_identifier;
-  EXPECT_EQ(ret, RMW_RET_INCORRECT_RMW_IMPLEMENTATION) << rcutils_get_error_string().str;
-  EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-  EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-  EXPECT_NE(nullptr, services.services[0]);
-  EXPECT_NE(nullptr, clients.clients[0]);
-  EXPECT_NE(nullptr, events.events[0]);
+  EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+  EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+  EXPECT_EQ(nullptr, services.services[0]);
+  EXPECT_EQ(nullptr, clients.clients[0]);
+  EXPECT_EQ(nullptr, events.events[0]);
   rmw_reset_error();
 
   // Battle test rmw_wait.
@@ -378,13 +378,16 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
       &subscriptions, &guard_conditions, &services, &clients, &events, wait_set,
       &timeout_argument);
 
-    EXPECT_TRUE(RMW_RET_TIMEOUT == ret || RMW_RET_ERROR == ret);
-    EXPECT_NE(nullptr, subscriptions.subscribers[0]);
-    EXPECT_NE(nullptr, guard_conditions.guard_conditions[0]);
-    EXPECT_NE(nullptr, services.services[0]);
-    EXPECT_NE(nullptr, clients.clients[0]);
-    EXPECT_NE(nullptr, events.events[0]);
-    rmw_reset_error();
+    if (RMW_RET_TIMEOUT == ret) {
+      EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
+      EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
+      EXPECT_EQ(nullptr, services.services[0]);
+      EXPECT_EQ(nullptr, clients.clients[0]);
+      EXPECT_EQ(nullptr, events.events[0]);
+    } else {
+      EXPECT_EQ(RMW_RET_ERROR, ret);
+      rmw_reset_error();
+    }
   });
 }
 
