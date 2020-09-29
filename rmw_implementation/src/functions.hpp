@@ -39,4 +39,7 @@ void prefetch_symbols(void);
 }
 #endif
 
+RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
+void unload_library();
+
 #endif  // FUNCTIONS_HPP_

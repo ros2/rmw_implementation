@@ -24,6 +24,7 @@ BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 {
   for (auto _ : st) {
     prefetch_symbols();
+    unload_library();
   }
 }
 
