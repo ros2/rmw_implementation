@@ -128,8 +128,8 @@ protected:
     ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
     client = rmw_create_client(node, service_ts, service_name, &rmw_qos_profile_default);
     ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
-    rmw_ret_t ret = rmw_subscription_event_init(&event, sub, RMW_EVENT_REQUESTED_QOS_INCOMPATIBLE);
-    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    rmw_ret_t ret = rmw_subscription_event_init(&event, sub, RMW_EVENT_LIVELINESS_CHANGED);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 
   void TearDown() override
