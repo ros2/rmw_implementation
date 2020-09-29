@@ -99,13 +99,14 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_create_wait_set)
   });
 }
 
-class CLASSNAME (TestWaitSetUse, RMW_IMPLEMENTATION) :
-  public CLASSNAME (TestWaitSet, RMW_IMPLEMENTATION)
+class CLASSNAME (TestWaitSetUse, RMW_IMPLEMENTATION)
+  : public CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION)
 {
- protected:
-  using Base = CLASSNAME (TestWaitSet, RMW_IMPLEMENTATION);
+protected:
+  using Base = CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION);
 
-  void SetUp() override {
+  void SetUp() override
+  {
     Base::SetUp();
     constexpr char node_name[] = "my_node";
     constexpr char node_namespace[] = "/my_ns";
@@ -131,7 +132,8 @@ class CLASSNAME (TestWaitSetUse, RMW_IMPLEMENTATION) :
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 
-  void TearDown() override {
+  void TearDown() override
+  {
     rmw_ret_t ret = rmw_event_fini(&event);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_client(node, client);
