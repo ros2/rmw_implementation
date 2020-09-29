@@ -12,34 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FUNCTIONS_HPP_
-#define FUNCTIONS_HPP_
-
 #include <memory>
 
-#include "rcpputils/shared_library.hpp"
+#include "performance_test_fixture/performance_test_fixture.hpp"
 
-#include "./visibility_control.h"
+#include "../../src/functions.hpp"
 
-RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
-std::shared_ptr<rcpputils::SharedLibrary> load_library();
+using performance_test_fixture::PerformanceTest;
 
-RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
-void * lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name);
-
-#ifdef __cplusplus
-extern "C"
+BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 {
-#endif
-
-RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
-void prefetch_symbols(void);
-
-#ifdef __cplusplus
+  for (auto _ : st) {
+    prefetch_symbols();
+    unload_library();
+  }
 }
-#endif
 
-RMW_IMPLEMENTATION_DEFAULT_VISIBILITY
-void unload_library();
-
-#endif  // FUNCTIONS_HPP_
+BENCHMARK_F(PerformanceTest, lookup_symbol)(benchmark::State & st)
+{
+  for (auto _ : st) {
+    std::shared_ptr<rcpputils::SharedLibrary> lib = load_library();
+    lookup_symbol(lib, "rmw_init");
+  }
+}
