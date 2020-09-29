@@ -122,3 +122,11 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
     rmw_get_error_string().str;
 }
+
+TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), rmw_get_serialized_message_size)
+{
+  if (rmw_get_serialized_message_size(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
+    // TODO(anyone): Add tests here when the implementation it's supported
+    GTEST_SKIP();
+  }
+}
