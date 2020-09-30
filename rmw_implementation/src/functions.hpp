@@ -16,6 +16,7 @@
 #define FUNCTIONS_HPP_
 
 #include <memory>
+#include <string>
 
 #include "rcpputils/shared_library.hpp"
 
