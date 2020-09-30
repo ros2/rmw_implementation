@@ -57,16 +57,22 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_b
   EXPECT_NE(RMW_RET_OK, rmw_serialize(&input_message, ts, &serialized_message));
   rmw_reset_error();
 
-  rosidl_message_type_support_t * non_const_ts =
-    const_cast<rosidl_message_type_support_t *>(ts);
-  const char * typesupport_identifier = non_const_ts->typesupport_identifier;
-  non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+    rmw_get_error_string().str;
+
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   ASSERT_EQ(
     RMW_RET_OK, rmw_serialized_message_init(
       &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+
+  rosidl_message_type_support_t * non_const_ts =
+    const_cast<rosidl_message_type_support_t *>(ts);
+  const char * typesupport_identifier = non_const_ts->typesupport_identifier;
+  non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
+
   EXPECT_NE(RMW_RET_OK, rmw_serialize(&input_message, non_const_ts, &serialized_message));
   rmw_reset_error();
+
   non_const_ts->typesupport_identifier = typesupport_identifier;
 
   EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
