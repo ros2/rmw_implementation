@@ -376,7 +376,7 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
     ret = rmw_wait(
       &subscriptions, &guard_conditions, &services, &clients, &events, wait_set,
       &timeout_argument);
-
+    EXPECT_NE(RMW_RET_OK, ret);
     if (RMW_RET_TIMEOUT == ret) {
       EXPECT_EQ(nullptr, subscriptions.subscribers[0]);
       EXPECT_EQ(nullptr, guard_conditions.guard_conditions[0]);
@@ -384,7 +384,6 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
       EXPECT_EQ(nullptr, clients.clients[0]);
       EXPECT_EQ(nullptr, events.events[0]);
     } else {
-      EXPECT_EQ(RMW_RET_ERROR, ret);
       rmw_reset_error();
     }
   });
