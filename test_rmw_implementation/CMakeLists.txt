@@ -116,7 +116,7 @@ if(BUILD_TESTING)
     target_compile_definitions(test_wait_set${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_wait_set${target_suffix}
-      rmw rmw_implementation rcutils osrf_testing_tools_cpp
+      rmw rmw_implementation rcutils osrf_testing_tools_cpp test_msgs
     )
 
     ament_add_gtest(test_graph_api${target_suffix}
