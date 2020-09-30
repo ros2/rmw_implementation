@@ -149,12 +149,12 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
 
   rosidl_message_type_support_t * non_const_ts =
     const_cast<rosidl_message_type_support_t *>(ts);
-  const char * old_identifier = non_const_ts->typesupport_identifier;
+  const char * typesupport_identifier = non_const_ts->typesupport_identifier;
   non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
   pub = rmw_create_publisher(node, non_const_ts, topic_name, &rmw_qos_profile_default, &options);
   EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
-  non_const_ts->typesupport_identifier = old_identifier;
+  non_const_ts->typesupport_identifier = typesupport_identifier;
 
   // Creating and destroying a publisher still succeeds.
   pub = rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);

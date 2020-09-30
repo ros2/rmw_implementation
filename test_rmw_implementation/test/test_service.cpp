@@ -146,12 +146,12 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), create_with_bad_arguments) {
 
   rosidl_service_type_support_t * non_const_ts =
     const_cast<rosidl_service_type_support_t *>(ts);
-  const char * old_identifier = non_const_ts->typesupport_identifier;
+  const char * typesupport_identifier = non_const_ts->typesupport_identifier;
   non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
   srv = rmw_create_service(node, non_const_ts, service_name, &rmw_qos_profile_default);
   EXPECT_EQ(nullptr, srv);
   rmw_reset_error();
-  non_const_ts->typesupport_identifier = old_identifier;
+  non_const_ts->typesupport_identifier = typesupport_identifier;
 
   // Creating and destroying a service still succeeds.
   srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
