@@ -150,16 +150,16 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_bad_argument
   EXPECT_EQ(nullptr, sub);
   rmw_reset_error();
 
-  rosidl_message_type_support_t * non_implementation_ts =
+  rosidl_message_type_support_t * non_const_ts =
     const_cast<rosidl_message_type_support_t *>(ts);
-  const char * old_identifier = non_implementation_ts->typesupport_identifier;
-  non_implementation_ts->typesupport_identifier = "not-an-implementation-identifier";
+  const char * old_identifier = non_const_ts->typesupport_identifier;
+  non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
   sub = rmw_create_subscription(
-    node, non_implementation_ts, topic_name,
+    node, non_const_ts, topic_name,
     &rmw_qos_profile_default, &options);
   EXPECT_EQ(nullptr, sub);
   rmw_reset_error();
-  non_implementation_ts->typesupport_identifier = old_identifier;
+  non_const_ts->typesupport_identifier = old_identifier;
 
   // Creating and destroying a subscription still succeeds.
   sub = rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
