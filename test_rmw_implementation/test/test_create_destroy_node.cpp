@@ -132,7 +132,8 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_an
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestNodeConstructionDestructionLocalHost, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME (TestLocalhostNodeConstructionDestruction,
+  RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -162,7 +163,10 @@ protected:
   rmw_context_t context;
 };
 
-TEST_F(CLASSNAME(TestNodeConstructionDestructionLocalHost, RMW_IMPLEMENTATION), create_and_destroy) {
+TEST_F(
+  CLASSNAME(
+    TestLocalhostNodeConstructionDestruction,
+    RMW_IMPLEMENTATION), create_and_destroy) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
   rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
