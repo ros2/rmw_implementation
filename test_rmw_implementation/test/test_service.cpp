@@ -330,7 +330,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   rmw_time_t timeout;
   auto rmw_intraprocess_discovery_delay_in_nanoseconds =
     std::chrono::duration_cast<std::chrono::nanoseconds>(
-      rmw_intraprocess_discovery_delay * 10).count();
+    rmw_intraprocess_discovery_delay * 10).count();
   timeout.sec = rmw_intraprocess_discovery_delay_in_nanoseconds / 1000000000;
   timeout.nsec = rmw_intraprocess_discovery_delay_in_nanoseconds % 1000000000;
   ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
