@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <chrono>
-
 #include <gtest/gtest.h>
+
+#include <chrono>
 
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
 
