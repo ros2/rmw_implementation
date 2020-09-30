@@ -110,7 +110,7 @@ protected:
     Base::SetUp();
     constexpr char node_name[] = "my_node";
     constexpr char node_namespace[] = "/my_ns";
-    node = rmw_create_node(&context, node_name, node_namespace, 1, false);
+    node = rmw_create_node(&context, node_name, node_namespace, 0, false);
     ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
     constexpr char topic_name[] = "/test";
     const rosidl_message_type_support_t * message_ts =
