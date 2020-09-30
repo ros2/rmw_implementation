@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
+
 #include <gtest/gtest.h>
 
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
@@ -326,8 +328,11 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   srv_array.service_count = 1u;
   srv_array.services = array;
   rmw_time_t timeout;
-  timeout.sec = 0;
-  timeout.nsec = rmw_intraprocess_discovery_delay.count() * 1000;
+  auto rmw_intraprocess_discovery_delay_in_nanoseconds =
+    std::chrono::duration_cast<std::chrono::nanoseconds>(
+      rmw_intraprocess_discovery_delay * 10).count();
+  timeout.sec = rmw_intraprocess_discovery_delay_in_nanoseconds / 1000000000;
+  timeout.nsec = rmw_intraprocess_discovery_delay_in_nanoseconds % 1000000000;
   ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ASSERT_NE(nullptr, srv_array.services[0]);
