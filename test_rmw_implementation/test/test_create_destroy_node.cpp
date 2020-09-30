@@ -205,11 +205,12 @@ TEST_F(
   {
     constexpr char node_name[] = "my_node";
     constexpr char node_namespace[] = "/my_ns";
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
-    ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+    rmw_node_t * node = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      node = rmw_create_node(&context, node_name, node_namespace);
+      ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
+    });
     if (RMW_RET_OK != rmw_destroy_node(node)) {
       rmw_reset_error();
     }

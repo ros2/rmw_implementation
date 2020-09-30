@@ -91,14 +91,15 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_internal_errors
 
   RCUTILS_FAULT_INJECTION_TEST(
   {
+    rmw_publisher_t * pub = nullptr;
     rmw_publisher_options_t options = rmw_get_default_publisher_options();
-    rmw_publisher_t * pub =
-    rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);
+    pub = rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);
     if (pub) {
-      int64_t count = rcutils_fault_injection_get_count();
-      rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-      EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
-      rcutils_fault_injection_set_count(count);
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_publisher(node, pub);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
     } else {
       rmw_reset_error();
     }
@@ -215,13 +216,13 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_internal_error
 
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    rmw_publisher_options_t options = rmw_get_default_publisher_options();
-    rmw_publisher_t * pub =
-    rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);
-    ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+    rmw_publisher_t * pub = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      rmw_publisher_options_t options = rmw_get_default_publisher_options();
+      pub = rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);
+      ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+    });
     if (RMW_RET_OK != rmw_destroy_publisher(node, pub)) {
       rmw_reset_error();
     }
