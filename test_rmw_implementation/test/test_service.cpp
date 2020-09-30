@@ -158,14 +158,13 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), create_with_internal_errors) 
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    rmw_service_t * srv =
-    rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
+    rmw_service_t * srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
     if (srv) {
-      int64_t count = rcutils_fault_injection_get_count();
-      rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-      rmw_ret_t ret = rmw_destroy_service(node, srv);
-      EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-      rcutils_fault_injection_set_count(count);
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_service(node, srv);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
     } else {
       rmw_reset_error();
     }
@@ -178,12 +177,12 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), destroy_with_internal_errors)
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    rmw_service_t * srv =
-    rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
-    ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+    rmw_service_t * srv = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
+      ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+    });
     if (RMW_RET_OK != rmw_destroy_service(node, srv)) {
       rmw_reset_error();
     }

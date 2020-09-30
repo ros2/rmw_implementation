@@ -86,16 +86,15 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_create_wait_set)
   {
     wait_set = rmw_create_wait_set(&context, 0);
 
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-
-    if (wait_set != nullptr) {
-      ret = rmw_destroy_wait_set(wait_set);
-      EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+    if (wait_set) {
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        ret = rmw_destroy_wait_set(wait_set);
+        EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+      });
     } else {
       rmw_reset_error();
     }
-    rcutils_fault_injection_set_count(count);
   });
 }
 

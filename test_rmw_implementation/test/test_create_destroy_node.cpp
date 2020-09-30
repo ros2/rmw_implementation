@@ -187,10 +187,11 @@ TEST_F(
     constexpr char node_namespace[] = "/my_ns";
     rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
     if (node) {
-      int64_t count = rcutils_fault_injection_get_count();
-      rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-      EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
-      rcutils_fault_injection_set_count(count);
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_node(node);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
     } else {
       rmw_reset_error();
     }

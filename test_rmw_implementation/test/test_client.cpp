@@ -159,11 +159,11 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_internal_errors) {
     rmw_client_t * client =
     rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
     if (client) {
-      int64_t count = rcutils_fault_injection_get_count();
-      rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-      rmw_ret_t ret = rmw_destroy_client(node, client);
-      EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-      rcutils_fault_injection_set_count(count);
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_client(node, client);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
     } else {
       rmw_reset_error();
     }

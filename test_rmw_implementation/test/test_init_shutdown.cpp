@@ -183,39 +183,45 @@ TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), init_with_internal_error
     rmw_context_t context = rmw_get_zero_initialized_context();
     rmw_ret_t ret = rmw_init(&options, &context);
 
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    if (RMW_RET_OK == ret) {
-      EXPECT_EQ(RMW_RET_OK, rmw_shutdown(&context)) << rmw_get_error_string().str;
-      EXPECT_EQ(RMW_RET_OK, rmw_context_fini(&context)) << rmw_get_error_string().str;
-    } else {
-      rmw_reset_error();
-    }
-    rcutils_fault_injection_set_count(count);
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      if (RMW_RET_OK == ret) {
+        ret = rmw_shutdown(&context);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+        ret = rmw_context_fini(&context);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      } else {
+        rmw_reset_error();
+      }
+    });
   });
 }
 
 TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), shutdown_with_internal_errors) {
   RCUTILS_FAULT_INJECTION_TEST(
   {
+    rmw_ret_t ret = RMW_RET_OK;
     rmw_context_t context = rmw_get_zero_initialized_context();
 
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    ASSERT_EQ(RMW_RET_OK, rmw_init(&options, &context)) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      ret = rmw_init(&options, &context);
+      ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    });
 
-    rmw_ret_t ret = rmw_shutdown(&context);
+    ret = rmw_shutdown(&context);
 
-    count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    if (RMW_RET_OK != ret) {
-      rmw_reset_error();
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      if (RMW_RET_OK != ret) {
+        rmw_reset_error();
 
-      EXPECT_EQ(RMW_RET_OK, rmw_shutdown(&context)) << rmw_get_error_string().str;
-    }
-    EXPECT_EQ(RMW_RET_OK, rmw_context_fini(&context)) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+        ret = rmw_shutdown(&context);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      }
+      ret = rmw_context_fini(&context);
+      EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    });
   });
 }
 
@@ -223,11 +229,13 @@ TEST_F(CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION), context_fini_with_intern
   RCUTILS_FAULT_INJECTION_TEST(
   {
     rmw_context_t context = rmw_get_zero_initialized_context();
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    EXPECT_EQ(RMW_RET_OK, rmw_init(&options, &context)) << rmw_get_error_string().str;
-    EXPECT_EQ(RMW_RET_OK, rmw_shutdown(&context)) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      rmw_ret_t ret = rmw_init(&options, &context);
+      ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      ret = rmw_shutdown(&context);
+      EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    });
 
     if (RMW_RET_OK != rmw_context_fini(&context)) {
       rmw_reset_error();

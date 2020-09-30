@@ -164,21 +164,20 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_internal_err
 
   RCUTILS_FAULT_INJECTION_TEST(
   {
+    rmw_subscription_t * sub = nullptr;
     rmw_subscription_options_t options = rmw_get_default_subscription_options();
-    rmw_subscription_t * sub =
-    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
+    sub = rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
     if (sub) {
-      int64_t count = rcutils_fault_injection_get_count();
-      rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-      rmw_ret_t ret = rmw_destroy_subscription(node, sub);
-      EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-      rcutils_fault_injection_set_count(count);
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_subscription(node, sub);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
     } else {
       rmw_reset_error();
     }
   });
 }
-
 
 TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
   rmw_subscription_options_t options = rmw_get_default_subscription_options();
@@ -218,13 +217,13 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), destroy_with_internal_er
 
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-    rmw_subscription_options_t options = rmw_get_default_subscription_options();
-    rmw_subscription_t * sub =
-    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
-    ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
-    rcutils_fault_injection_set_count(count);
+    rmw_subscription_t * sub = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      rmw_subscription_options_t options = rmw_get_default_subscription_options();
+      sub = rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
+      ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+    });
     if (RMW_RET_OK != rmw_destroy_subscription(node, sub)) {
       rmw_reset_error();
     }
