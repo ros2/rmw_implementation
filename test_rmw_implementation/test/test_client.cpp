@@ -143,7 +143,8 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   EXPECT_EQ(nullptr, client);
   rmw_reset_error();
 
-  rosidl_service_type_support_t * non_implementation_ts = const_cast<rosidl_service_type_support_t *>(ts);
+  rosidl_service_type_support_t * non_implementation_ts =
+    const_cast<rosidl_service_type_support_t *>(ts);
   const char * old_identifier = non_implementation_ts->typesupport_identifier;
   non_implementation_ts->typesupport_identifier = "not-an-implementation-identifier";
   client = rmw_create_client(node, non_implementation_ts, service_name, &rmw_qos_profile_default);

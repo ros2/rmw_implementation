@@ -147,7 +147,8 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
   EXPECT_EQ(nullptr, pub);
   rmw_reset_error();
 
-  rosidl_message_type_support_t * non_implementation_ts = const_cast<rosidl_message_type_support_t *>(ts);
+  rosidl_message_type_support_t * non_implementation_ts =
+    const_cast<rosidl_message_type_support_t *>(ts);
   const char * old_identifier = non_implementation_ts->typesupport_identifier;
   non_implementation_ts->typesupport_identifier = "not-an-implementation-identifier";
   pub = rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &options);

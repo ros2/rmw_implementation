@@ -57,7 +57,8 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_b
   EXPECT_NE(RMW_RET_OK, rmw_serialize(&input_message, ts, &serialized_message));
   rmw_reset_error();
 
-  rosidl_message_type_support_t * non_implementation_ts = const_cast<rosidl_message_type_support_t *>(ts);
+  rosidl_message_type_support_t * non_implementation_ts =
+    const_cast<rosidl_message_type_support_t *>(ts);
   const char * old_identifier = non_implementation_ts->typesupport_identifier;
   non_implementation_ts->typesupport_identifier = "not-an-implementation-identifier";
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
