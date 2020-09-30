@@ -131,3 +131,45 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_an
   ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
+
+class CLASSNAME (TestLocalhostNodeConstructionDestruction,
+  RMW_IMPLEMENTATION) : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    options = rmw_get_zero_initialized_init_options();
+    rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
+    ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+    options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
+    ASSERT_STREQ("/", options.enclave);
+    options.localhost_only = RMW_LOCALHOST_ONLY_ENABLED;
+    context = rmw_get_zero_initialized_context();
+    ret = rmw_init(&options, &context);
+    ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+  }
+
+  void TearDown() override
+  {
+    rmw_ret_t ret = rmw_shutdown(&context);
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+    ret = rmw_context_fini(&context);
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+    ret = rmw_init_options_fini(&options);
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+  }
+
+  rmw_init_options_t options;
+  rmw_context_t context;
+};
+
+TEST_F(
+  CLASSNAME(
+    TestLocalhostNodeConstructionDestruction,
+    RMW_IMPLEMENTATION), create_and_destroy) {
+  const char * const node_name = "my_node";
+  const char * const node_namespace = "/my_ns";
+  rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
+  ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
+}
