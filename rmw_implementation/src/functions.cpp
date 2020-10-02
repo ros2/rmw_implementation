@@ -605,25 +605,25 @@ RMW_INTERFACE_FN(
   rmw_set_subscription_callback,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
-    void *, Event_callback, void *, void *))
+    const void *, Event_callback, const void *, void *))
 
 RMW_INTERFACE_FN(
   rmw_set_service_callback,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
-    void *, Event_callback, void *, void *))
+    const void *, Event_callback, const void *, void *))
 
 RMW_INTERFACE_FN(
   rmw_set_client_callback,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
-    void *, Event_callback, void *, void *))
+    const void *, Event_callback, const void *, void *))
 
 RMW_INTERFACE_FN(
   rmw_set_guard_condition_callback,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
-    void *, Event_callback, void *, void *))
+    const void *, Event_callback, const void *, void *))
 
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
