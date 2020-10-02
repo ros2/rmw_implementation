@@ -601,6 +601,30 @@ RMW_INTERFACE_FN(
     bool,
     rmw_topic_endpoint_info_array_t *))
 
+RMW_INTERFACE_FN(
+  rmw_set_subscription_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    void *, Event_callback, void *, void *))
+
+RMW_INTERFACE_FN(
+  rmw_set_service_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    void *, Event_callback, void *, void *))
+
+RMW_INTERFACE_FN(
+  rmw_set_client_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    void *, Event_callback, void *, void *))
+
+RMW_INTERFACE_FN(
+  rmw_set_guard_condition_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    void *, Event_callback, void *, void *))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -678,6 +702,10 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_set_log_severity)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
+  GET_SYMBOL(rmw_set_subscription_callback)
+  GET_SYMBOL(rmw_set_service_callback)
+  GET_SYMBOL(rmw_set_client_callback)
+  GET_SYMBOL(rmw_set_guard_condition_callback)
 }
 
 void * symbol_rmw_init = nullptr;
