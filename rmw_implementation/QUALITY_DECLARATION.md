@@ -118,7 +118,7 @@ A description of how coverage statistics are summarized from this page, can be f
 
 ### Performance [4.iv]
 
-`rmw_implementation` does not currently have performance tests.
+The performance tests of `rmw_implementation` are located in the [test/benchmark directory](https://github.com/ros2/rmw_implementation/tree/master/rmw_implementation/test/benchmark). The most recent test results can be found [here](http://build.ros2.org/view/Rci/job/Rci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).
 
 ### Linters and Static Analysis [4.v]
 
@@ -195,7 +195,7 @@ The chart below compares the requirements in the REP-2004 with the current state
 |4.ii| Public API tests | None |
 |4.iii.a| Using coverage | ✓ |
 |4.iii.a| Coverage policy | ✓ |
-|4.iv.a| Performance tests (if applicable) | x |
+|4.iv.a| Performance tests (if applicable) | ✓ |
 |4.iv.b| Performance tests policy| None |
 |4.v.a| Code style enforcement (linters)| ✓ |
 |4.v.b| Use of static analysis tools | None |
