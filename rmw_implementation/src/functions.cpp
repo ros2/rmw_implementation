@@ -698,6 +698,36 @@ RMW_INTERFACE_FN(
     rcutils_allocator_t *,
     rmw_network_flow_endpoint_array_t *))
 
+RMW_INTERFACE_FN(
+  rmw_subscription_set_listener_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    rmw_subscription_t *, rmw_listener_callback_t, const void *))
+
+RMW_INTERFACE_FN(
+  rmw_service_set_listener_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    rmw_service_t *, rmw_listener_callback_t, const void *))
+
+RMW_INTERFACE_FN(
+  rmw_client_set_listener_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    rmw_client_t *, rmw_listener_callback_t, const void *))
+
+RMW_INTERFACE_FN(
+  rmw_guard_condition_set_listener_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    rmw_guard_condition_t *, rmw_listener_callback_t, const void *, bool))
+
+RMW_INTERFACE_FN(
+  rmw_event_set_listener_callback,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    rmw_event_t *, rmw_listener_callback_t, const void *, bool))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -783,6 +813,11 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_subscription_get_network_flow_endpoints)
   GET_SYMBOL(rmw_client_request_publisher_get_actual_qos);
   GET_SYMBOL(rmw_client_response_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_subscription_set_listener_callback)
+  GET_SYMBOL(rmw_service_set_listener_callback)
+  GET_SYMBOL(rmw_client_set_listener_callback)
+  GET_SYMBOL(rmw_guard_condition_set_listener_callback)
+  GET_SYMBOL(rmw_event_set_listener_callback)
 }
 
 void * symbol_rmw_init = nullptr;
