@@ -195,7 +195,7 @@ The chart below compares the requirements in the REP-2004 with the current state
 |4.ii| Public API tests | None |
 |4.iii.a| Using coverage | ✓ |
 |4.iii.a| Coverage policy | ✓ |
-|4.iv.a| Performance tests (if applicable) | x |
+|4.iv.a| Performance tests (if applicable) | ✓ |
 |4.iv.b| Performance tests policy| None |
 |4.v.a| Code style enforcement (linters)| ✓ |
 |4.v.b| Use of static analysis tools | None |
