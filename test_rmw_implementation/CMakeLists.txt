@@ -72,7 +72,7 @@ if(BUILD_TESTING)
     ament_add_gtest(test_subscription${target_suffix}
       test/test_subscription.cpp
       ENV ${rmw_implementation_env_var}
-      TIMEOUT 80
+      TIMEOUT 120
     )
     target_compile_definitions(test_subscription${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")

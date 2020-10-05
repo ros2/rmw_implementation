@@ -14,11 +14,15 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/memory_tools/memory_tools.hpp"
+
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
 
 #include "rmw/error_handling.h"
 #include "rmw/rmw.h"
+
+#include "./testing_macros.hpp"
 
 
 #ifdef RMW_IMPLEMENTATION
@@ -172,4 +176,43 @@ TEST_F(
   rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace, 1, false);
   ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
+}
+
+TEST_F(
+  CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION),
+  create_with_internal_errors) {
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    constexpr char node_name[] = "my_node";
+    constexpr char node_namespace[] = "/my_ns";
+    rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
+    if (node) {
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_node(node);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
+    } else {
+      rmw_reset_error();
+    }
+  });
+}
+
+TEST_F(
+  CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION),
+  destroy_with_internal_errors) {
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    constexpr char node_name[] = "my_node";
+    constexpr char node_namespace[] = "/my_ns";
+    rmw_node_t * node = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      node = rmw_create_node(&context, node_name, node_namespace);
+      ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
+    });
+    if (RMW_RET_OK != rmw_destroy_node(node)) {
+      rmw_reset_error();
+    }
+  });
 }
