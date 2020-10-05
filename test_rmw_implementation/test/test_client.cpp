@@ -159,6 +159,44 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_with_internal_errors) {
+  constexpr char service_name[] = "/test";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_client_t * client =
+    rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
+    if (client) {
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_client(node, client);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
+    } else {
+      rmw_reset_error();
+    }
+  });
+}
+
+TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), destroy_with_internal_errors) {
+  constexpr char service_name[] = "/test";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_client_t * client = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      client = rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
+      ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+    });
+    if (RMW_RET_OK != rmw_destroy_client(node, client)) {
+      rmw_reset_error();
+    }
+  });
+}
+
 class CLASSNAME (TestClientUse, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestClient, RMW_IMPLEMENTATION)
 {
@@ -372,27 +410,4 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
 
   ret = rmw_destroy_service(node, service);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-}
-
-TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), create_client_with_internal_errors)
-{
-  RCUTILS_FAULT_INJECTION_TEST(
-  {
-    const rosidl_service_type_support_t * ts = ROSIDL_GET_SRV_TYPE_SUPPORT(
-      test_msgs, srv, BasicTypes);
-    rmw_client_t * client_fault = rmw_create_client(
-      node, ts, "/service_name_test",
-      &rmw_qos_profile_default);
-
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-
-    if (client_fault != nullptr) {
-      rmw_ret_t ret = rmw_destroy_client(node, client_fault);
-      EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
-    } else {
-      rmw_reset_error();
-    }
-    rcutils_fault_injection_set_count(count);
-  });
 }

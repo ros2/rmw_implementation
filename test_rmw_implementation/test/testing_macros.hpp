@@ -18,6 +18,11 @@
 #include <chrono>
 #include <thread>
 
+#include "osrf_testing_tools_cpp/memory_tools/memory_tools.hpp"
+
+#include "rcutils/macros.h"
+#include "rcutils/testing/fault_injection.h"
+
 /// Retry until `timeout` expires, sleeping for `delay` in between attempts.
 /*
  * \note Time is measured against OS provided steady clock.
