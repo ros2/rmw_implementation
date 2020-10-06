@@ -622,8 +622,8 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_set_guard_condition_callback,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(
-    const void *, Event_callback, const void *, void *))
+  5, ARG_TYPES(
+    const void *, Event_callback, const void *, void *, bool))
 
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
