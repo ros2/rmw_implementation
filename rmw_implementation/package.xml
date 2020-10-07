@@ -8,6 +8,8 @@
   <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
   <license>Apache License 2.0</license>
 
+  <author>Dirk Thomas</author>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rmw_implementation_cmake</buildtool_depend>
 
