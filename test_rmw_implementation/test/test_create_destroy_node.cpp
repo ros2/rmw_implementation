@@ -169,7 +169,7 @@ TEST_F(
     RMW_IMPLEMENTATION), create_and_destroy) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
-  rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
+  rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace, 1, false);
   ASSERT_NE(nullptr, node) << rmw_get_error_string().str;
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
