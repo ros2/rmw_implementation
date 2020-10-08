@@ -51,7 +51,7 @@ protected:
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     constexpr char node_name[] = "my_test_node";
     constexpr char node_namespace[] = "/my_test_ns";
-    node = rmw_create_node(&context, node_name, node_namespace);
+    node = rmw_create_node(&context, node_name, node_namespace, 1, false);
     ASSERT_NE(nullptr, node) << rcutils_get_error_string().str;
     rmw_publisher_options_t options = rmw_get_default_publisher_options();
     constexpr char topic_name[] = "/test0";

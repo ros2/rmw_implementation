@@ -54,9 +54,9 @@ protected:
     ASSERT_STREQ("/", init_options.enclave);
     ret = rmw_init(&init_options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
-    node = rmw_create_node(&context, node_name, node_namespace);
+    node = rmw_create_node(&context, node_name, node_namespace, 1, true);
     ASSERT_NE(nullptr, node) << rcutils_get_error_string().str;
-    other_node = rmw_create_node(&context, node_name, node_namespace);
+    other_node = rmw_create_node(&context, node_name, node_namespace, 1, true);
     ASSERT_NE(nullptr, other_node) << rcutils_get_error_string().str;
   }
 
