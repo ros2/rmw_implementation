@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Foxy updated maintainers (`#158 <https://github.com/ros2/rmw_implementation/issues/158>`_)
+* Contributors: Alejandro Hernández Cordero
+
 1.0.0 (2020-05-12)
 ------------------
 * Remove MANUAL_BY_NODE liveliness API (`#101 <https://github.com/ros2/rmw_implementation/issues/101>`_)
