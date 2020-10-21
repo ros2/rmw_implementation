@@ -2,8 +2,8 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2020-10-21)
+------------------
 * Fixed rmw_create_node arguments
 * Add fault injection tests to construction/destroy APIs.  (`#144 <https://github.com/ros2/rmw_implementation/issues/144>`_)
 * Fixed function rmw_create_node in tests

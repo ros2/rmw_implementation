@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2020-10-21)
+------------------
 * Foxy updated maintainers (`#158 <https://github.com/ros2/rmw_implementation/issues/158>`_)
 * Contributors: Alejandro Hernández Cordero
 
