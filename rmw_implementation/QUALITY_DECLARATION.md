@@ -95,7 +95,7 @@ Most recent test results can be found [here](https://ci.ros2.org/view/nightly/jo
 Unit tests for these features are located in the test directory.
 Most recent test results can be found [here](https://ci.ros2.org/job/nightly_linux_release/lastBuild/testReport/rmw_implementation).
 
-Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/master/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/master/test_communication) packages, further extend coverage.
+Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/foxy/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/foxy/test_communication) packages, further extend coverage.
 
 ### Public API Testing [4.ii]
 
@@ -118,7 +118,7 @@ A description of how coverage statistics are summarized from this page, can be f
 
 ### Performance [4.iv]
 
-The performance tests of `rmw_implementation` are located in the [test/benchmark directory](https://github.com/ros2/rmw_implementation/tree/master/rmw_implementation/test/benchmark). The most recent test results can be found [here](http://build.ros2.org/view/Rci/job/Rci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).
+The performance tests of `rmw_implementation` are located in the [test/benchmark directory](https://github.com/ros2/rmw_implementation/tree/foxy/rmw_implementation/test/benchmark). The most recent test results can be found [here](http://build.ros2.org/view/Fci/job/Fci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).
 
 ### Linters and Static Analysis [4.v]
 
