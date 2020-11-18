@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
 
 #include "rcutils/allocator.h"
@@ -142,11 +144,58 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), create_with_bad_arguments) {
   EXPECT_EQ(nullptr, srv);
   rmw_reset_error();
 
+  rosidl_service_type_support_t * non_const_ts =
+    const_cast<rosidl_service_type_support_t *>(ts);
+  const char * typesupport_identifier = non_const_ts->typesupport_identifier;
+  non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
+  srv = rmw_create_service(node, non_const_ts, service_name, &rmw_qos_profile_default);
+  EXPECT_EQ(nullptr, srv);
+  rmw_reset_error();
+  non_const_ts->typesupport_identifier = typesupport_identifier;
+
   // Creating and destroying a service still succeeds.
   srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
   ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
   rmw_ret_t ret = rmw_destroy_service(node, srv);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+
+TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), create_with_internal_errors) {
+  constexpr char service_name[] = "/test";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_service_t * srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
+    if (srv) {
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_service(node, srv);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
+    } else {
+      rmw_reset_error();
+    }
+  });
+}
+
+TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), destroy_with_internal_errors) {
+  constexpr char service_name[] = "/test";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_service_t * srv = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      srv = rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
+      ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+    });
+    if (RMW_RET_OK != rmw_destroy_service(node, srv)) {
+      rmw_reset_error();
+    }
+  });
 }
 
 class CLASSNAME (TestServiceUse, RMW_IMPLEMENTATION)
@@ -326,8 +375,11 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   srv_array.service_count = 1u;
   srv_array.services = array;
   rmw_time_t timeout;
-  timeout.sec = 0;
-  timeout.nsec = rmw_intraprocess_discovery_delay.count() * 1000;
+  auto rmw_intraprocess_discovery_delay_in_nanoseconds =
+    std::chrono::duration_cast<std::chrono::nanoseconds>(
+    rmw_intraprocess_discovery_delay * 10).count();
+  timeout.sec = rmw_intraprocess_discovery_delay_in_nanoseconds / 1000000000;
+  timeout.nsec = rmw_intraprocess_discovery_delay_in_nanoseconds % 1000000000;
   ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ASSERT_NE(nullptr, srv_array.services[0]);

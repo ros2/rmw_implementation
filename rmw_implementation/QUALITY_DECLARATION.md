@@ -2,9 +2,9 @@ This document is a declaration of software quality for the `rmw_implementation` 
 
 # `rmw_implementation` Quality Declaration
 
-The package `rmw_implementation` claims to be in the **Quality Level 3** category.
+The package `rmw_implementation` claims to be in the **Quality Level 2** category.
 
-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 3 in REP-2004](https://www.ros.org/reps/rep-2004.html).
+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 2 in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
 ## Version Policy [1]
 
@@ -91,7 +91,11 @@ Most recent test results can be found [here](https://ci.ros2.org/view/nightly/jo
 
 ### Feature Testing [4.i]
 
-`rmw_implementation` features enable ROS middleware configuration. Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/master/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/master/test_communication) packages, provide coverage.
+`rmw_implementation` features enable ROS middleware configuration and dynamic loading.
+Unit tests for these features are located in the test directory.
+Most recent test results can be found [here](https://ci.ros2.org/job/nightly_linux_release/lastBuild/testReport/rmw_implementation).
+
+Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/master/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/master/test_communication) packages, further extend coverage.
 
 ### Public API Testing [4.ii]
 
@@ -99,11 +103,22 @@ Most recent test results can be found [here](https://ci.ros2.org/view/nightly/jo
 
 ### Coverage [4.iii]
 
-`rmw_implementation` does not currently track test coverage.
+`rmw_implementation` follows the recommendations for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#code-coverage), and opts to use line coverage instead of branch coverage.
+
+This includes:
+
+- tracking and reporting line coverage statistics
+- achieving and maintaining a reasonable branch line coverage (90-100%)
+- no lines are manually skipped in coverage calculations
+
+Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.
+
+Current coverage statistics can be viewed [here](https://ci.ros2.org/job/ci_linux_coverage/lastSuccessfulBuild/cobertura/).
+A description of how coverage statistics are summarized from this page, can be found in the [ROS 2 Onboarding Guide](https://index.ros.org/doc/ros2/Contributing/ROS-2-On-boarding-Guide/#note-on-coverage-runs).
 
 ### Performance [4.iv]
 
-`rmw_implementation` does not currently have performance tests.
+The performance tests of `rmw_implementation` are located in the [test/benchmark directory](https://github.com/ros2/rmw_implementation/tree/master/rmw_implementation/test/benchmark). The most recent test results can be found [here](http://build.ros2.org/view/Rci/job/Rci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).
 
 ### Linters and Static Analysis [4.v]
 
@@ -176,11 +191,11 @@ The chart below compares the requirements in the REP-2004 with the current state
 |3.v.a| Quality declaration linked to README | ✓ |
 |3.v.b| Centralized declaration available for peer review |✓|
 |4| **Testing** | --- |
-|4.i| Feature items tests | None |
+|4.i| Feature items tests | ✓ |
 |4.ii| Public API tests | None |
-|4.iii.a| Using coverage | None |
-|4.iii.a| Coverage policy | None |
-|4.iv.a| Performance tests (if applicable) | x |
+|4.iii.a| Using coverage | ✓ |
+|4.iii.a| Coverage policy | ✓ |
+|4.iv.a| Performance tests (if applicable) | ✓ |
 |4.iv.b| Performance tests policy| None |
 |4.v.a| Code style enforcement (linters)| ✓ |
 |4.v.b| Use of static analysis tools | None |

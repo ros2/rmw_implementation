@@ -150,11 +150,44 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_bad_argument
   EXPECT_EQ(nullptr, sub);
   rmw_reset_error();
 
+  rosidl_message_type_support_t * non_const_ts =
+    const_cast<rosidl_message_type_support_t *>(ts);
+  const char * typesupport_identifier = non_const_ts->typesupport_identifier;
+  non_const_ts->typesupport_identifier = "not-a-typesupport-identifier";
+  sub = rmw_create_subscription(
+    node, non_const_ts, topic_name,
+    &rmw_qos_profile_default, &options);
+  EXPECT_EQ(nullptr, sub);
+  rmw_reset_error();
+  non_const_ts->typesupport_identifier = typesupport_identifier;
+
   // Creating and destroying a subscription still succeeds.
   sub = rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
   ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
   rmw_ret_t ret = rmw_destroy_subscription(node, sub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_internal_errors) {
+  constexpr char topic_name[] = "/test";
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
+
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_subscription_t * sub = nullptr;
+    rmw_subscription_options_t options = rmw_get_default_subscription_options();
+    sub = rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
+    if (sub) {
+      RCUTILS_NO_FAULT_INJECTION(
+      {
+        rmw_ret_t ret = rmw_destroy_subscription(node, sub);
+        EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+      });
+    } else {
+      rmw_reset_error();
+    }
+  });
 }
 
 TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
@@ -186,6 +219,26 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), destroy_with_bad_argumen
   ret = rmw_destroy_subscription(node, sub);
   EXPECT_EQ(RMW_RET_OK, ret);
   rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), destroy_with_internal_errors) {
+  constexpr char topic_name[] = "/test";
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
+
+  RCUTILS_FAULT_INJECTION_TEST(
+  {
+    rmw_subscription_t * sub = nullptr;
+    RCUTILS_NO_FAULT_INJECTION(
+    {
+      rmw_subscription_options_t options = rmw_get_default_subscription_options();
+      sub = rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
+      ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+    });
+    if (RMW_RET_OK != rmw_destroy_subscription(node, sub)) {
+      rmw_reset_error();
+    }
+  });
 }
 
 TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), get_actual_qos_from_system_defaults) {

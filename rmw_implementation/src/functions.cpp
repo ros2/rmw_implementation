@@ -96,7 +96,7 @@ get_library()
 }
 
 void *
-lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol_name)
+lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const std::string & symbol_name)
 {
   if (!lib) {
     if (!rmw_error_is_set()) {
@@ -110,22 +110,28 @@ lookup_symbol(std::shared_ptr<rcpputils::SharedLibrary> lib, const char * symbol
       std::string library_path = lib->get_library_path();
       RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
         "failed to resolve symbol '%s' in shared library '%s'",
-        symbol_name, library_path.c_str());
-    } catch (const std::runtime_error &) {
+        symbol_name.c_str(), library_path.c_str());
+    } catch (const std::exception & e) {
       RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-        "failed to resolve symbol '%s' in shared library",
-        symbol_name);
+        "failed to resolve symbol '%s' in shared library due to %s",
+        symbol_name.c_str(), e.what());
     }
     return nullptr;
   }
-
   return lib->get_symbol(symbol_name);
 }
 
 void *
 get_symbol(const char * symbol_name)
 {
-  return lookup_symbol(get_library(), symbol_name);
+  try {
+    return lookup_symbol(get_library(), symbol_name);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to get symbol '%s' due to %s",
+      symbol_name, e.what());
+    return nullptr;
+  }
 }
 
 #ifdef __cplusplus
