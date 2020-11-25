@@ -2,9 +2,9 @@ This document is a declaration of software quality for the `rmw_implementation` 
 
 # `rmw_implementation` Quality Declaration
 
-The package `rmw_implementation` claims to be in the **Quality Level 2** category.
+The package `rmw_implementation` claims to be in the **Quality Level 1** category when it is used with a **Quality Level 1** middleware.
 
-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 2 in REP-2004](https://www.ros.org/reps/rep-2004.html).
+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 1 in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
 ## Version Policy [1]
 
@@ -39,7 +39,7 @@ The current version can be found in its [package.xml](./package.xml), and its ch
 
 ### Change Requests [2.i]
 
-This package requires that all changes occurr through a pull request.
+This package requires that all changes occur through a pull request.
 
 ### Contributor Origin [2.ii]
 
@@ -134,12 +134,11 @@ Currently nightly results can be seen here:
 
 ### Direct Runtime ROS Dependencies [5.i/5.ii]
 
-`rmw_implementation` has run-time and build-time dependencies that need to be considered for this declaration.
+`rmw_implementation` has run-time and build-time dependencies that are at **Quality Level 1**
 
- - rcpputils
- - rcutils
- - rmw
- - rmw_implementation_cmake
+ - rcpputils: [QUALITY DECLARATION](https://github.com/ros2/rcpputils/blob/master/QUALITY_DECLARATION.md)
+ - rcutils: [QUALITY DECLARATION](https://github.com/ros2/rcutils/blob/master/QUALITY_DECLARATION.md)
+ - rmw: [QUALITY DECLARATION](https://github.com/ros2/rmw/blob/master/rmw/QUALITY_DECLARATION.md)
 
 ### Direct Runtime non-ROS Dependency [5.iii]
 
