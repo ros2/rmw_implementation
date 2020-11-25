@@ -53,11 +53,11 @@ All pull request will be peer-reviewed, check [ROS 2 Developer Guide](https://in
 
 All pull request must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers)
 
-Currently nightly results can be seen here:
-* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/rmw_implementation/)
-* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rmw_implementation/)
-* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
-* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
+Though there are no nightly jobs for foxy outside of linux, each change is tested on ci.ros2.org.
+* [linux-aarch64](https://ci.ros2.org/job/ci_linux-aarch64)
+* [linux](https://ci.ros2.org/job/ci_linux)
+* [mac_osx](https://ci.ros2.org/job/ci_osx)
+* [windows](https://ci.ros2.org/job/ci_windows)
 
 ### Documentation Policy [2.v]
 
@@ -85,7 +85,7 @@ The copyright holders each provide a statement of copyright in each source code 
 
 There is an automated test which runs a linter (ament_copyright) that ensures each file has at least one copyright statement.
 
-Most recent test results can be found [here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rcl/copyright/).
+Most recent test results can be found [here](http://build.ros2.org/view/Fpr/job/Fpr__rmw_implementation__ubuntu_focal_amd64/lastCompletedBuild/testReport/copyright/).
 
 ## Testing [4]
 
@@ -93,7 +93,7 @@ Most recent test results can be found [here](https://ci.ros2.org/view/nightly/jo
 
 `rmw_implementation` features enable ROS middleware configuration and dynamic loading.
 Unit tests for these features are located in the test directory.
-Most recent test results can be found [here](https://ci.ros2.org/job/nightly_linux_release/lastBuild/testReport/rmw_implementation).
+Most recent test results can be found [here](http://build.ros2.org/view/Fpr/job/Fpr__rmw_implementation__ubuntu_focal_amd64/lastCompletedBuild/testReport).
 
 Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/foxy/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/foxy/test_communication) packages, further extend coverage.
 
@@ -113,7 +113,7 @@ This includes:
 
 Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.
 
-Current coverage statistics can be viewed [here](https://ci.ros2.org/job/ci_linux_coverage/lastSuccessfulBuild/cobertura/).
+Current coverage statistics can be viewed [here](https://ci.ros2.org/job/nightly_linux_foxy_coverage/lastSuccessfulBuild/cobertura/).
 A description of how coverage statistics are summarized from this page, can be found in the [ROS 2 Onboarding Guide](https://index.ros.org/doc/ros2/Contributing/ROS-2-On-boarding-Guide/#note-on-coverage-runs).
 
 ### Performance [4.iv]
@@ -124,11 +124,7 @@ The performance tests of `rmw_implementation` are located in the [test/benchmark
 
 `rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis).
 
-Currently nightly results can be seen here:
-* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/rmw_implementation/)
-* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rmw_implementation/)
-* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
-* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
+Currently nightly results can be seen [here](http://build.ros2.org/view/Fpr/job/Fpr__rmw_implementation__ubuntu_focal_amd64/lastCompletedBuild/testReport)
 
 ## Dependencies [5]
 
@@ -136,9 +132,9 @@ Currently nightly results can be seen here:
 
 `rmw_implementation` has run-time and build-time dependencies that are at **Quality Level 1**
 
- - rcpputils: [QUALITY DECLARATION](https://github.com/ros2/rcpputils/blob/master/QUALITY_DECLARATION.md)
- - rcutils: [QUALITY DECLARATION](https://github.com/ros2/rcutils/blob/master/QUALITY_DECLARATION.md)
- - rmw: [QUALITY DECLARATION](https://github.com/ros2/rmw/blob/master/rmw/QUALITY_DECLARATION.md)
+ - rcpputils: [QUALITY DECLARATION](https://github.com/ros2/rcpputils/blob/foxy/QUALITY_DECLARATION.md)
+ - rcutils: [QUALITY DECLARATION](https://github.com/ros2/rcutils/blob/foxy/QUALITY_DECLARATION.md)
+ - rmw: [QUALITY DECLARATION](https://github.com/ros2/rmw/blob/foxy/rmw/QUALITY_DECLARATION.md)
 
 ### Direct Runtime non-ROS Dependency [5.iii]
 
@@ -151,11 +147,11 @@ It also has several test dependencies, which do not affect the resulting quality
 
 `rmw_implementation` supports all of the tier 1 platforms as described in [REP-2000](https://www.ros.org/reps/rep-2000.html#support-tiers), and tests each change against all of them.
 
-Currently nightly results can be seen here:
-* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/rmw_implementation/)
-* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/rmw_implementation/)
-* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/rmw_implementation/)
-* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/rmw_implementation/)
+Though there are no nightly jobs for foxy outside of linux, each change is tested on ci.ros2.org.
+* [linux-aarch64](https://ci.ros2.org/job/ci_linux-aarch64)
+* [linux](https://ci.ros2.org/job/ci_linux)
+* [mac_osx](https://ci.ros2.org/job/ci_osx)
+* [windows](https://ci.ros2.org/job/ci_windows)
 
 ## Security [7]
 
