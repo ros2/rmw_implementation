@@ -415,6 +415,16 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(rmw_event_t *, const rmw_subscription_t *, rmw_event_type_t))
 
 RMW_INTERFACE_FN(
+  rmw_subscription_set_cft_expression_parameters,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_subscription_t *, const char *, const rcutils_string_array_t *))
+
+RMW_INTERFACE_FN(
+  rmw_subscription_get_cft_expression_parameters,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(const rmw_subscription_t *, char **, rcutils_string_array_t *))
+
+RMW_INTERFACE_FN(
   rmw_take,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(const rmw_subscription_t *, void *, bool *, rmw_subscription_allocation_t *))
@@ -762,6 +772,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_subscription_count_matched_publishers);
   GET_SYMBOL(rmw_subscription_get_actual_qos);
   GET_SYMBOL(rmw_subscription_event_init)
+  GET_SYMBOL(rmw_subscription_set_cft_expression_parameters)
+  GET_SYMBOL(rmw_subscription_get_cft_expression_parameters)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
   GET_SYMBOL(rmw_take_serialized_message)
@@ -872,6 +884,8 @@ unload_library()
   symbol_rmw_subscription_count_matched_publishers = nullptr;
   symbol_rmw_subscription_get_actual_qos = nullptr;
   symbol_rmw_subscription_event_init = nullptr;
+  symbol_rmw_subscription_set_cft_expression_parameters = nullptr;
+  symbol_rmw_subscription_get_cft_expression_parameters = nullptr;
   symbol_rmw_take = nullptr;
   symbol_rmw_take_sequence = nullptr;
   symbol_rmw_take_with_info = nullptr;
