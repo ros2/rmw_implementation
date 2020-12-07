@@ -486,6 +486,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_client_gone
 
   // Remove client
   ret = rmw_destroy_client(node, client);
+  EXPECT_EQ(RMW_RET_OK, ret);
   destroy_client = false;
 
   // RMW_RET_OK is returned even if the client is gone

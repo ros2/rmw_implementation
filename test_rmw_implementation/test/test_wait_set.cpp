@@ -144,6 +144,7 @@ protected:
     ret = rmw_destroy_guard_condition(gc);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_node(node);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     Base::TearDown();
   }
 
