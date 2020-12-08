@@ -408,3 +408,88 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   rmw_reset_error();
   srv->implementation_identifier = implementation_identifier;
 }
+
+TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_client_gone) {
+  constexpr char service_name[] = "/test";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  test_msgs__srv__BasicTypes_Response service_response;
+  ASSERT_TRUE(test_msgs__srv__BasicTypes_Response__init(&service_response));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__srv__BasicTypes_Response__fini(&service_response);
+  });
+  service_response.bool_value = false;
+  service_response.uint8_value = 1;
+  service_response.uint32_value = 2;
+  test_msgs__srv__BasicTypes_Request request;
+  ASSERT_TRUE(test_msgs__srv__BasicTypes_Request__init(&request));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__srv__BasicTypes_Request__fini(&request);
+  });
+  request.bool_value = false;
+  request.uint8_value = 1;
+  request.uint32_value = 2;
+  int64_t sequence_number;
+  rmw_service_info_t header;
+  rmw_service_t * srv =
+    rmw_create_service(node, ts, service_name, &rmw_qos_profile_default);
+  ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    rmw_ret_t ret = rmw_destroy_service(node, srv);
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+  });
+  bool destroy_client = true;
+  rmw_client_t * client =
+    rmw_create_client(node, ts, service_name, &rmw_qos_profile_default);
+  ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    if (destroy_client) {
+      rmw_ret_t ret = rmw_destroy_client(node, client);
+      EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+    }
+  });
+
+  rmw_ret_t ret = rmw_send_request(client, &request, &sequence_number);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  size_t number_of_services = 1u;
+  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, number_of_services);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    rmw_ret_t ret = rmw_destroy_wait_set(wait_set);
+    EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
+  });
+  void * array[1];
+  array[0] = srv->data;
+  rmw_services_t srv_array;
+  srv_array.service_count = 1u;
+  srv_array.services = array;
+  rmw_time_t timeout;
+  auto rmw_intraprocess_discovery_delay_in_nanoseconds =
+    std::chrono::duration_cast<std::chrono::nanoseconds>(
+    rmw_intraprocess_discovery_delay * 10).count();
+  timeout.sec = rmw_intraprocess_discovery_delay_in_nanoseconds / 1000000000;
+  timeout.nsec = rmw_intraprocess_discovery_delay_in_nanoseconds % 1000000000;
+  ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_NE(nullptr, srv_array.services[0]);
+
+  bool taken = false;
+  ret = rmw_take_request(srv, &header, &request, &taken);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_EQ(true, taken);
+
+  // Remove client
+  ret = rmw_destroy_client(node, client);
+  EXPECT_EQ(RMW_RET_OK, ret);
+  destroy_client = false;
+
+  // RMW_RET_OK is returned even if the client is gone
+  ret = rmw_send_response(srv, &header.request_id, &service_response);
+  EXPECT_EQ(RMW_RET_OK, ret);
+}
