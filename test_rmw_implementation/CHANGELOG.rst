@@ -2,8 +2,8 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.0 (2020-12-10)
+------------------
 * Add some additional checking that cleanup happens. (`#168 <https://github.com/ros2/rmw_implementation/issues/168>`_)
 * Add test to check rmw_send_response when the client is gone (`#162 <https://github.com/ros2/rmw_implementation/issues/162>`_)
 * Update maintainers (`#154 <https://github.com/ros2/rmw_implementation/issues/154>`_)

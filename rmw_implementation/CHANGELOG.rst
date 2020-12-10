@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.0 (2020-12-10)
+------------------
 * Update QD to QL 1 (`#166 <https://github.com/ros2/rmw_implementation/issues/166>`_)
 * Fix up C functions to never throw. (`#149 <https://github.com/ros2/rmw_implementation/issues/149>`_)
 * Restored Dirk as author (`#155 <https://github.com/ros2/rmw_implementation/issues/155>`_)
