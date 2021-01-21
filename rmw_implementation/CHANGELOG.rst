@@ -2,6 +2,19 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.0 (2020-12-10)
+------------------
+* Update QD to QL 1 (`#166 <https://github.com/ros2/rmw_implementation/issues/166>`_)
+* Fix up C functions to never throw. (`#149 <https://github.com/ros2/rmw_implementation/issues/149>`_)
+* Restored Dirk as author (`#155 <https://github.com/ros2/rmw_implementation/issues/155>`_)
+* Update maintainers (`#154 <https://github.com/ros2/rmw_implementation/issues/154>`_)
+* Updated performance QD section (`#153 <https://github.com/ros2/rmw_implementation/issues/153>`_)
+* Update Quality Declaration to QL2. (`#151 <https://github.com/ros2/rmw_implementation/issues/151>`_)
+* Add nominal test for symbol prefetch() and unload. (`#145 <https://github.com/ros2/rmw_implementation/issues/145>`_)
+* Added benchmark test to rmw_implementation (`#127 <https://github.com/ros2/rmw_implementation/issues/127>`_)
+* Test load and lookup functionality. (`#135 <https://github.com/ros2/rmw_implementation/issues/135>`_)
+* Contributors: Alejandro Hernández Cordero, Michel Hidalgo, Stephen Brawner
+
 2.0.0 (2020-07-08)
 ------------------
 * Remove domain_id and localhost_only from node API (`#114 <https://github.com/ros2/rmw_implementation/issues/114>`_)

@@ -25,7 +25,6 @@
 #include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
-#include "rcpputils/find_library.hpp"
 #include "rcpputils/get_env.hpp"
 #include "rcpputils/shared_library.hpp"
 
@@ -60,28 +59,21 @@ load_library()
     env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
   }
 
-  std::string library_path;
+  std::string library_name;
   try {
-    library_path = rcpputils::find_library_path(env_var);
+    library_name = rcpputils::get_platform_library_name(env_var);
   } catch (const std::exception & e) {
     RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to find shared library due to %s", e.what());
-    return nullptr;
-  }
-
-  if (library_path.empty()) {
-    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to find shared library '%s'",
-      env_var.c_str());
+      "failed to compute shared library name due to %s", e.what());
     return nullptr;
   }
 
   try {
-    return std::make_shared<rcpputils::SharedLibrary>(library_path.c_str());
+    return std::make_shared<rcpputils::SharedLibrary>(library_name);
   } catch (const std::exception & e) {
     RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
       "failed to load shared library '%s' due to %s",
-      library_path.c_str(), e.what());
+      library_name.c_str(), e.what());
     return nullptr;
   }
 }
