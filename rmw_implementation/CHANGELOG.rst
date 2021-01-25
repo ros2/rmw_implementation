@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Defer path resolution of rmw implementation libraries to dynamic linker. (`#169 <https://github.com/ros2/rmw_implementation/issues/169>`_)
+* Contributors: Michel Hidalgo
+
 2.1.0 (2020-12-10)
 ------------------
 * Update QD to QL 1 (`#166 <https://github.com/ros2/rmw_implementation/issues/166>`_)
