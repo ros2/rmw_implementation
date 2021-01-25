@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.1 (2021-01-25)
+------------------
 * Defer path resolution of rmw implementation libraries to dynamic linker. (`#169 <https://github.com/ros2/rmw_implementation/issues/169>`_)
 * Contributors: Michel Hidalgo
 
