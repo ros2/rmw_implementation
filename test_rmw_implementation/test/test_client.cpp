@@ -385,7 +385,7 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
 TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_good_args)
 {
   bool is_available;
-  rmw_ret_t ret;
+  rmw_ret_t ret = RMW_RET_ERROR;
   SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
     ret = rmw_service_server_is_available(node, client, &is_available);
     if (RMW_RET_OK == ret && is_available) {
