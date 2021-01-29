@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.2 (2021-01-29)
+------------------
+* Set the return value of rmw_ret_t before entering the loop. (`#171 <https://github.com/ros2/rmw_implementation/issues/171>`_)
+* Contributors: Chris Lalancette
+
 2.1.1 (2021-01-25)
 ------------------
 

@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.2 (2021-01-29)
+------------------
+* Accept any RMW implementation, not just the default (`#172 <https://github.com/ros2/rmw_implementation/issues/172>`_)
+* Contributors: Scott K Logan
+
 2.1.1 (2021-01-25)
 ------------------
 * Defer path resolution of rmw implementation libraries to dynamic linker. (`#169 <https://github.com/ros2/rmw_implementation/issues/169>`_)
