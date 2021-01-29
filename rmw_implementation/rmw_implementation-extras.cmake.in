@@ -16,18 +16,8 @@
 
 find_package(rmw_implementation_cmake REQUIRED)
 
-if(NOT "${RMW_IMPLEMENTATION}" STREQUAL "")
-  set(requested_rmw_implementation "${RMW_IMPLEMENTATION}")
-  set(requested_rmw_implementation_from "CMake")
-elseif(NOT "$ENV{RMW_IMPLEMENTATION}" STREQUAL "")
-  set(requested_rmw_implementation "$ENV{RMW_IMPLEMENTATION}")
-  set(requested_rmw_implementation_from
-    "environment variable 'RMW_IMPLEMENTATION'")
-else()
-  set(requested_rmw_implementation "@RMW_IMPLEMENTATION@")
-  set(requested_rmw_implementation_from
-    "the default when @PROJECT_NAME@ was built")
-endif()
+get_default_rmw_implementation(requested_rmw_implementation)
+set(requested_rmw_implementation_from "get_default_rmw_implementation")
 
 if(@RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION@)
   message(STATUS "Using RMW implementation '@RMW_IMPLEMENTATION@'")
