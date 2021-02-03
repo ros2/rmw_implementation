@@ -24,6 +24,7 @@
 #include "rmw/error_handling.h"
 
 #include "test_msgs/msg/basic_types.h"
+#include "test_msgs/msg/strings.h"
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
@@ -530,6 +531,12 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   rmw_message_sequence_t sequence = rmw_get_zero_initialized_message_sequence();
   rmw_ret_t ret = rmw_message_sequence_init(&sequence, count, &allocator);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  auto seq = test_msgs__msg__Strings__Sequence__create(count);
+  for (size_t ii = 0; ii < count; ++ii) {
+    sequence.data[ii] = &seq->data[ii];
+  }
+
   rmw_message_info_sequence_t info_sequence = rmw_get_zero_initialized_message_info_sequence();
   ret = rmw_message_info_sequence_init(&info_sequence, count, &allocator);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
