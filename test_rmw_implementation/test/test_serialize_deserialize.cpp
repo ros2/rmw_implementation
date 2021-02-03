@@ -158,7 +158,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), tampered_buffer_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_NE(nullptr, serialized_message.buffer);
   EXPECT_GT(serialized_message.buffer_length, 0lu);
-  
+
   // Tamper the serialized message to force deserialization failure
   memset(serialized_message.buffer, 0xFF, serialized_message.buffer_length);
 
@@ -183,7 +183,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), tampered_buffer_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_NE(nullptr, serialized_message.buffer);
   EXPECT_GT(serialized_message.buffer_length, 0lu);
-  
+
   // Tamper the serialized message to force deserialization failure
   memset(serialized_message.buffer, 0xFF, serialized_message.buffer_length);
 
