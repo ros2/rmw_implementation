@@ -546,11 +546,13 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(taken, 0u);
 
+  ret = rmw_message_info_sequence_fini(&info_sequence);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
   ret = rmw_message_sequence_fini(&sequence);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  ret = rmw_message_info_sequence_fini(&info_sequence);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  test_msgs__msg__Strings__Sequence__destroy(seq);
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence_with_bad_args) {
