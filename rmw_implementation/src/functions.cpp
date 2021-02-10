@@ -493,7 +493,7 @@ RMW_INTERFACE_FN(
   rmw_ret_t, RMW_RET_ERROR,
   7, ARG_TYPES(
     rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *, rmw_clients_t *,
-    rmw_events_t *, rmw_wait_set_t *, const rmw_time_t *))
+    rmw_events_t *, rmw_wait_set_t *, rmw_duration_t))
 
 RMW_INTERFACE_FN(
   rmw_get_publisher_names_and_types_by_node,

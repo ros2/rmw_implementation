@@ -374,13 +374,12 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
   rmw_services_t srv_array;
   srv_array.service_count = 1u;
   srv_array.services = array;
-  rmw_time_t timeout;
+  rmw_duration_t timeout;
   auto rmw_intraprocess_discovery_delay_in_nanoseconds =
     std::chrono::duration_cast<std::chrono::nanoseconds>(
     rmw_intraprocess_discovery_delay * 10).count();
-  timeout.sec = rmw_intraprocess_discovery_delay_in_nanoseconds / 1000000000;
-  timeout.nsec = rmw_intraprocess_discovery_delay_in_nanoseconds % 1000000000;
-  ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
+  timeout = rmw_intraprocess_discovery_delay_in_nanoseconds;
+  ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, timeout);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ASSERT_NE(nullptr, srv_array.services[0]);
 
@@ -469,13 +468,12 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_client_gone
   rmw_services_t srv_array;
   srv_array.service_count = 1u;
   srv_array.services = array;
-  rmw_time_t timeout;
+  rmw_duration_t timeout;
   auto rmw_intraprocess_discovery_delay_in_nanoseconds =
     std::chrono::duration_cast<std::chrono::nanoseconds>(
     rmw_intraprocess_discovery_delay * 10).count();
-  timeout.sec = rmw_intraprocess_discovery_delay_in_nanoseconds / 1000000000;
-  timeout.nsec = rmw_intraprocess_discovery_delay_in_nanoseconds % 1000000000;
-  ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, &timeout);
+  timeout = rmw_intraprocess_discovery_delay_in_nanoseconds;
+  ret = rmw_wait(nullptr, nullptr, &srv_array, nullptr, nullptr, wait_set, timeout);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   ASSERT_NE(nullptr, srv_array.services[0]);
 
