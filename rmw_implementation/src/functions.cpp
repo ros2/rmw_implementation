@@ -599,6 +599,16 @@ RMW_INTERFACE_FN(
     bool,
     rmw_topic_endpoint_info_array_t *))
 
+RMW_INTERFACE_FN(
+  rmw_qos_profile_check_compatible,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_qos_profile_t,
+    const rmw_qos_profile_t,
+    rmw_qos_compatibility_type_t *,
+    char *,
+    size_t))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -676,6 +686,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_set_log_severity)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
+  GET_SYMBOL(rmw_qos_profile_check_compatible)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -775,6 +786,7 @@ unload_library()
   symbol_rmw_set_log_severity = nullptr;
   symbol_rmw_get_publishers_info_by_topic = nullptr;
   symbol_rmw_get_subscriptions_info_by_topic = nullptr;
+  symbol_rmw_qos_profile_check_compatible = nullptr;
   symbol_rmw_init = nullptr;
   g_rmw_lib.reset();
 }
