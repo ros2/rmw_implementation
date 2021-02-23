@@ -24,55 +24,38 @@
 #endif
 
 TEST(CLASSNAME(TestQoSProfilesAreCompatible, RMW_IMPLEMENTATION), compatible) {
-  rmw_ret_t ret;
+  // A profile without system default or unknown values should be compatible with itself
+  rmw_qos_profile_t qos = {
+    RMW_QOS_POLICY_HISTORY_KEEP_LAST,
+    5,
+    RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT,
+    RMW_QOS_POLICY_DURABILITY_VOLATILE,
+    {1, 0},   // deadline
+    {1, 0},   // lifespan
+    RMW_QOS_POLICY_LIVELINESS_AUTOMATIC,
+    {1, 0},   // liveliness lease duration
+    false
+  };
   rmw_qos_compatibility_type_t compatible;
-  // All of the provided profiles should be compatible with themselves
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_sensor_data, rmw_qos_profile_sensor_data, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_OK);
-  EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_default, rmw_qos_profile_default, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_OK);
-  EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_parameters, rmw_qos_profile_parameters, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_OK);
-  EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_parameter_events, rmw_qos_profile_parameter_events, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_OK);
-  EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_services_default, rmw_qos_profile_services_default, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_OK);
-  EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_system_default, rmw_qos_profile_system_default, &compatible, nullptr, 0u);
+  size_t reason_size = 100u;
+  char reason[100];
+  rmw_ret_t ret = rmw_qos_profile_check_compatible(qos, qos, &compatible, reason, reason_size);
   EXPECT_EQ(ret, RMW_RET_OK);
   EXPECT_EQ(compatible, RMW_QOS_COMPATIBILITY_OK);
 }
 
-TEST(CLASSNAME(TestQoSProfilesAreCompatible, RMW_IMPLEMENTATION), error_on_unknown) {
-  rmw_ret_t ret;
-  rmw_qos_compatibility_type_t compatible;
-  // Expect an error code if a policy is "unknown"
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_sensor_data, rmw_qos_profile_unknown, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_default, rmw_qos_profile_unknown, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_parameters, rmw_qos_profile_unknown, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_parameter_events, rmw_qos_profile_unknown, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_services_default, rmw_qos_profile_unknown, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
-  ret = rmw_qos_profile_check_compatible(
-    rmw_qos_profile_system_default, rmw_qos_profile_unknown, &compatible, nullptr, 0u);
-  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
+TEST(CLASSNAME(TestQoSProfilesAreCompatible, RMW_IMPLEMENTATION), invalid_input) {
+  // Error on null 'compatible' parameter
+  {
+    rmw_ret_t ret = rmw_qos_profile_check_compatible(
+      rmw_qos_profile_sensor_data, rmw_qos_profile_sensor_data, nullptr, nullptr, 0u);
+    EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
+  }
+  // Error on null reason and non-zero size
+  {
+    rmw_qos_compatibility_type_t compatible;
+    rmw_ret_t ret = rmw_qos_profile_check_compatible(
+      rmw_qos_profile_sensor_data, rmw_qos_profile_sensor_data, &compatible, nullptr, 1u);
+    EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
+  }
 }
