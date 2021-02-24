@@ -616,7 +616,7 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(
     const rmw_publisher_t *,
     rcutils_allocator_t *,
-    rmw_network_flow_array_t *))
+    rmw_network_flow_endpoint_array_t *))
 
 RMW_INTERFACE_FN(
   rmw_subscription_get_network_flow_endpoints,
@@ -624,7 +624,7 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(
     const rmw_subscription_t *,
     rcutils_allocator_t *,
-    rmw_network_flow_array_t *))
+    rmw_network_flow_endpoint_array_t *))
 
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
