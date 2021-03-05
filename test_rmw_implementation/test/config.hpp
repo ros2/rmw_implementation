@@ -24,7 +24,7 @@ namespace
 // behavior of the following implementations:
 // - rmw_fastrtps_cpp
 // - rmw_fastrtps_dynamic_cpp
-// - rmw_connext_cpp
+// - rmw_connextdds
 // - rmw_cyclonedds_cpp
 // within ci.ros2.org instances.
 
