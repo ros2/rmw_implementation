@@ -2,6 +2,13 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.0 (2021-03-08)
+------------------
+* Add function for checking QoS profile compatibility (`#180 <https://github.com/ros2/rmw_implementation/issues/180>`_)
+* Make sure to initialize the rmw_message_sequence after init. (`#175 <https://github.com/ros2/rmw_implementation/issues/175>`_)
+* Set the value of is_available before entering the loop (`#173 <https://github.com/ros2/rmw_implementation/issues/173>`_)
+* Contributors: Chris Lalancette, Jacob Perron
+
 2.1.2 (2021-01-29)
 ------------------
 * Set the return value of rmw_ret_t before entering the loop. (`#171 <https://github.com/ros2/rmw_implementation/issues/171>`_)

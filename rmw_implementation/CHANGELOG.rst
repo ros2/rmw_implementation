@@ -2,6 +2,13 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.0 (2021-03-08)
+------------------
+* Add function for checking QoS profile compatibility (`#180 <https://github.com/ros2/rmw_implementation/issues/180>`_)
+* Shorten some excessively long lines of CMake (`#179 <https://github.com/ros2/rmw_implementation/issues/179>`_)
+* Add rmw_fastrtps_dynamic_cpp to the explicit group deps (`#177 <https://github.com/ros2/rmw_implementation/issues/177>`_)
+* Contributors: Jacob Perron, Scott K Logan
+
 2.1.2 (2021-01-29)
 ------------------
 * Accept any RMW implementation, not just the default (`#172 <https://github.com/ros2/rmw_implementation/issues/172>`_)
