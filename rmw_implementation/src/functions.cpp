@@ -417,7 +417,7 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_subscription_set_cft_expression_parameters,
   rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(const rmw_subscription_t *, const char *, const rcutils_string_array_t *))
+  3, ARG_TYPES(rmw_subscription_t *, const char *, const rcutils_string_array_t *))
 
 RMW_INTERFACE_FN(
   rmw_subscription_get_cft_expression_parameters,
