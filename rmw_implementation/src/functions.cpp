@@ -719,14 +719,14 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_guard_condition_set_listener_callback,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(
-    rmw_guard_condition_t *, rmw_listener_callback_t, const void *, bool))
+  3, ARG_TYPES(
+    rmw_guard_condition_t *, rmw_listener_callback_t, const void *))
 
 RMW_INTERFACE_FN(
   rmw_event_set_listener_callback,
   rmw_ret_t, RMW_RET_ERROR,
-  4, ARG_TYPES(
-    rmw_event_t *, rmw_listener_callback_t, const void *, bool))
+  3, ARG_TYPES(
+    rmw_event_t *, rmw_listener_callback_t, const void *))
 
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
