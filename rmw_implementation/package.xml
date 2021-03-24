@@ -20,7 +20,6 @@
   Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
   This ensures that binary packages have support for all of these rmw impl. enabled.
   -->
-  <build_depend>rmw_connext_cpp</build_depend>
   <build_depend>rmw_connextdds</build_depend>
   <build_depend>rmw_cyclonedds_cpp</build_depend>
   <build_depend>rmw_fastrtps_cpp</build_depend>
