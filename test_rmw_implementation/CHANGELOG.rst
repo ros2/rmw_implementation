@@ -2,6 +2,12 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove rmw_connext_cpp. (`#183 <https://github.com/ros2/rmw_implementation/issues/183>`_)
+* Add support for rmw_connextdds (`#182 <https://github.com/ros2/rmw_implementation/issues/182>`_)
+* Contributors: Andrea Sorbini, Chris Lalancette
+
 2.2.0 (2021-03-08)
 ------------------
 * Add function for checking QoS profile compatibility (`#180 <https://github.com/ros2/rmw_implementation/issues/180>`_)
