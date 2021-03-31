@@ -717,12 +717,6 @@ RMW_INTERFACE_FN(
     rmw_client_t *, rmw_listener_callback_t, const void *))
 
 RMW_INTERFACE_FN(
-  rmw_guard_condition_set_listener_callback,
-  rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(
-    rmw_guard_condition_t *, rmw_listener_callback_t, const void *))
-
-RMW_INTERFACE_FN(
   rmw_event_set_listener_callback,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(
@@ -816,7 +810,6 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_subscription_set_listener_callback)
   GET_SYMBOL(rmw_service_set_listener_callback)
   GET_SYMBOL(rmw_client_set_listener_callback)
-  GET_SYMBOL(rmw_guard_condition_set_listener_callback)
   GET_SYMBOL(rmw_event_set_listener_callback)
 }
 
