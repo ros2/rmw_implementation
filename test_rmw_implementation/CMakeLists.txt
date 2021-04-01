@@ -160,6 +160,16 @@ if(BUILD_TESTING)
     ament_target_dependencies(test_client${target_suffix}
       osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
     )
+
+    ament_add_gtest(test_qos_profile_check_compatible${target_suffix}
+      test/test_qos_profile_check_compatible.cpp
+      ENV ${rmw_implementation_env_var}
+    )
+    target_compile_definitions(test_qos_profile_check_compatible${target_suffix}
+      PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
+    ament_target_dependencies(test_qos_profile_check_compatible${target_suffix}
+      rmw rmw_implementation
+    )
   endmacro()
 
   call_for_each_rmw_implementation(test_api)

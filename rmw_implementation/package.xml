@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rmw_implementation</name>
-  <version>2.1.0</version>
+  <version>2.3.0</version>
   <description>The decision which ROS middleware implementation should be used for C++.</description>
   <maintainer email="alejandro@openrobotics.org">Alejandro Hernandez Cordero</maintainer>
   <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
@@ -20,9 +20,10 @@
   Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
   This ensures that binary packages have support for all of these rmw impl. enabled.
   -->
-  <build_depend>rmw_connext_cpp</build_depend>
+  <build_depend>rmw_connextdds</build_depend>
   <build_depend>rmw_cyclonedds_cpp</build_depend>
   <build_depend>rmw_fastrtps_cpp</build_depend>
+  <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
   <!-- end of group dependencies added for bloom -->
 
   <depend>rmw_implementation_cmake</depend>

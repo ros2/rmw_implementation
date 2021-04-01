@@ -2,6 +2,29 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.0 (2021-03-25)
+------------------
+* Remove rmw_connext_cpp. (`#183 <https://github.com/ros2/rmw_implementation/issues/183>`_)
+* Add support for rmw_connextdds (`#182 <https://github.com/ros2/rmw_implementation/issues/182>`_)
+* Contributors: Andrea Sorbini, Chris Lalancette
+
+2.2.0 (2021-03-08)
+------------------
+* Add function for checking QoS profile compatibility (`#180 <https://github.com/ros2/rmw_implementation/issues/180>`_)
+* Shorten some excessively long lines of CMake (`#179 <https://github.com/ros2/rmw_implementation/issues/179>`_)
+* Add rmw_fastrtps_dynamic_cpp to the explicit group deps (`#177 <https://github.com/ros2/rmw_implementation/issues/177>`_)
+* Contributors: Jacob Perron, Scott K Logan
+
+2.1.2 (2021-01-29)
+------------------
+* Accept any RMW implementation, not just the default (`#172 <https://github.com/ros2/rmw_implementation/issues/172>`_)
+* Contributors: Scott K Logan
+
+2.1.1 (2021-01-25)
+------------------
+* Defer path resolution of rmw implementation libraries to dynamic linker. (`#169 <https://github.com/ros2/rmw_implementation/issues/169>`_)
+* Contributors: Michel Hidalgo
+
 2.1.0 (2020-12-10)
 ------------------
 * Update QD to QL 1 (`#166 <https://github.com/ros2/rmw_implementation/issues/166>`_)
