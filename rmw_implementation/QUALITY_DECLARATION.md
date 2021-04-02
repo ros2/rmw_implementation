@@ -10,7 +10,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Version Scheme [1.i]
 
-`rmw_implementation` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning).
+`rmw_implementation` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/foxy/Contributing/Developer-Guide.html#versioning).
 
 ### Version Stability [1.ii]
 
@@ -35,7 +35,7 @@ The current version can be found in its [package.xml](./package.xml), and its ch
 
 ## Change Control Process [2]
 
-`rmw_implementation` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process).
+`rmw_implementation` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/foxy/Contributing/Developer-Guide.html#change-control-process).
 
 ### Change Requests [2.i]
 
@@ -47,7 +47,7 @@ This package has a confirmation of contributor origin policy, which can be found
 
 ### Peer Review Policy [2.iii]
 
-All pull request will be peer-reviewed, check [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.
+All pull request will be peer-reviewed, check [ROS 2 Developer Guide](https://docs.ros.org/en/foxy/Contributing/Developer-Guide.html#change-control-process) for additional information.
 
 ### Continuous Integration [2.iv]
 
@@ -103,7 +103,7 @@ Integration and system tests against available `rmw` implementations up the stac
 
 ### Coverage [4.iii]
 
-`rmw_implementation` follows the recommendations for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#code-coverage), and opts to use line coverage instead of branch coverage.
+`rmw_implementation` follows the recommendations for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/foxy/Contributing/Developer-Guide.html#code-coverage), and opts to use line coverage instead of branch coverage.
 
 This includes:
 
@@ -114,7 +114,7 @@ This includes:
 Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.
 
 Current coverage statistics can be viewed [here](https://ci.ros2.org/job/nightly_linux_foxy_coverage/lastSuccessfulBuild/cobertura/).
-A description of how coverage statistics are summarized from this page, can be found in the [ROS 2 Onboarding Guide](https://index.ros.org/doc/ros2/Contributing/ROS-2-On-boarding-Guide/#note-on-coverage-runs).
+A description of how coverage statistics are summarized from this page, can be found in the [ROS 2 Onboarding Guide](https://docs.ros.org/en/foxy/Contributing/Developer-Guide.html#note-on-coverage-runs).
 
 ### Performance [4.iv]
 
@@ -122,7 +122,7 @@ The performance tests of `rmw_implementation` are located in the [test/benchmark
 
 ### Linters and Static Analysis [4.v]
 
-`rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis).
+`rmw_implementation` uses and passes all the standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://docs.ros.org/en/foxy/Contributing/Developer-Guide.html#linters-and-static-analysis).
 
 Currently nightly results can be seen [here](http://build.ros2.org/view/Fpr/job/Fpr__rmw_implementation__ubuntu_focal_amd64/lastCompletedBuild/testReport)
 
