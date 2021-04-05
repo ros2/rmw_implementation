@@ -31,6 +31,7 @@
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
 #include "rmw/names_and_types.h"
+#include "rmw/get_network_flow_endpoints.h"
 #include "rmw/get_node_info_and_types.h"
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/get_topic_endpoint_info.h"
@@ -609,6 +610,22 @@ RMW_INTERFACE_FN(
     char *,
     size_t))
 
+RMW_INTERFACE_FN(
+  rmw_publisher_get_network_flow_endpoints,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rmw_publisher_t *,
+    rcutils_allocator_t *,
+    rmw_network_flow_endpoint_array_t *))
+
+RMW_INTERFACE_FN(
+  rmw_subscription_get_network_flow_endpoints,
+  rmw_ret_t, RMW_RET_ERROR,
+  3, ARG_TYPES(
+    const rmw_subscription_t *,
+    rcutils_allocator_t *,
+    rmw_network_flow_endpoint_array_t *))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -687,6 +704,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
   GET_SYMBOL(rmw_qos_profile_check_compatible)
+  GET_SYMBOL(rmw_publisher_get_network_flow_endpoints)
+  GET_SYMBOL(rmw_subscription_get_network_flow_endpoints)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -787,6 +806,8 @@ unload_library()
   symbol_rmw_get_publishers_info_by_topic = nullptr;
   symbol_rmw_get_subscriptions_info_by_topic = nullptr;
   symbol_rmw_qos_profile_check_compatible = nullptr;
+  symbol_rmw_publisher_get_network_flow_endpoints = nullptr;
+  symbol_rmw_subscription_get_network_flow_endpoints = nullptr;
   symbol_rmw_init = nullptr;
   g_rmw_lib.reset();
 }
