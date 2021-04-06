@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.4.0 (2021-04-06)
+------------------
 * Unique network flows (`#170 <https://github.com/ros2/rmw_implementation/issues/170>`_)
 * updating quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#185 <https://github.com/ros2/rmw_implementation/issues/185>`_)
 * Contributors: Ananya Muddukrishna, shonigmann
