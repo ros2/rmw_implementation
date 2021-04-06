@@ -2,6 +2,12 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Unique network flows (`#170 <https://github.com/ros2/rmw_implementation/issues/170>`_)
+* updating quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#185 <https://github.com/ros2/rmw_implementation/issues/185>`_)
+* Contributors: Ananya Muddukrishna, shonigmann
+
 2.3.0 (2021-03-25)
 ------------------
 * Remove rmw_connext_cpp. (`#183 <https://github.com/ros2/rmw_implementation/issues/183>`_)
