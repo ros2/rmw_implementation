@@ -808,8 +808,38 @@ protected:
 };
 
 TEST_F(CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION), rmw_take_loaned_message) {
-  // TODO(lobotuerk): add tests for rmw_take_loaned_message() when we have an implementation.
-  FAIL() << "Not implemented";
+  bool taken = false;
+  void * loaned_message = nullptr;
+  rmw_subscription_allocation_t * null_allocation{nullptr};  // still valid allocation
+  rmw_ret_t ret = rmw_take_loaned_message(nullptr, &loaned_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  EXPECT_EQ(nullptr, loaned_message);
+  EXPECT_FALSE(taken);
+
+  ret = rmw_take_loaned_message(sub, nullptr, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  EXPECT_EQ(nullptr, loaned_message);
+  EXPECT_FALSE(taken);
+
+  ret = rmw_take_loaned_message(sub, &loaned_message, nullptr, null_allocation);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  EXPECT_EQ(nullptr, loaned_message);
+  EXPECT_FALSE(taken);
+
+  ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(nullptr, loaned_message);
+  EXPECT_FALSE(taken);
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_take_loaned_message(sub, &loaned_message, &taken, null_allocation);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
 }
 
 TEST_F(
