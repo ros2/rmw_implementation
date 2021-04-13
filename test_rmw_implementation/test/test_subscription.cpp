@@ -894,9 +894,26 @@ TEST_F(
 TEST_F(
   CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION),
   rmw_return_loaned_message_from_subscription) {
-  // TODO(lobotuerk): add tests for rmw_return_loaned_message_from_subscription()
-  // when we have an implementation.
-  FAIL() << "Not implemented";
+  test_msgs__msg__BasicTypes msg{};
+  rmw_ret_t ret = rmw_return_loaned_message_from_subscription(nullptr, &msg);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_return_loaned_message_from_subscription(sub, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  // Returning a sample that was not loaned
+  ret = rmw_return_loaned_message_from_subscription(sub, &msg);
+  EXPECT_EQ(RMW_RET_ERROR, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  const char * implementation_identifier = sub->implementation_identifier;
+  sub->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_return_loaned_message_from_subscription(sub, &msg);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+  sub->implementation_identifier = implementation_identifier;
 }
 
 bool operator==(const test_msgs__msg__BasicTypes & m1, const test_msgs__msg__BasicTypes & m2)
