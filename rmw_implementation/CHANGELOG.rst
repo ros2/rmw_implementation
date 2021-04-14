@@ -2,6 +2,17 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.2 (2021-04-14)
+------------------
+* Update quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#184 <https://github.com/ros2/rmw_implementation/issues/184>`_)
+* Update QD to QL 1 (`#167 <https://github.com/ros2/rmw_implementation/issues/167>`_)
+* Updated performance QD section (`#153 <https://github.com/ros2/rmw_implementation/issues/153>`_)
+* Move the QD into the rmw_implementation subdirectory. (`#111 <https://github.com/ros2/rmw_implementation/issues/111>`_)
+* Add nominal test for symbol prefetch() and unload. (`#145 <https://github.com/ros2/rmw_implementation/issues/145>`_)
+* Added benchmark test to rmw_implementation (`#127 <https://github.com/ros2/rmw_implementation/issues/127>`_)
+* Test load and lookup functionality. (`#135 <https://github.com/ros2/rmw_implementation/issues/135>`_)
+* Contributors: Alejandro Hernández Cordero, Chris Lalancette, Michel Hidalgo, Scott K Logan, Simon Honigmann, Stephen Brawner
+
 1.0.1 (2020-10-21)
 ------------------
 * Foxy updated maintainers (`#158 <https://github.com/ros2/rmw_implementation/issues/158>`_)

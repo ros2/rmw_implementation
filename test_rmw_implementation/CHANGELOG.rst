@@ -2,6 +2,9 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.2 (2021-04-14)
+------------------
+
 1.0.1 (2020-10-21)
 ------------------
 * Fixed rmw_create_node arguments
