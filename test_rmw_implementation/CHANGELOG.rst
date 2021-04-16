@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Implement test for subscription loaned messages (`#186 <https://github.com/ros2/rmw_implementation/issues/186>`_)
+* Contributors: Miguel Company
+
 2.4.0 (2021-04-06)
 ------------------
 
