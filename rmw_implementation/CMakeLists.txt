@@ -12,6 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 
 if(BUILD_TESTING)
@@ -53,6 +54,7 @@ else()
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   ament_target_dependencies(${PROJECT_NAME}
+    "ament_index_cpp"
     "rcpputils"
     "rcutils"
     "rmw")
@@ -73,7 +75,7 @@ else()
 
   ament_export_libraries(${PROJECT_NAME})
   ament_export_targets(${PROJECT_NAME})
-  ament_export_dependencies(rcpputils rcutils)
+  ament_export_dependencies(ament_index_cpp rcpputils rcutils)
 
   if(BUILD_TESTING)
     find_package(ament_cmake_gtest REQUIRED)
