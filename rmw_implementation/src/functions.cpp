@@ -22,7 +22,6 @@
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
-#include "rcutils/get_env.h"
 #include "rcutils/types/string_array.h"
 
 #include "rcpputils/get_env.hpp"
