@@ -98,8 +98,6 @@ load_library()
   }
 
   // User didn't specify, so next try to load the default RMW
-  rmw_reset_error();
-
   std::shared_ptr<rcpputils::SharedLibrary> ret;
 
   ret = attempt_to_load_one_rmw(STRINGIFY(DEFAULT_RMW_IMPLEMENTATION));
