@@ -107,15 +107,16 @@ load_library()
 
   // OK, we failed to load the default RMW.  Fetch all of the ones we can
   // find and attempt to load them one-by-one.
+  rmw_reset_error();
   const std::map<std::string, std::string> packages_with_prefixes = ament_index_cpp::get_resources(
     "rmw_typesupport");
   for (const auto & package_prefix_pair : packages_with_prefixes) {
     if (package_prefix_pair.first != "rmw_implementation") {
-      rmw_reset_error();
       ret = attempt_to_load_one_rmw(package_prefix_pair.first);
       if (ret != nullptr) {
         return ret;
       }
+      rmw_reset_error();
     }
   }
 
