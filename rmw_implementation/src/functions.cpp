@@ -15,10 +15,12 @@
 #include "./functions.hpp"
 
 #include <cstddef>
-#include <stdexcept>
-
+#include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
+
+#include "ament_index_cpp/get_resources.hpp"
 
 #include "rcutils/allocator.h"
 #include "rcutils/format_string.h"
@@ -42,9 +44,43 @@
 
 static std::shared_ptr<rcpputils::SharedLibrary> g_rmw_lib = nullptr;
 
+static std::shared_ptr<rcpputils::SharedLibrary>
+attempt_to_load_one_rmw(const std::string & library)
+{
+  std::string library_name;
+  std::shared_ptr<rcpputils::SharedLibrary> ret = nullptr;
+
+  try {
+    library_name = rcpputils::get_platform_library_name(library);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to compute shared library name due to %s", e.what());
+    return ret;
+  }
+
+  try {
+    ret = std::make_shared<rcpputils::SharedLibrary>(library_name);
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to load shared library '%s' due to %s",
+      library_name.c_str(), e.what());
+    ret = nullptr;
+  }
+
+  return ret;
+}
+
 std::shared_ptr<rcpputils::SharedLibrary>
 load_library()
 {
+  // The logic to pick the RMW library to load goes as follows:
+  //
+  // 1. If the user specified the library to use via the RMW_IMPLEMENTATION
+  //    environment variable, try to load only that library.
+  // 2. Otherwise, try to load the default RMW implementation.
+  // 3. If that fails, try loading all other implementations available in turn
+  //    until one succeeds or we run out of options.
+
   std::string env_var;
   try {
     env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
@@ -55,27 +91,39 @@ load_library()
     return nullptr;
   }
 
-  if (env_var.empty()) {
-    env_var = STRINGIFY(DEFAULT_RMW_IMPLEMENTATION);
+  // User specified an RMW, attempt to load that one and only that one
+  if (!env_var.empty()) {
+    return attempt_to_load_one_rmw(env_var);
   }
 
-  std::string library_name;
-  try {
-    library_name = rcpputils::get_platform_library_name(env_var);
-  } catch (const std::exception & e) {
-    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to compute shared library name due to %s", e.what());
-    return nullptr;
+  // User didn't specify, so next try to load the default RMW
+  std::shared_ptr<rcpputils::SharedLibrary> ret;
+
+  ret = attempt_to_load_one_rmw(STRINGIFY(DEFAULT_RMW_IMPLEMENTATION));
+  if (ret != nullptr) {
+    return ret;
   }
 
-  try {
-    return std::make_shared<rcpputils::SharedLibrary>(library_name);
-  } catch (const std::exception & e) {
-    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
-      "failed to load shared library '%s' due to %s",
-      library_name.c_str(), e.what());
-    return nullptr;
+  // OK, we failed to load the default RMW.  Fetch all of the ones we can
+  // find and attempt to load them one-by-one.
+  rmw_reset_error();
+  const std::map<std::string, std::string> packages_with_prefixes = ament_index_cpp::get_resources(
+    "rmw_typesupport");
+  for (const auto & package_prefix_pair : packages_with_prefixes) {
+    if (package_prefix_pair.first != "rmw_implementation") {
+      ret = attempt_to_load_one_rmw(package_prefix_pair.first);
+      if (ret != nullptr) {
+        return ret;
+      }
+      rmw_reset_error();
+    }
   }
+
+  // If we made it here, we couldn't find an rmw to load.
+
+  RMW_SET_ERROR_MSG("failed to load any RMW implementations");
+
+  return nullptr;
 }
 
 std::shared_ptr<rcpputils::SharedLibrary>

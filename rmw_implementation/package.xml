@@ -13,6 +13,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rmw_implementation_cmake</buildtool_depend>
 
+  <depend>ament_index_cpp</depend>
   <depend>rcpputils</depend>
   <depend>rcutils</depend>
   <build_depend>rmw</build_depend>
