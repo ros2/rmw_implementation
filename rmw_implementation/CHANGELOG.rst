@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.5.0 (2021-05-05)
+------------------
 * Attempt to load any available RMW implementation. (`#189 <https://github.com/ros2/rmw_implementation/issues/189>`_)
 * Update includes after rcutils/get_env.h deprecation (`#190 <https://github.com/ros2/rmw_implementation/issues/190>`_)
 * Contributors: Chris Lalancette, Christophe Bedard
