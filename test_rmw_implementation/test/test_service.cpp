@@ -358,6 +358,17 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_bad_argumen
     EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   });
 
+  bool is_available = false;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    rmw_ret_t ret = rmw_service_server_is_available(node, client, &is_available);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+    if (is_available) {
+      break;
+    }
+  }
+  ASSERT_TRUE(is_available);
+
   rmw_ret_t ret = rmw_send_request(client, &request, &sequence_number);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
@@ -452,6 +463,17 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), send_reponse_with_client_gone
       EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     }
   });
+
+  bool is_available = false;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    rmw_ret_t ret = rmw_service_server_is_available(node, client, &is_available);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+    if (is_available) {
+      break;
+    }
+  }
+  ASSERT_TRUE(is_available);
 
   rmw_ret_t ret = rmw_send_request(client, &request, &sequence_number);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;

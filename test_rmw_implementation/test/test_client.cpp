@@ -385,29 +385,26 @@ TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available
 TEST_F(CLASSNAME(TestClientUse, RMW_IMPLEMENTATION), service_server_is_available_good_args)
 {
   bool is_available = false;
-  rmw_ret_t ret = RMW_RET_ERROR;
-  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
-    ret = rmw_service_server_is_available(node, client, &is_available);
-    if (RMW_RET_OK == ret && is_available) {
-      break;
-    }
-  }
-  EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
-  EXPECT_FALSE(is_available) << rmw_get_error_string().str;
-  rmw_reset_error();
+  rmw_ret_t ret = rmw_service_server_is_available(node, client, &is_available);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_FALSE(is_available);
 
   rmw_service_t * service = rmw_create_service(node, ts, service_name, &qos_profile);
-  ASSERT_NE(nullptr, client) << rcutils_get_error_string().str;
+  ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    rmw_ret_t ret = rmw_destroy_service(node, service);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    rmw_reset_error();
+  });
+
+  is_available = false;
   SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
     ret = rmw_service_server_is_available(node, client, &is_available);
-    if (RMW_RET_OK == ret && is_available) {
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (is_available) {
       break;
     }
   }
-  EXPECT_EQ(ret, RMW_RET_OK) << rmw_get_error_string().str;
-  EXPECT_TRUE(is_available) << rmw_get_error_string().str;
-  rmw_reset_error();
-
-  ret = rmw_destroy_service(node, service);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_TRUE(is_available);
 }
