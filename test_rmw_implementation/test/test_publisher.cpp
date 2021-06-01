@@ -528,31 +528,8 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_serialized_with_
 }
 
 TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), wait_for_all_acked_with_best_effort) {
-  test_msgs__msg__BasicTypes input_message{};
-  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&input_message));
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    test_msgs__msg__BasicTypes__fini(&input_message);
-  });
-
-  rmw_subscription_options_t options = rmw_get_default_subscription_options();
-  rmw_subscription_t * sub = rmw_create_subscription(node, ts, topic_name, &qos_profile, &options);
-  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    rmw_ret_t ret = rmw_destroy_subscription(node, sub);
-    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  });
-
-  size_t subscription_count = 0u;
-  rmw_ret_t ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
-  ASSERT_EQ(subscription_count, static_cast<size_t>(1));
-
-  ret = rmw_publish(pub, &input_message, nullptr);
-  ASSERT_EQ(ret, RMW_RET_OK);
-
   // For best effort, alway return RMW_RET_OK immediately
-  ret = rmw_publisher_wait_for_all_acked(pub, {0, 0});
+  rmw_ret_t ret = rmw_publisher_wait_for_all_acked(pub, {0, 0});
   EXPECT_EQ(ret, RMW_RET_OK);
 
   ret = rmw_publisher_wait_for_all_acked(nullptr, {0, 0});
