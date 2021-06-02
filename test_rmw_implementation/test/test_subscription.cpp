@@ -524,6 +524,79 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_with_info_with_b
   sub->implementation_identifier = implementation_identifier;
 }
 
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publications) {
+  rmw_ret_t ret;
+  bool taken = false;
+
+  // Create publisher
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+
+  // Create subscription with ignore_local_publications = true
+  rmw_subscription_options_t sub_options_ignorelocal = rmw_get_default_subscription_options();
+  sub_options_ignorelocal.ignore_local_publications = true;
+  rmw_subscription_t * sub_ignorelocal =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options_ignorelocal);
+  ASSERT_NE(nullptr, sub_ignorelocal) << rmw_get_error_string().str;
+
+  size_t subscription_count = 0u;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 2u == subscription_count) {  // Early return on failure.
+      break;
+    }
+  }
+
+  // Roundtrip message from publisher to both subscriptions
+  test_msgs__msg__BasicTypes original_message{};
+  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&original_message));
+  original_message.bool_value = true;
+  original_message.char_value = 'k';
+  original_message.float32_value = 3.14159f;
+  rmw_publisher_allocation_t * null_allocation_p{nullptr};
+  rmw_subscription_allocation_t * null_allocation_s{nullptr};
+
+  // ignore_local_publications = true
+  {
+    ret = rmw_publish(pub, &original_message, null_allocation_p);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+    test_msgs__msg__BasicTypes output_message{};
+    ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
+    ret = rmw_take(sub_ignorelocal, &output_message, &taken, null_allocation_s);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    EXPECT_FALSE(taken);
+    test_msgs__msg__BasicTypes__fini(&output_message);
+  }
+
+  // ignore_local_publications = false
+  {
+    ret = rmw_publish(pub, &original_message, null_allocation_p);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+    test_msgs__msg__BasicTypes output_message{};
+    ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
+
+    std::chrono::milliseconds take_delay(100);
+    SLEEP_AND_RETRY_UNTIL(take_delay, take_delay * 10) {
+      ret = rmw_take(sub, &output_message, &taken, null_allocation_s);
+      if (RMW_RET_OK == ret && taken) {
+        break;
+      }
+    }
+    EXPECT_TRUE(taken);
+    EXPECT_EQ(original_message, output_message);
+    test_msgs__msg__BasicTypes__fini(&output_message);
+  }
+
+  test_msgs__msg__BasicTypes__fini(&original_message);
+  ret = rmw_destroy_publisher(node, pub);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_destroy_subscription(node, sub_ignorelocal);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   size_t count = 1u;
   size_t taken = 10u;  // Non-zero value to check variable update
