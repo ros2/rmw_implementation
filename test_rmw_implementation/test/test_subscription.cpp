@@ -532,6 +532,10 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
   rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
   rmw_publisher_t * pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
 
   // Create subscription with ignore_local_publications = true
   rmw_subscription_options_t sub_options_ignorelocal = rmw_get_default_subscription_options();
@@ -539,6 +543,11 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
   rmw_subscription_t * sub_ignorelocal =
     rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options_ignorelocal);
   ASSERT_NE(nullptr, sub_ignorelocal) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub_ignorelocal)) << rmw_get_error_string().str;
+  });
 
   size_t subscription_count = 0u;
   SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
@@ -554,6 +563,11 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
   original_message.bool_value = true;
   original_message.char_value = 'k';
   original_message.float32_value = 3.14159f;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__BasicTypes__fini(&original_message);
+  });
+
   rmw_publisher_allocation_t * null_allocation_p{nullptr};
   rmw_subscription_allocation_t * null_allocation_s{nullptr};
 
@@ -564,10 +578,28 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
 
     test_msgs__msg__BasicTypes output_message{};
     ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      test_msgs__msg__BasicTypes__fini(&output_message);
+    });
+
+    rmw_subscriptions_t subscriptions;
+    subscriptions.subscribers = &sub_ignorelocal->data;
+    subscriptions.subscriber_count = 1;
+    rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
+    ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+    });
+    rmw_time_t timeout = {1, 0};  // 1000ms
+    ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
     ret = rmw_take(sub_ignorelocal, &output_message, &taken, null_allocation_s);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     EXPECT_FALSE(taken);
-    test_msgs__msg__BasicTypes__fini(&output_message);
   }
 
   // ignore_local_publications = false
@@ -577,24 +609,30 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
 
     test_msgs__msg__BasicTypes output_message{};
     ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      test_msgs__msg__BasicTypes__fini(&output_message);
+    });
 
-    std::chrono::milliseconds take_delay(100);
-    SLEEP_AND_RETRY_UNTIL(take_delay, take_delay * 10) {
-      ret = rmw_take(sub, &output_message, &taken, null_allocation_s);
-      if (RMW_RET_OK == ret && taken) {
-        break;
-      }
-    }
+    rmw_subscriptions_t subscriptions;
+    subscriptions.subscribers = &sub->data;
+    subscriptions.subscriber_count = 1;
+    rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
+    ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+    });
+    rmw_time_t timeout = {1, 0};  // 1000ms
+    ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+    ret = rmw_take(sub, &output_message, &taken, null_allocation_s);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     EXPECT_TRUE(taken);
     EXPECT_EQ(original_message, output_message);
-    test_msgs__msg__BasicTypes__fini(&output_message);
   }
-
-  test_msgs__msg__BasicTypes__fini(&original_message);
-  ret = rmw_destroy_publisher(node, pub);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  ret = rmw_destroy_subscription(node, sub_ignorelocal);
-  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
