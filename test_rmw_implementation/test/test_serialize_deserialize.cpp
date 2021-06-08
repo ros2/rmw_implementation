@@ -14,6 +14,8 @@
 
 #include <gtest/gtest.h>
 
+#include "osrf_testing_tools_cpp/scope_exit.hpp"
+
 #include "rcutils/allocator.h"
 
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
@@ -123,7 +125,15 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   test_msgs__msg__BoundedSequencesNoStrings input_message{};
   test_msgs__msg__BoundedSequencesNoStrings output_message{};
   ASSERT_TRUE(test_msgs__msg__BoundedSequencesNoStrings__init(&input_message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__BoundedSequencesNoStrings__fini(&input_message);
+  });
   ASSERT_TRUE(test_msgs__msg__BoundedSequencesNoStrings__init(&output_message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__BoundedSequencesNoStrings__fini(&output_message);
+  });
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
   ASSERT_EQ(
@@ -164,9 +174,6 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(input_message.int32_values.data[0], output_message.int32_values.data[0]);
   EXPECT_EQ(input_message.uint16_values.size, output_message.uint16_values.size);
   EXPECT_EQ(input_message.uint16_values.data[0], output_message.uint16_values.data[0]);
-
-  test_msgs__msg__BoundedSequencesNoStrings__fini(&input_message);
-  test_msgs__msg__BoundedSequencesNoStrings__fini(&output_message);
 
   EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
     rmw_get_error_string().str;
