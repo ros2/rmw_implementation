@@ -591,7 +591,8 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
   rmw_time_t timeout = {1, 0};  // 1000ms
   ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  // ASSERT_NE(nullptr, subscriptions.subscribers[0]); // cyclonedds_rmw blocks data at a DDS level
+  // Subscriptions that ignore local publications may or may not be awaken by locally sent messages.
+  // ASSERT_NE(nullptr, subscriptions.subscribers[0]);
   ASSERT_NE(nullptr, subscriptions.subscribers[1]);
 
   // ignore_local_publications = true
