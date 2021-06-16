@@ -28,8 +28,8 @@
 #include "test_msgs/msg/basic_types.h"
 #include "test_msgs/msg/basic_types.hpp"
 
-#include "test_msgs/msg/bounded_sequences_no_strings.h"
-#include "test_msgs/msg/bounded_sequences_no_strings.hpp"
+#include "test_msgs/msg/bounded_plain_sequences.h"
+#include "test_msgs/msg/bounded_plain_sequences.hpp"
 
 #include "./allocator_testing_utils.h"
 
@@ -121,18 +121,18 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_c_bounded_message) {
   const rosidl_message_type_support_t * ts{
-    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BoundedSequencesNoStrings)};
-  test_msgs__msg__BoundedSequencesNoStrings input_message{};
-  test_msgs__msg__BoundedSequencesNoStrings output_message{};
-  ASSERT_TRUE(test_msgs__msg__BoundedSequencesNoStrings__init(&input_message));
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BoundedPlainSequences)};
+  test_msgs__msg__BoundedPlainSequences input_message{};
+  test_msgs__msg__BoundedPlainSequences output_message{};
+  ASSERT_TRUE(test_msgs__msg__BoundedPlainSequences__init(&input_message));
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
-    test_msgs__msg__BoundedSequencesNoStrings__fini(&input_message);
+    test_msgs__msg__BoundedPlainSequences__fini(&input_message);
   });
-  ASSERT_TRUE(test_msgs__msg__BoundedSequencesNoStrings__init(&output_message));
+  ASSERT_TRUE(test_msgs__msg__BoundedPlainSequences__init(&output_message));
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
-    test_msgs__msg__BoundedSequencesNoStrings__fini(&output_message);
+    test_msgs__msg__BoundedPlainSequences__fini(&output_message);
   });
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
@@ -211,9 +211,9 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_bounded_message) {
   const rosidl_message_type_support_t * ts =
-    rosidl_typesupport_cpp::get_message_type_support_handle<test_msgs::msg::BoundedSequencesNoStrings>();
-  test_msgs::msg::BoundedSequencesNoStrings input_message{};
-  test_msgs::msg::BoundedSequencesNoStrings output_message{};
+    rosidl_typesupport_cpp::get_message_type_support_handle<test_msgs::msg::BoundedPlainSequences>();
+  test_msgs::msg::BoundedPlainSequences input_message{};
+  test_msgs::msg::BoundedPlainSequences output_message{};
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
   ASSERT_EQ(
