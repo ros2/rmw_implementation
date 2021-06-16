@@ -87,7 +87,7 @@ if(BUILD_TESTING)
     target_compile_definitions(test_serialize_deserialize${target_suffix}
       PUBLIC "RMW_IMPLEMENTATION=${rmw_implementation}")
     ament_target_dependencies(test_serialize_deserialize${target_suffix}
-      rcutils rmw rmw_implementation test_msgs
+      osrf_testing_tools_cpp rcutils rmw rmw_implementation test_msgs
     )
 
     ament_add_gtest(test_publisher_allocator${target_suffix}
