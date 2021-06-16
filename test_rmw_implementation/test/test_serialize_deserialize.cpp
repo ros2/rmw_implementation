@@ -139,6 +139,10 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   ASSERT_EQ(
     RMW_RET_OK, rmw_serialized_message_init(
       &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+  });
 
   // Make input_message not equal to output_message.
   ASSERT_TRUE(rosidl_runtime_c__bool__Sequence__init(&input_message.bool_values, 1));
@@ -174,9 +178,6 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(input_message.int32_values.data[0], output_message.int32_values.data[0]);
   EXPECT_EQ(input_message.uint16_values.size, output_message.uint16_values.size);
   EXPECT_EQ(input_message.uint16_values.data[0], output_message.uint16_values.data[0]);
-
-  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
-    rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_message) {
