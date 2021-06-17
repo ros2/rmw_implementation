@@ -360,6 +360,11 @@ RMW_INTERFACE_FN(
   1, ARG_TYPES(const rmw_publisher_t *))
 
 RMW_INTERFACE_FN(
+  rmw_publisher_wait_for_all_acked,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, rmw_time_t))
+
+RMW_INTERFACE_FN(
   rmw_serialize,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const void *, const rosidl_message_type_support_t *, rmw_serialized_message_t *))
@@ -702,6 +707,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
+  GET_SYMBOL(rmw_publisher_wait_for_all_acked)
   GET_SYMBOL(rmw_get_serialized_message_size)
   GET_SYMBOL(rmw_serialize)
   GET_SYMBOL(rmw_deserialize)
@@ -804,6 +810,7 @@ unload_library()
   symbol_rmw_publish_serialized_message = nullptr;
   symbol_rmw_get_serialized_message_size = nullptr;
   symbol_rmw_publisher_assert_liveliness = nullptr;
+  symbol_rmw_publisher_wait_for_all_acked = nullptr;
   symbol_rmw_serialize = nullptr;
   symbol_rmw_deserialize = nullptr;
   symbol_rmw_init_subscription_allocation = nullptr;

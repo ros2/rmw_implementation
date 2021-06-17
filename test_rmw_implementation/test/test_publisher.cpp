@@ -527,6 +527,15 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_serialized_with_
   });
 }
 
+TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), wait_for_all_acked_with_best_effort) {
+  // For best effort, alway return RMW_RET_OK immediately
+  rmw_ret_t ret = rmw_publisher_wait_for_all_acked(pub, {0, 0});
+  EXPECT_EQ(ret, RMW_RET_OK);
+
+  ret = rmw_publisher_wait_for_all_acked(nullptr, {0, 0});
+  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
+}
+
 
 class CLASSNAME (TestPublisherUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
