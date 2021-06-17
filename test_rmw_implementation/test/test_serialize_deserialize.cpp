@@ -119,7 +119,10 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
     rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_c_bounded_message) {
+TEST_F(
+  CLASSNAME(
+    TestSerializeDeserialize,
+    RMW_IMPLEMENTATION), clean_round_trip_for_c_bounded_message) {
   const rosidl_message_type_support_t * ts{
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BoundedPlainSequences)};
   test_msgs__msg__BoundedPlainSequences input_message{};
@@ -141,7 +144,9 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
       &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
-    EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_serialized_message_fini(
+        &serialized_message)) << rmw_get_error_string().str;
   });
 
   // Make input_message not equal to output_message.
@@ -161,7 +166,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   input_message.int32_values.data[0] = -1;
   ASSERT_TRUE(rosidl_runtime_c__uint16__Sequence__init(&input_message.uint16_values, 1));
   input_message.uint16_values.data[0] = 125;
-  
+
   ret = rmw_serialize(&input_message, ts, &serialized_message);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_NE(nullptr, serialized_message.buffer);
@@ -209,7 +214,10 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
     rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_bounded_message) {
+TEST_F(
+  CLASSNAME(
+    TestSerializeDeserialize,
+    RMW_IMPLEMENTATION), clean_round_trip_for_cpp_bounded_message) {
   const rosidl_message_type_support_t * ts =
     rosidl_typesupport_cpp::get_message_type_support_handle<test_msgs::msg::BoundedPlainSequences>();
   test_msgs::msg::BoundedPlainSequences input_message{};
@@ -228,7 +236,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_NE(nullptr, serialized_message.buffer);
   EXPECT_GT(serialized_message.buffer_length, 0lu);
-  
+
   // Adding more items should increase buffer length
   auto first_message_length = serialized_message.buffer_length;
   input_message.int32_values.push_back(-1);
