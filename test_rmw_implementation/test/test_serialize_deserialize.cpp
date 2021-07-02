@@ -228,6 +228,12 @@ TEST_F(
   ASSERT_EQ(
     RMW_RET_OK, rmw_serialized_message_init(
       &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+	  {
+	    EXPECT_EQ(
+	      RMW_RET_OK, rmw_serialized_message_fini(
+	        &serialized_message)) << rmw_get_error_string().str;
+	  });
 
   // Make input_message not equal to output_message.
   input_message.bool_values.push_back(true);
@@ -252,9 +258,6 @@ TEST_F(
   ret = rmw_deserialize(&serialized_message, ts, &output_message);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(input_message, output_message);
-
-  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
-    rmw_get_error_string().str;
 }
 
 TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), rmw_get_serialized_message_size)
