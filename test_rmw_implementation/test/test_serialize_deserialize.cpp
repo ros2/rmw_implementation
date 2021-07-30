@@ -218,22 +218,22 @@ TEST_F(
   CLASSNAME(
     TestSerializeDeserialize,
     RMW_IMPLEMENTATION), clean_round_trip_for_cpp_bounded_message) {
-  using test_message = test_msgs::msg::BoundedPlainSequences;
+  using TestMessage = test_msgs::msg::BoundedPlainSequences;
   const rosidl_message_type_support_t * ts =
-    rosidl_typesupport_cpp::get_message_type_support_handle<test_message>();
-  test_message input_message{};
-  test_message output_message{};
+    rosidl_typesupport_cpp::get_message_type_support_handle<TestMessage>();
+  TestMessage input_message{};
+  TestMessage output_message{};
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
   ASSERT_EQ(
     RMW_RET_OK, rmw_serialized_message_init(
       &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-	  {
-	    EXPECT_EQ(
-	      RMW_RET_OK, rmw_serialized_message_fini(
-	        &serialized_message)) << rmw_get_error_string().str;
-	  });
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_serialized_message_fini(
+        &serialized_message)) << rmw_get_error_string().str;
+  });
 
   // Make input_message not equal to output_message.
   input_message.bool_values.push_back(true);
