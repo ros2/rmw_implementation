@@ -247,6 +247,7 @@ TEST_F(
   // Adding more items should increase buffer length
   auto first_message_length = serialized_message.buffer_length;
   input_message.int32_values.push_back(-1);
+  input_message.int32_values.push_back(583);
   input_message.uint16_values.push_back(125);
 
   ret = rmw_serialize(&input_message, ts, &serialized_message);
