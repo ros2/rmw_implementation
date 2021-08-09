@@ -2,6 +2,14 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add RMW_DURATION_INFINITE basic compliance test. (`#194 <https://github.com/ros2/rmw_implementation/issues/194>`_)
+* Test SubscriptionOptions::ignore_local_publications. (`#192 <https://github.com/ros2/rmw_implementation/issues/192>`_)
+* Add rmw_publisher_wait_for_all_acked. (`#188 <https://github.com/ros2/rmw_implementation/issues/188>`_)
+* Wait for server in test_rmw_implementation service tests. (`#191 <https://github.com/ros2/rmw_implementation/issues/191>`_)
+* Contributors: Barry Xu, Emerson Knapp, Jose Antonio Moral, Michel Hidalgo
+
 2.5.0 (2021-05-05)
 ------------------
 
