@@ -23,6 +23,8 @@
 
 #include "test_msgs/msg/basic_types.h"
 #include "test_msgs/msg/basic_types.hpp"
+#include "test_msgs/msg/unbounded_sequences.h"
+#include "test_msgs/msg/unbounded_sequences.hpp"
 
 #include "./allocator_testing_utils.h"
 
@@ -136,6 +138,57 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
   ret = rmw_deserialize(&serialized_message, ts, &output_message);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_EQ(input_message, output_message);
+
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+    rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), tampered_buffer_for_c_message) {
+  const rosidl_message_type_support_t * ts{
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences)};
+  test_msgs__msg__UnboundedSequences message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&message));
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+
+  rmw_ret_t ret = rmw_serialize(&message, ts, &serialized_message);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_NE(nullptr, serialized_message.buffer);
+  EXPECT_GT(serialized_message.buffer_length, 0lu);
+
+  // Tamper the serialized message to force deserialization failure
+  memset(serialized_message.buffer, 0xFF, serialized_message.buffer_length);
+
+  ret = rmw_deserialize(&serialized_message, ts, &message);
+  EXPECT_NE(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+    rmw_get_error_string().str;
+}
+
+TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), tampered_buffer_for_cpp_message) {
+  const rosidl_message_type_support_t * ts =
+    rosidl_typesupport_cpp::get_message_type_support_handle<test_msgs::msg::UnboundedSequences>();
+  test_msgs::msg::UnboundedSequences message{};
+  rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
+  rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+  ASSERT_EQ(
+    RMW_RET_OK, rmw_serialized_message_init(
+      &serialized_message, 0lu, &default_allocator)) << rmw_get_error_string().str;
+
+  rmw_ret_t ret = rmw_serialize(&message, ts, &serialized_message);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_NE(nullptr, serialized_message.buffer);
+  EXPECT_GT(serialized_message.buffer_length, 0lu);
+
+  // Tamper the serialized message to force deserialization failure
+  memset(serialized_message.buffer, 0xFF, serialized_message.buffer_length);
+
+  ret = rmw_deserialize(&serialized_message, ts, &message);
+  EXPECT_NE(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   EXPECT_EQ(RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
     rmw_get_error_string().str;
