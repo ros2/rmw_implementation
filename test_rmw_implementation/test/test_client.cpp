@@ -414,40 +414,46 @@ TEST_F(CLASSNAME(TestClient, RMW_IMPLEMENTATION), check_qos) {
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
 
-  rmw_qos_profile_t qos_profile;
-  qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
-  qos_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
+  rmw_qos_profile_t qos_profile = rmw_qos_profile_services_default;
   qos_profile.liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
-  qos_profile.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
-  uint64_t depth = 2;
-  qos_profile.depth = depth;
-  uint64_t duration = 2;
-  qos_profile.deadline.sec = duration;
-  qos_profile.lifespan.sec = duration;
-  qos_profile.liveliness_lease_duration.sec = duration;
-  qos_profile.deadline.nsec = duration;
-  qos_profile.lifespan.nsec = duration;
-  qos_profile.liveliness_lease_duration.nsec = duration;
-  qos_profile.avoid_ros_namespace_conventions = false;
+  uint64_t duration = 1;
+  qos_profile.deadline = {duration, duration};
+  qos_profile.lifespan = {duration, duration};
+  qos_profile.liveliness_lease_duration = {duration, duration};
 
   rmw_client_t * client =
     rmw_create_client(node, ts, service_name, &qos_profile);
-  rmw_qos_profile_t actual_qos;
-  rmw_ret_t ret = rmw_client_get_actual_qos(
+
+  rmw_qos_profile_t actual_rp_qos;
+  rmw_ret_t ret = rmw_client_request_publisher_get_actual_qos(
     client,
-    &actual_qos);
+    &actual_rp_qos);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_EQ(actual_rp_qos.reliability, qos_profile.reliability);
+  EXPECT_EQ(actual_rp_qos.durability, qos_profile.durability);
+  EXPECT_EQ(actual_rp_qos.liveliness, qos_profile.liveliness);
+  EXPECT_EQ(actual_rp_qos.history, qos_profile.history);
+  EXPECT_EQ(actual_rp_qos.depth, qos_profile.depth);
+  EXPECT_EQ(actual_rp_qos.deadline.sec, qos_profile.deadline.sec);
+  EXPECT_EQ(actual_rp_qos.deadline.nsec, qos_profile.deadline.nsec);
+  EXPECT_EQ(actual_rp_qos.lifespan.sec, qos_profile.lifespan.sec);
+  EXPECT_EQ(actual_rp_qos.lifespan.nsec, qos_profile.lifespan.nsec);
+  EXPECT_EQ(actual_rp_qos.liveliness_lease_duration.sec, qos_profile.liveliness_lease_duration.sec);
+  EXPECT_EQ(actual_rp_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
+
+  rmw_qos_profile_t actual_rs_qos;
+  ret = rmw_client_response_subscription_get_actual_qos(
+    client,
+    &actual_rs_qos);
 
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  EXPECT_EQ(actual_qos.reliability, qos_profile.reliability);
-  EXPECT_EQ(actual_qos.durability, qos_profile.durability);
-  EXPECT_EQ(actual_qos.liveliness, qos_profile.liveliness);
-  EXPECT_EQ(actual_qos.history, qos_profile.history);
-  EXPECT_EQ(actual_qos.depth, qos_profile.depth);
-  EXPECT_EQ(actual_qos.deadline.sec, qos_profile.deadline.sec);
-  EXPECT_EQ(actual_qos.lifespan.sec, qos_profile.lifespan.sec);
-  EXPECT_EQ(actual_qos.liveliness_lease_duration.sec, qos_profile.liveliness_lease_duration.sec);
-  EXPECT_EQ(actual_qos.deadline.nsec, qos_profile.deadline.nsec);
-  EXPECT_EQ(actual_qos.lifespan.nsec, qos_profile.lifespan.nsec);
-  EXPECT_EQ(actual_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
-  EXPECT_EQ(actual_qos.avoid_ros_namespace_conventions, qos_profile.avoid_ros_namespace_conventions);
+  EXPECT_EQ(actual_rs_qos.reliability, qos_profile.reliability);
+  EXPECT_EQ(actual_rs_qos.durability, qos_profile.durability);
+  EXPECT_EQ(actual_rs_qos.liveliness, qos_profile.liveliness);
+  EXPECT_EQ(actual_rs_qos.history, qos_profile.history);
+  EXPECT_EQ(actual_rs_qos.depth, qos_profile.depth);
+  EXPECT_EQ(actual_rs_qos.deadline.sec, qos_profile.deadline.sec);
+  EXPECT_EQ(actual_rs_qos.deadline.nsec, qos_profile.deadline.nsec);
+  EXPECT_EQ(actual_rs_qos.liveliness_lease_duration.sec, qos_profile.liveliness_lease_duration.sec);
+  EXPECT_EQ(actual_rs_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
 }
