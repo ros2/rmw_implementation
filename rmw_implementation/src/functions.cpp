@@ -26,7 +26,7 @@
 #include "rcutils/format_string.h"
 #include "rcutils/types/string_array.h"
 
-#include "rcpputils/get_env.hpp"
+#include "rcpputils/env.hpp"
 #include "rcpputils/shared_library.hpp"
 
 #include "rmw/error_handling.h"
