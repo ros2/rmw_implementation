@@ -2,6 +2,12 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix renamed `rcpputils` header (`#198 <https://github.com/ros2/rmw_implementation/issues/198>`_)
+* Fix rmw_implementation generated documentation (`#197 <https://github.com/ros2/rmw_implementation/issues/197>`_)
+* Contributors: Abrar Rahman Protyasha, Michel Hidalgo
+
 2.6.0 (2021-08-09)
 ------------------
 * Add rmw_publisher_wait_for_all_acked. (`#188 <https://github.com/ros2/rmw_implementation/issues/188>`_)
