@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.6.1 (2021-11-18)
+------------------
 * Fix renamed `rcpputils` header (`#198 <https://github.com/ros2/rmw_implementation/issues/198>`_)
 * Fix rmw_implementation generated documentation (`#197 <https://github.com/ros2/rmw_implementation/issues/197>`_)
 * Contributors: Abrar Rahman Protyasha, Michel Hidalgo

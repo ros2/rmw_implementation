@@ -2,8 +2,8 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.6.1 (2021-11-18)
+------------------
 * Added tests for bounded sequences serialization (`#193 <https://github.com/ros2/rmw_implementation/issues/193>`_)
 * Contributors: Miguel Company
 
