@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.7.0 (2021-11-19)
+------------------
 * Add client/service QoS getters. (`#196 <https://github.com/ros2/rmw_implementation/issues/196>`_)
 * Update maintainers to Audrow Nash and Michael Carroll. (`#199 <https://github.com/ros2/rmw_implementation/issues/199>`_)
 * Contributors: Audrow Nash, mauropasse
