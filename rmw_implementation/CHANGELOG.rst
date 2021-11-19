@@ -2,6 +2,12 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add client/service QoS getters. (`#196 <https://github.com/ros2/rmw_implementation/issues/196>`_)
+* Update maintainers to Audrow Nash and Michael Carroll. (`#199 <https://github.com/ros2/rmw_implementation/issues/199>`_)
+* Contributors: Audrow Nash, mauropasse
+
 2.6.1 (2021-11-18)
 ------------------
 * Fix renamed `rcpputils` header (`#198 <https://github.com/ros2/rmw_implementation/issues/198>`_)
