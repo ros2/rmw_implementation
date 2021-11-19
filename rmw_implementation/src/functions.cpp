@@ -490,6 +490,16 @@ RMW_INTERFACE_FN(
   4, ARG_TYPES(const rmw_client_t *, rmw_service_info_t *, void *, bool *))
 
 RMW_INTERFACE_FN(
+  rmw_client_request_publisher_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_client_t *, rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(
+  rmw_client_response_subscription_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_client_t *, rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(
   rmw_create_service,
   rmw_service_t *, nullptr,
   4, ARG_TYPES(
@@ -510,6 +520,16 @@ RMW_INTERFACE_FN(
   rmw_send_response,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *))
+
+RMW_INTERFACE_FN(
+  rmw_service_response_publisher_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_service_t *, rmw_qos_profile_t *))
+
+RMW_INTERFACE_FN(
+  rmw_service_request_subscription_get_actual_qos,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_service_t *, rmw_qos_profile_t *))
 
 RMW_INTERFACE_FN(
   rmw_take_event,
@@ -752,6 +772,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
   GET_SYMBOL(rmw_compare_gids_equal)
+  GET_SYMBOL(rmw_service_response_publisher_get_actual_qos);
+  GET_SYMBOL(rmw_service_request_subscription_get_actual_qos);
   GET_SYMBOL(rmw_service_server_is_available)
   GET_SYMBOL(rmw_set_log_severity)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
@@ -759,6 +781,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_qos_profile_check_compatible)
   GET_SYMBOL(rmw_publisher_get_network_flow_endpoints)
   GET_SYMBOL(rmw_subscription_get_network_flow_endpoints)
+  GET_SYMBOL(rmw_client_request_publisher_get_actual_qos);
+  GET_SYMBOL(rmw_client_response_subscription_get_actual_qos);
 }
 
 void * symbol_rmw_init = nullptr;
@@ -830,10 +854,14 @@ unload_library()
   symbol_rmw_return_loaned_message_from_subscription = nullptr;
   symbol_rmw_create_client = nullptr;
   symbol_rmw_destroy_client = nullptr;
+  symbol_rmw_client_request_publisher_get_actual_qos = nullptr;
+  symbol_rmw_client_response_subscription_get_actual_qos = nullptr;
   symbol_rmw_send_request = nullptr;
   symbol_rmw_take_response = nullptr;
   symbol_rmw_create_service = nullptr;
   symbol_rmw_destroy_service = nullptr;
+  symbol_rmw_service_response_publisher_get_actual_qos = nullptr;
+  symbol_rmw_service_request_subscription_get_actual_qos = nullptr;
   symbol_rmw_take_request = nullptr;
   symbol_rmw_send_response = nullptr;
   symbol_rmw_take_event = nullptr;
