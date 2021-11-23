@@ -547,7 +547,8 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), check_qos) {
   EXPECT_EQ(actual_rp_qos.liveliness_lease_duration.sec, qos_profile.liveliness_lease_duration.sec);
   EXPECT_EQ(actual_rp_qos.deadline.nsec, qos_profile.deadline.nsec);
   EXPECT_EQ(actual_rp_qos.lifespan.nsec, qos_profile.lifespan.nsec);
-  EXPECT_EQ(actual_rp_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
+  EXPECT_EQ(
+    actual_rp_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
 
   rmw_qos_profile_t actual_rs_qos;
   ret = rmw_service_request_subscription_get_actual_qos(
@@ -563,5 +564,6 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), check_qos) {
   EXPECT_EQ(actual_rs_qos.deadline.sec, qos_profile.deadline.sec);
   EXPECT_EQ(actual_rs_qos.deadline.nsec, qos_profile.deadline.nsec);
   EXPECT_EQ(actual_rs_qos.liveliness_lease_duration.sec, qos_profile.liveliness_lease_duration.sec);
-  EXPECT_EQ(actual_rs_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
+  EXPECT_EQ(
+    actual_rs_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
 }
