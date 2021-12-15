@@ -55,10 +55,11 @@ else()
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
   target_link_libraries(${PROJECT_NAME} PUBLIC
+    rmw::rmw)
+  target_link_libraries(${PROJECT_NAME} PRIVATE
     ament_index_cpp::ament_index_cpp
     rcpputils::rcpputils
     rcutils::rcutils
-    rmw::rmw
     Threads::Threads)
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
