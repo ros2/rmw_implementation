@@ -50,14 +50,16 @@ else()
   find_package(rcpputils REQUIRED)
   find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
+  find_package(Threads REQUIRED)
 
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
-  ament_target_dependencies(${PROJECT_NAME}
-    "ament_index_cpp"
-    "rcpputils"
-    "rcutils"
-    "rmw")
+  target_link_libraries(${PROJECT_NAME} PUBLIC
+    ament_index_cpp::ament_index_cpp
+    rcpputils::rcpputils
+    rcutils::rcutils
+    rmw::rmw
+    Threads::Threads)
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
 
@@ -73,8 +75,7 @@ else()
 
   configure_rmw_library(${PROJECT_NAME})
 
-  ament_export_libraries(${PROJECT_NAME})
-  ament_export_targets(${PROJECT_NAME})
+  ament_export_targets(export_${PROJECT_NAME})
   ament_export_dependencies(ament_index_cpp rcpputils rcutils)
 
   if(BUILD_TESTING)
@@ -103,7 +104,7 @@ else()
   endif()
 
   install(
-    TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
+    TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
