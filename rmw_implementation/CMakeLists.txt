@@ -44,6 +44,11 @@ option(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION "\
 if(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION)
   message(STATUS "Runtime selection of RMW disabled; Only using "
     "'${RMW_IMPLEMENTATION}'")
+  find_package(${RMW_IMPLEMENTATION})
+  # Create interface target to be exported
+  add_library(${PROJECT_NAME} INTERFACE)
+  target_link_libraries(${PROJECT_NAME} INTERFACE ${RMW_IMPLEMENTATION}::${RMW_IMPLEMENTATION})
+  ament_export_dependencies(${RMW_IMPLEMENTATION})
 else()
   message(STATUS "Runtime selection of RMW enabled")
 
@@ -73,8 +78,6 @@ else()
 
   configure_rmw_library(${PROJECT_NAME})
 
-  ament_export_libraries(${PROJECT_NAME})
-  ament_export_targets(${PROJECT_NAME})
   ament_export_dependencies(ament_index_cpp rcpputils rcutils)
 
   if(BUILD_TESTING)
@@ -101,20 +104,20 @@ else()
     endmacro()
     call_for_each_rmw_implementation(benchmark_rmws)
   endif()
-
-  install(
-    TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-  )
 endif()
+
+ament_export_targets(${PROJECT_NAME})
+
+install(
+  TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 register_rmw_implementation(
   "c:rosidl_typesupport_c"
   "cpp:rosidl_typesupport_cpp"
 )
 
-ament_package(
-  CONFIG_EXTRAS "rmw_implementation-extras.cmake.in"
-)
+ament_package()
