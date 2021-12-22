@@ -50,7 +50,6 @@ else()
   find_package(rcpputils REQUIRED)
   find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
-  find_package(Threads REQUIRED)
 
   add_library(${PROJECT_NAME} SHARED
     src/functions.cpp)
@@ -59,8 +58,7 @@ else()
   target_link_libraries(${PROJECT_NAME} PRIVATE
     ament_index_cpp::ament_index_cpp
     rcpputils::rcpputils
-    rcutils::rcutils
-    Threads::Threads)
+    rcutils::rcutils)
   target_compile_definitions(${PROJECT_NAME}
     PUBLIC "DEFAULT_RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION}")
 
