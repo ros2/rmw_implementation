@@ -81,7 +81,11 @@ else()
     find_package(ament_cmake_gtest REQUIRED)
     ament_add_gtest(test_functions test/test_functions.cpp)
     ament_target_dependencies(test_functions rcutils rmw)
-    target_link_libraries(test_functions ${PROJECT_NAME})
+    target_link_libraries(test_functions
+      ${PROJECT_NAME}
+      ament_index_cpp::ament_index_cpp
+      rcpputils::rcpputils
+      rcutils::rcutils)
 
     find_package(performance_test_fixture REQUIRED)
     # Give cppcheck hints about macro definitions coming from outside this package
@@ -96,7 +100,11 @@ else()
       add_performance_test(benchmark_symbols${target_suffix} test/benchmark/benchmark_symbols.cpp
         ENV ${rmw_implementation_env_var})
       if(TARGET benchmark_symbols${target_suffix})
-        target_link_libraries(benchmark_symbols${target_suffix} ${PROJECT_NAME})
+        target_link_libraries(benchmark_symbols${target_suffix}
+          ${PROJECT_NAME}
+          ament_index_cpp::ament_index_cpp
+          rcpputils::rcpputils
+          rcutils::rcutils)
       endif()
     endmacro()
     call_for_each_rmw_implementation(benchmark_rmws)
