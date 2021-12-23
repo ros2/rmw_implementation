@@ -30,13 +30,29 @@ if(@RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION@)
   endif()
   find_package("@RMW_IMPLEMENTATION@" REQUIRED)
 
-  # TODO should never need definitions and include dirs?
-  list(APPEND rmw_implementation_DEFINITIONS
-    ${@RMW_IMPLEMENTATION@_DEFINITIONS})
-  list(APPEND rmw_implementation_INCLUDE_DIRS
-    ${@RMW_IMPLEMENTATION@_INCLUDE_DIRS})
-  list(APPEND rmw_implementation_LIBRARIES
-    ${@RMW_IMPLEMENTATION@_LIBRARIES})
+  # Create a target rmw_implementation::rmw_implementation that depends on the real implementation
+  add_library(rmw_implementation::rmw_implementation INTERFACE IMPORTED)
+
+  if(DEFINED @RMW_IMPLEMENTATION@_TARGETS)
+    # First preference: depend on all targets exported by the package
+    target_link_libraries(rmw_implementation::rmw_implementation INTERFACE
+      ${@RMW_IMPLEMENTATION@_TARGETS})
+  elseif(TARGET @RMW_IMPLEMENTATION@::@RMW_IMPLEMENTATION@)
+    # Next preference: depend on a target with the package's name
+    target_link_libraries(rmw_implementation::rmw_implementation INTERFACE
+      @RMW_IMPLEMENTATION@::@RMW_IMPLEMENTATION@)
+  else()
+    # Last resort: assume old-style CMake variables are set
+    target_compile_definitions(rmw_implementation::rmw_implementation INTERFACE
+      ${@RMW_IMPLEMENTATION@_DEFINITIONS})
+    target_include_directories(rmw_implementation::rmw_implementation INTERFACE
+      ${@RMW_IMPLEMENTATION@_INCLUDE_DIRS})
+    target_link_libraries(rmw_implementation::rmw_implementation INTERFACE
+      ${@RMW_IMPLEMENTATION@_LIBRARIES})
+  endif()
+
+  list(APPEND rmw_implementation_TARGETS
+    rmw_implementation::rmw_implementation)
 else()
   get_available_rmw_implementations(available_rmw_implementations)
 
@@ -53,6 +69,3 @@ else()
   # no need to find_package @PROJECT_NAME@
   # since this code is already part of a find_package call of that package
 endif()
-
-find_package(Threads REQUIRED)
-list(APPEND rmw_implementation_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
