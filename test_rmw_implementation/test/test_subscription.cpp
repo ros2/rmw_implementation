@@ -871,6 +871,143 @@ TEST_F(
     RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
 }
 
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), no_content_filter_get) {
+  rmw_subscription_content_filter_options_t options;
+  auto allocator = rcutils_get_default_allocator();
+  rmw_ret_t ret = rmw_subscription_get_content_filter(sub, &allocator, &options);
+  EXPECT_NE(RMW_RET_OK, ret);
+}
+
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), no_content_filter_set) {
+  rmw_ret_t ret;
+  bool taken = false;
+
+  // Create publisher
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  size_t subscription_count = 0u;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 1u == subscription_count) {  // Early return on failure.
+      break;
+    }
+  }
+
+  // Publish message with float (3.14159) from publisher to subscription
+  test_msgs__msg__BasicTypes original_message{};
+  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&original_message));
+  original_message.float32_value = 3.14159f;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__BasicTypes__fini(&original_message);
+  });
+
+  rmw_publisher_allocation_t * null_allocation_p{nullptr};
+  rmw_subscription_allocation_t * null_allocation_s{nullptr};
+
+  ret = rmw_publish(pub, &original_message, null_allocation_p);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  // expect to get message because no content filter set
+  {
+    rmw_subscriptions_t subscriptions;
+    void * subscriptions_storage[1];
+    subscriptions_storage[0] = sub->data;
+    subscriptions.subscribers = subscriptions_storage;
+    subscriptions.subscriber_count = 1;
+
+    rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
+    ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+    });
+    rmw_time_t timeout = {1, 0};  // 1000ms
+    ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    ASSERT_NE(nullptr, subscriptions.subscribers[0]);
+
+    test_msgs__msg__BasicTypes output_message{};
+    ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      test_msgs__msg__BasicTypes__fini(&output_message);
+    });
+
+    ret = rmw_take(sub, &output_message, &taken, null_allocation_s);
+    // whatever the cft is supported or not
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+    EXPECT_TRUE(taken);
+    EXPECT_EQ(original_message, output_message);
+  }
+
+  // set content filter with 3.14
+  rmw_subscription_content_filter_options_t options =
+    rmw_get_zero_initialized_content_filter_options();
+  auto allocator = rcutils_get_default_allocator();
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_subscription_content_filter_options_init(
+      "float32_value=3.14",
+      0,
+      nullptr,
+      &allocator,
+      &options));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK,
+      rmw_subscription_content_filter_options_fini(&options, &allocator));
+  });
+
+  ret = rmw_subscription_set_content_filter(sub, &options);
+  if (ret != RMW_RET_UNSUPPORTED) {
+    ASSERT_EQ(RMW_RET_OK, ret);
+    ret = rmw_publish(pub, &original_message, null_allocation_p);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+    rmw_subscriptions_t subscriptions;
+    void * subscriptions_storage[1];
+    subscriptions_storage[0] = sub->data;
+    subscriptions.subscribers = subscriptions_storage;
+    subscriptions.subscriber_count = 1;
+
+    rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
+    ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+    });
+    rmw_time_t timeout = {1, 0};  // 1000ms
+    ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+    EXPECT_EQ(RMW_RET_TIMEOUT, ret) << rmw_get_error_string().str;
+    ASSERT_EQ(nullptr, subscriptions.subscribers[0]);
+
+    // content filter subscription with 3.14 that is not equal with 3.14159
+    {
+      test_msgs__msg__BasicTypes output_message{};
+      ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&output_message));
+      OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+      {
+        test_msgs__msg__BasicTypes__fini(&output_message);
+      });
+
+      ret = rmw_take(sub, &output_message, &taken, null_allocation_s);
+      EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+      EXPECT_FALSE(taken);
+    }
+  }
+}
+
 class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
 {
