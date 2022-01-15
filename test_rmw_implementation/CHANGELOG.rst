@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.7.1 (2022-01-14)
+------------------
+* Fix linter issues (`#200 <https://github.com/ros2/rmw_implementation/issues/200>`_)
+* Contributors: Jorge Perez
+
 2.7.0 (2021-11-19)
 ------------------
 * Add client/service QoS getters. (`#196 <https://github.com/ros2/rmw_implementation/issues/196>`_)
