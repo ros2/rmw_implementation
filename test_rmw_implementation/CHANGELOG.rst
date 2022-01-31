@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.3 (2022-01-31)
+------------------
+* Add test to check rmw_send_response when the client is gone (`#163 <https://github.com/ros2/rmw_implementation/issues/163>`_)
+* Contributors: José Luis Bueno López
+
 1.0.2 (2021-04-14)
 ------------------
 
