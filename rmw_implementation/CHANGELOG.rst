@@ -2,6 +2,12 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.7.1 (2022-01-14)
+------------------
+* Fix relative path include syntax for cpplint (`#203 <https://github.com/ros2/rmw_implementation/issues/203>`_)
+* Support and prefer exported targets from rmw implementations (`#201 <https://github.com/ros2/rmw_implementation/issues/201>`_)
+* Contributors: Jacob Perron, Shane Loretz
+
 2.7.0 (2021-11-19)
 ------------------
 * Add client/service QoS getters. (`#196 <https://github.com/ros2/rmw_implementation/issues/196>`_)
