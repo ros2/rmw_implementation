@@ -2,6 +2,9 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.7.1 (2022-01-14)
 ------------------
 * Fix linter issues (`#200 <https://github.com/ros2/rmw_implementation/issues/200>`_)
