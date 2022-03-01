@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.8.0 (2022-03-01)
+------------------
 * Add EventsExecutor (`#161 <https://github.com/ros2/rmw_implementation/issues/161>`_)
 * Contributors: iRobot ROS
 
