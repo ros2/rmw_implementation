@@ -31,12 +31,13 @@
 
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
-#include "rmw/names_and_types.h"
+#include "rmw/features.h"
 #include "rmw/get_network_flow_endpoints.h"
 #include "rmw/get_node_info_and_types.h"
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/get_topic_endpoint_info.h"
 #include "rmw/get_topic_names_and_types.h"
+#include "rmw/names_and_types.h"
 #include "rmw/rmw.h"
 
 #define STRINGIFY_(s) #s
@@ -722,6 +723,12 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(
     rmw_event_t *, rmw_event_callback_t, const void *))
 
+RMW_INTERFACE_FN(
+  rmw_feature_supported,
+  bool, false,
+  1, ARG_TYPES(
+    rmw_feature_t))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -811,6 +818,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_service_set_on_new_request_callback)
   GET_SYMBOL(rmw_client_set_on_new_response_callback)
   GET_SYMBOL(rmw_event_set_callback)
+  GET_SYMBOL(rmw_feature_supported)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -923,5 +931,6 @@ unload_library()
   symbol_rmw_service_set_on_new_request_callback = nullptr;
   symbol_rmw_client_set_on_new_response_callback = nullptr;
   symbol_rmw_event_set_callback = nullptr;
+  symbol_rmw_feature_supported = nullptr;
   g_rmw_lib.reset();
 }
