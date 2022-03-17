@@ -1254,11 +1254,10 @@ TEST_F(CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION), get_cont
   if (sub->is_cft_enabled) {
     EXPECT_EQ(RMW_RET_OK, ret);
     EXPECT_STREQ(options.filter_expression, filter_expression);
-    ASSERT_NE(nullptr, options.expression_parameters);
-    ASSERT_EQ(expression_parameters_count, options.expression_parameters->size);
-    for (size_t i = 0; i < options.expression_parameters->size; ++i) {
+    ASSERT_EQ(expression_parameters_count, options.expression_parameters.size);
+    for (size_t i = 0; i < options.expression_parameters.size; ++i) {
       EXPECT_STREQ(
-        options.expression_parameters->data[i],
+        options.expression_parameters.data[i],
         expression_parameters[i]);
     }
     EXPECT_EQ(
