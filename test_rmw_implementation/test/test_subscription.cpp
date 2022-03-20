@@ -14,6 +14,9 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <thread>
+
 #include "osrf_testing_tools_cpp/memory_tools/gtest_quickstart.hpp"
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
 
@@ -970,6 +973,8 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), no_content_filter_set
   ret = rmw_subscription_set_content_filter(sub, &options);
   if (ret != RMW_RET_UNSUPPORTED) {
     ASSERT_EQ(RMW_RET_OK, ret);
+    // waiting to allow for filter propagation
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     ret = rmw_publish(pub, &original_message, null_allocation_p);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
@@ -1390,6 +1395,8 @@ TEST_F(CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION), content_
     EXPECT_EQ(
       RMW_RET_OK,
       rmw_subscription_set_content_filter(sub, &options));
+    // waiting to allow for filter propagation
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     ret = rmw_publish(pub, &original_message, null_allocation_p);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -1533,6 +1540,8 @@ TEST_F(CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION), content_
     EXPECT_EQ(
       RMW_RET_OK,
       rmw_subscription_set_content_filter(sub, &options));
+    // waiting to allow for filter propagation
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     ret = rmw_publish(pub, &original_message, null_allocation_p);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -1677,6 +1686,8 @@ TEST_F(CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION), content_
     EXPECT_EQ(
       RMW_RET_OK,
       rmw_subscription_set_content_filter(sub, &options));
+    // waiting to allow for filter propagation
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     ret = rmw_publish(pub, &original_message, null_allocation_p);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
