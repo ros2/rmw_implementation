@@ -31,12 +31,13 @@
 
 #include "rmw/error_handling.h"
 #include "rmw/event.h"
-#include "rmw/names_and_types.h"
+#include "rmw/features.h"
 #include "rmw/get_network_flow_endpoints.h"
 #include "rmw/get_node_info_and_types.h"
 #include "rmw/get_service_names_and_types.h"
 #include "rmw/get_topic_endpoint_info.h"
 #include "rmw/get_topic_names_and_types.h"
+#include "rmw/names_and_types.h"
 #include "rmw/rmw.h"
 
 #define STRINGIFY_(s) #s
@@ -722,6 +723,12 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(
     rmw_event_t *, rmw_event_callback_t, const void *))
 
+RMW_INTERFACE_FN(
+  rmw_feature_supported,
+  bool, false,
+  1, ARG_TYPES(
+    rmw_feature_t))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -738,16 +745,16 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_node)
   GET_SYMBOL(rmw_destroy_node)
   GET_SYMBOL(rmw_node_get_graph_guard_condition)
-  GET_SYMBOL(rmw_init_publisher_allocation);
-  GET_SYMBOL(rmw_fini_publisher_allocation);
+  GET_SYMBOL(rmw_init_publisher_allocation)
+  GET_SYMBOL(rmw_fini_publisher_allocation)
   GET_SYMBOL(rmw_create_publisher)
   GET_SYMBOL(rmw_destroy_publisher)
-  GET_SYMBOL(rmw_borrow_loaned_message);
-  GET_SYMBOL(rmw_return_loaned_message_from_publisher);
+  GET_SYMBOL(rmw_borrow_loaned_message)
+  GET_SYMBOL(rmw_return_loaned_message_from_publisher)
   GET_SYMBOL(rmw_publish)
   GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
-  GET_SYMBOL(rmw_publisher_get_actual_qos);
+  GET_SYMBOL(rmw_publisher_get_actual_qos)
   GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
   GET_SYMBOL(rmw_publisher_assert_liveliness)
@@ -759,8 +766,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_fini_subscription_allocation)
   GET_SYMBOL(rmw_create_subscription)
   GET_SYMBOL(rmw_destroy_subscription)
-  GET_SYMBOL(rmw_subscription_count_matched_publishers);
-  GET_SYMBOL(rmw_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_subscription_count_matched_publishers)
+  GET_SYMBOL(rmw_subscription_get_actual_qos)
   GET_SYMBOL(rmw_subscription_event_init)
   GET_SYMBOL(rmw_take)
   GET_SYMBOL(rmw_take_with_info)
@@ -796,8 +803,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_count_subscribers)
   GET_SYMBOL(rmw_get_gid_for_publisher)
   GET_SYMBOL(rmw_compare_gids_equal)
-  GET_SYMBOL(rmw_service_response_publisher_get_actual_qos);
-  GET_SYMBOL(rmw_service_request_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_service_response_publisher_get_actual_qos)
+  GET_SYMBOL(rmw_service_request_subscription_get_actual_qos)
   GET_SYMBOL(rmw_service_server_is_available)
   GET_SYMBOL(rmw_set_log_severity)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
@@ -805,12 +812,13 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_qos_profile_check_compatible)
   GET_SYMBOL(rmw_publisher_get_network_flow_endpoints)
   GET_SYMBOL(rmw_subscription_get_network_flow_endpoints)
-  GET_SYMBOL(rmw_client_request_publisher_get_actual_qos);
-  GET_SYMBOL(rmw_client_response_subscription_get_actual_qos);
+  GET_SYMBOL(rmw_client_request_publisher_get_actual_qos)
+  GET_SYMBOL(rmw_client_response_subscription_get_actual_qos)
   GET_SYMBOL(rmw_subscription_set_on_new_message_callback)
   GET_SYMBOL(rmw_service_set_on_new_request_callback)
   GET_SYMBOL(rmw_client_set_on_new_response_callback)
   GET_SYMBOL(rmw_event_set_callback)
+  GET_SYMBOL(rmw_feature_supported)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -923,5 +931,6 @@ unload_library()
   symbol_rmw_service_set_on_new_request_callback = nullptr;
   symbol_rmw_client_set_on_new_response_callback = nullptr;
   symbol_rmw_event_set_callback = nullptr;
+  symbol_rmw_feature_supported = nullptr;
   g_rmw_lib.reset();
 }
