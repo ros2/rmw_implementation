@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.1 (2022-03-28)
+------------------
+* add content-filtered-topic interfaces (`#181 <https://github.com/ros2/rmw_implementation/issues/181>`_)
+* Contributors: Chen Lihui
+
 2.8.0 (2022-03-01)
 ------------------
 

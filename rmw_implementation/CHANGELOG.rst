@@ -2,6 +2,12 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.1 (2022-03-28)
+------------------
+* add content-filtered-topic interfaces (`#181 <https://github.com/ros2/rmw_implementation/issues/181>`_)
+* Add rmw_feature_supported() (`#204 <https://github.com/ros2/rmw_implementation/issues/204>`_)
+* Contributors: Chen Lihui, Ivan Santiago Paunovic
+
 2.8.0 (2022-03-01)
 ------------------
 * Add EventsExecutor (`#161 <https://github.com/ros2/rmw_implementation/issues/161>`_)
