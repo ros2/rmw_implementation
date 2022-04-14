@@ -697,6 +697,24 @@ RMW_INTERFACE_FN(
     size_t))
 
 RMW_INTERFACE_FN(
+  rmw_qos_profile_get_most_compatible_for_subscription,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_topic_endpoint_info_arrat_t *,
+    rmw_qos_profile_t *,
+    rmw_topic_endpoint_info_array_t *,
+    rcutils_allocator_t *))
+
+RMW_INTERFACE_FN(
+  rmw_qos_profile_get_most_compatible_for_publisher,
+  rmw_ret_t, RMW_RET_ERROR,
+  4, ARG_TYPES(
+    const rmw_topic_endpoint_info_arrat_t *,
+    rmw_qos_profile_t *,
+    rmw_topic_endpoint_info_array_t *,
+    rcutils_allocator_t *))
+
+RMW_INTERFACE_FN(
   rmw_publisher_get_network_flow_endpoints,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(
@@ -825,6 +843,8 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_publishers_info_by_topic)
   GET_SYMBOL(rmw_get_subscriptions_info_by_topic)
   GET_SYMBOL(rmw_qos_profile_check_compatible)
+  GET_SYMBOL(rmw_qos_profile_get_most_compatible_for_subscription)
+  GET_SYMBOL(rmw_qos_profile_get_most_compatible_for_publisher)
   GET_SYMBOL(rmw_publisher_get_network_flow_endpoints)
   GET_SYMBOL(rmw_subscription_get_network_flow_endpoints)
   GET_SYMBOL(rmw_client_request_publisher_get_actual_qos)
@@ -941,6 +961,8 @@ unload_library()
   symbol_rmw_get_publishers_info_by_topic = nullptr;
   symbol_rmw_get_subscriptions_info_by_topic = nullptr;
   symbol_rmw_qos_profile_check_compatible = nullptr;
+  symbol_rmw_qos_profile_get_most_compatible_for_subscription = nullptr;
+  symbol_rmw_qos_profile_get_most_compatible_for_publisher = nullptr;
   symbol_rmw_publisher_get_network_flow_endpoints = nullptr;
   symbol_rmw_subscription_get_network_flow_endpoints = nullptr;
   symbol_rmw_init = nullptr;
