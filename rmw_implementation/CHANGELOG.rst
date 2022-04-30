@@ -2,6 +2,9 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.9.0 (2022-04-29)
+------------------
+
 2.8.1 (2022-03-28)
 ------------------
 * add content-filtered-topic interfaces (`#181 <https://github.com/ros2/rmw_implementation/issues/181>`_)
