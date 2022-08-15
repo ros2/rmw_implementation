@@ -311,7 +311,3 @@ TEST_F(CLASSNAME(TestUniqueIdentifiersForMultipleClients, RMW_IMPLEMENTATION), d
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_FALSE(are_equal);
 }
-
-
-
-
