@@ -273,7 +273,6 @@ protected:
   void SetUp() override
   {
     Base::SetUp();
-    rmw_publisher_options_t options = rmw_get_default_publisher_options();
     constexpr char service_name[] = "service_name";
     cli1 = rmw_create_client(
       node, srv_ts, service_name, &qos_profile);
