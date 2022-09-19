@@ -23,6 +23,7 @@
 #include "rmw/rmw.h"
 
 #include "test_msgs/msg/basic_types.h"
+#include "test_msgs/srv/basic_types.h"
 
 
 #ifdef RMW_IMPLEMENTATION
