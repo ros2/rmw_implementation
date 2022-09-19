@@ -59,13 +59,16 @@ protected:
     pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &options);
     ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
 
-    constexpr char service_name[] = "test_service";
-    cli = rmw_create_client(node, srv_ts, service_name, &qos_profile);
+    constexpr char service_name[] = "/test_service0";
+    client = rmw_create_client(node, srv_ts, service_name, &qos_profile);
+    ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
   }
 
   void TearDown() override
   {
     rmw_ret_t ret = rmw_destroy_publisher(node, pub);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    ret = rmw_destroy_client(node, client);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_node(node);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -83,7 +86,7 @@ protected:
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes)};
   rmw_qos_profile_t qos_profile{rmw_qos_profile_default};
   rmw_publisher_t * pub{nullptr};
-  rmw_client_t * cli{nullptr};
+  rmw_client_t * client{nullptr};
 };
 
 TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_pub_gid_with_bad_args) {
@@ -121,9 +124,9 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_pub_gid_with_
 }
 
 
-TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_cli_gid_with_bad_args) {
+TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_client_gid_with_bad_args) {
   rmw_gid_t gid{};
-  rmw_ret_t ret = rmw_get_gid_for_client(cli, &gid);
+  rmw_ret_t ret = rmw_get_gid_for_client(client, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   rmw_gid_t expected_gid = gid;
 
@@ -135,7 +138,7 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_cli_gid_with_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_TRUE(gids_are_equal);
 
-  ret = rmw_get_gid_for_client(cli, nullptr);
+  ret = rmw_get_gid_for_client(client, nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
   gids_are_equal = false;
@@ -143,10 +146,10 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_cli_gid_with_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_TRUE(gids_are_equal);
 
-  const char * implementation_identifier = cli->implementation_identifier;
-  cli->implementation_identifier = "not-an-rmw-implementation-identifier";
-  ret = rmw_get_gid_for_client(cli, &gid);
-  cli->implementation_identifier = implementation_identifier;
+  const char * implementation_identifier = client->implementation_identifier;
+  client->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_get_gid_for_client(client, &gid);
+  client->implementation_identifier = implementation_identifier;
   EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
   rmw_reset_error();
   gids_are_equal = false;
@@ -273,41 +276,53 @@ protected:
   void SetUp() override
   {
     Base::SetUp();
-    constexpr char service_name[] = "service_name";
-    cli1 = rmw_create_client(
+    constexpr char service_name[] = "/test_service1";
+    first_client_for_service1 = rmw_create_client(
       node, srv_ts, service_name, &qos_profile);
-    ASSERT_NE(nullptr, cli1) << rmw_get_error_string().str;
-    cli2 = rmw_create_client(
+    ASSERT_NE(nullptr, first_client_for_service1) << rmw_get_error_string().str;
+    second_client_for_service1 = rmw_create_client(
       node, srv_ts, service_name, &qos_profile);
-    ASSERT_NE(nullptr, cli2) << rmw_get_error_string().str;
+    ASSERT_NE(nullptr, second_client_for_service1) << rmw_get_error_string().str;
+    client_for_service0 = client;
   }
 
   void TearDown() override
   {
-    rmw_ret_t ret = rmw_destroy_client(node, cli1);
+    rmw_ret_t ret = rmw_destroy_client(node, first_client_for_service1);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    ret = rmw_destroy_client(node, cli2);
+    ret = rmw_destroy_client(node, second_client_for_service1);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     Base::TearDown();
   }
 
-  rmw_client_t * cli1 {nullptr};
-  rmw_client_t * cli2 {nullptr};
+  rmw_client_t * client_for_service0{nullptr};
+  rmw_client_t * first_client_for_service1{nullptr};
+  rmw_client_t * second_client_for_service1{nullptr};
 };
 
 
 TEST_F(CLASSNAME(TestUniqueIdentifiersForMultipleClients, RMW_IMPLEMENTATION), different_clis) {
-  rmw_gid_t cli1_gid{};
-  rmw_gid_t cli2_gid{};
-
-  rmw_ret_t ret = rmw_get_gid_for_client(cli1, &cli1_gid);
+  rmw_gid_t gid_of_client_for_service0{};
+  rmw_ret_t ret = rmw_get_gid_for_client(client_for_service0, &gid_of_client_for_service0);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  ret = rmw_get_gid_for_client(cli2, &cli2_gid);
+  rmw_gid_t gid_of_first_client_for_service1{};
+  ret = rmw_get_gid_for_client(first_client_for_service1, &gid_of_first_client_for_service1);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  rmw_gid_t gid_of_second_client_for_service1{};
+  ret = rmw_get_gid_for_client(second_client_for_service1, &gid_of_second_client_for_service1);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   bool are_equal = true;
-  ret = rmw_compare_gids_equal(&cli1_gid, &cli2_gid, &are_equal);
+  ret = rmw_compare_gids_equal(
+    &gid_of_client_for_service0, &gid_of_first_client_for_service1, &are_equal);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_FALSE(are_equal);
+
+  are_equal = true;
+  ret = rmw_compare_gids_equal(
+    &gid_of_first_client_for_service1, &gid_of_second_client_for_service1, &are_equal);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   EXPECT_FALSE(are_equal);
 }
