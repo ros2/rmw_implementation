@@ -647,6 +647,11 @@ RMW_INTERFACE_FN(
   3, ARG_TYPES(const rmw_node_t *, const char *, size_t *))
 
 RMW_INTERFACE_FN(
+  rmw_get_gid_for_client,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_client_t *, rmw_gid_t *))
+
+RMW_INTERFACE_FN(
   rmw_get_gid_for_publisher,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_publisher_t *, rmw_gid_t *))
@@ -816,6 +821,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_get_node_names_with_enclaves)
   GET_SYMBOL(rmw_count_publishers)
   GET_SYMBOL(rmw_count_subscribers)
+  GET_SYMBOL(rmw_get_gid_for_client)
   GET_SYMBOL(rmw_get_gid_for_publisher)
   GET_SYMBOL(rmw_compare_gids_equal)
   GET_SYMBOL(rmw_service_response_publisher_get_actual_qos)
@@ -934,6 +940,7 @@ unload_library()
   symbol_rmw_get_node_names_with_enclaves = nullptr;
   symbol_rmw_count_publishers = nullptr;
   symbol_rmw_count_subscribers = nullptr;
+  symbol_rmw_get_gid_for_client = nullptr;
   symbol_rmw_get_gid_for_publisher = nullptr;
   symbol_rmw_compare_gids_equal = nullptr;
   symbol_rmw_service_server_is_available = nullptr;
