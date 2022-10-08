@@ -913,3 +913,61 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_subscribers_with_bad_a
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_subscribers(node, topic_name, nullptr));
   rmw_reset_error();
 }
+
+TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_with_bad_arguments) {
+  size_t count = 0u;
+  constexpr char service_name[] = "/test_service";
+
+  // A null node is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(nullptr, service_name, &count));
+  rmw_reset_error();
+
+  // A node from a different implementation cannot be used to query.
+  const char * implementation_identifier = node->implementation_identifier;
+  node->implementation_identifier = "not-an-rmw-implementation-identifier";
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, rmw_count_clients(node, service_name, &count));
+  node->implementation_identifier = implementation_identifier;
+  rmw_reset_error();
+
+  // A null topic name is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, nullptr, &count));
+  rmw_reset_error();
+
+  // An invalid topic name is an invalid argument.
+  constexpr char invalid_service_name[] = "not a valid topic name !";
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, invalid_service_name, &count));
+  rmw_reset_error();
+
+  // A null count is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, service_name, nullptr));
+  rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_arguments) {
+  size_t count = 0u;
+  constexpr char service_name[] = "/test_service";
+  
+  // A null node is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(nullptr, service_name, &count));
+  rmw_reset_error();
+
+  // A node from a different implementation cannot be used to query.
+  const char * implementation_identifier = node->implementation_identifier;
+  node->implementation_identifier = "not-an-rmw-implementation-identifier";
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, rmw_count_services(node, service_name, &count));
+  node->implementation_identifier = implementation_identifier;
+  rmw_reset_error();
+
+  // A null topic name is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, nullptr, &count));
+  rmw_reset_error();
+
+  // An invalid topic name is an invalid argument.
+  constexpr char invalid_service_name[] = "not a valid topic name !";
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, invalid_service_name, &count));
+  rmw_reset_error();
+
+  // A null count is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, service_name, nullptr));
+  rmw_reset_error();
+}
