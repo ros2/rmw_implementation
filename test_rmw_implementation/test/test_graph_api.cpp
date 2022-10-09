@@ -946,7 +946,6 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_with_bad_argum
 TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_arguments) {
   size_t count = 0u;
   constexpr char service_name[] = "/test_service";
-  
   // A null node is an invalid argument.
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(nullptr, service_name, &count));
   rmw_reset_error();
