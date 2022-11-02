@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.10.0 (2022-11-02)
+-------------------
 * Add rmw_get_gid_for_client & tests (`#206 <https://github.com/ros2/rmw_implementation/issues/206>`_)
 * Contributors: Brian
 
