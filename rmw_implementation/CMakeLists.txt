@@ -12,7 +12,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(ament_index_cpp REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 
 if(BUILD_TESTING)
@@ -47,6 +46,7 @@ if(RMW_IMPLEMENTATION_DISABLE_RUNTIME_SELECTION)
 else()
   message(STATUS "Runtime selection of RMW enabled")
 
+  find_package(ament_index_cpp REQUIRED)
   find_package(rcpputils REQUIRED)
   find_package(rcutils REQUIRED)
   find_package(rmw REQUIRED)
