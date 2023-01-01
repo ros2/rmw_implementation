@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <chrono>
 
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
 
@@ -26,6 +27,8 @@
 #include "rmw/get_topic_names_and_types.h"
 #include "rmw/rmw.h"
 #include "rmw/sanity_checks.h"
+
+#include "test_msgs/srv/basic_types.h"
 
 #include "./config.hpp"
 #include "./testing_macros.hpp"
@@ -969,4 +972,45 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_argu
   // A null count is an invalid argument.
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, service_name, nullptr));
   rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_and_services) {
+  constexpr char service_name[] = "/test_service";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  size_t count = 0u;
+
+  rmw_service_t * srv = rmw_create_service(
+    other_node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  EXPECT_EQ(RMW_RET_OK, rmw_count_services(node, service_name, &count));
+  EXPECT_EQ(1u, count);
+  count = 0u;
+
+  rmw_client_t * client = rmw_create_client(
+    other_node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  EXPECT_EQ(RMW_RET_OK, rmw_count_clients(node, service_name, &count));
+  EXPECT_EQ(1u, count);
+  count = 0u;
+
+  rmw_service_t * srv2 = rmw_create_service(
+    node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, srv2) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_count_services(other_node, service_name, &count));
+  EXPECT_EQ(2u, count);
+  count = 0u;
+
+  rmw_client_t * client2 = rmw_create_client(
+    node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, client2) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_count_clients(other_node, service_name, &count));
+  EXPECT_EQ(2u, count);
+
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_client(other_node, client)) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_service(other_node, srv)) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_client(node, client2)) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_service(node, srv2)) << rmw_get_error_string().str;
 }
