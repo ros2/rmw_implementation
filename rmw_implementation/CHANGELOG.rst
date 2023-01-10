@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.2 (2023-01-10)
+------------------
+* Build-time RMW selection does not need ament_index_cpp (`#210 <https://github.com/ros2/rmw_implementation/issues/210>`_) (`#211 <https://github.com/ros2/rmw_implementation/issues/211>`_)
+* Contributors: mergify[bot]
+
 2.8.1 (2022-03-28)
 ------------------
 * add content-filtered-topic interfaces (`#181 <https://github.com/ros2/rmw_implementation/issues/181>`_)
