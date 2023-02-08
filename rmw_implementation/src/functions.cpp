@@ -747,6 +747,27 @@ RMW_INTERFACE_FN(
   1, ARG_TYPES(
     rmw_feature_t))
 
+RMW_INTERFACE_FN(
+  rmw_take_dynamic_message_with_info,
+  rmw_ret_t, RMW_RET_ERROR,
+  5, ARG_TYPES(
+    const rmw_subscription_t *,
+    rosidl_dynamic_typesupport_dynamic_data_t *,
+    bool *,
+    rmw_message_info_t *,
+    rmw_subscription_allocation_t *))
+
+RMW_INTERFACE_FN(
+  rmw_get_serialization_support,
+  rosidl_dynamic_typesupport_serialization_support_t *, nullptr,
+  1, ARG_TYPES(const char *))
+
+RMW_INTERFACE_FN(
+  rmw_serialized_to_dynamic_data,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(rmw_serialized_message_t *, rosidl_dynamic_typesupport_dynamic_data_t *))
+
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -840,6 +861,9 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_client_set_on_new_response_callback)
   GET_SYMBOL(rmw_event_set_callback)
   GET_SYMBOL(rmw_feature_supported)
+  GET_SYMBOL(rmw_take_dynamic_message_with_info)
+  GET_SYMBOL(rmw_get_serialization_support)
+  GET_SYMBOL(rmw_serialized_to_dynamic_data)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -956,5 +980,8 @@ unload_library()
   symbol_rmw_client_set_on_new_response_callback = nullptr;
   symbol_rmw_event_set_callback = nullptr;
   symbol_rmw_feature_supported = nullptr;
+  symbol_rmw_take_dynamic_message_with_info = nullptr;
+  symbol_rmw_get_serialization_support = nullptr;
+  symbol_rmw_serialized_to_dynamic_data = nullptr;
   g_rmw_lib.reset();
 }
