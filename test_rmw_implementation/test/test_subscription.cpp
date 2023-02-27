@@ -173,6 +173,47 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_bad_argument
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
+TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_unsupported_cft_options) {
+  constexpr char topic_name[] = "/test";
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
+
+  rmw_subscription_options_t options = rmw_get_default_subscription_options();
+  auto allocator = rcutils_get_default_allocator();
+
+  rmw_subscription_content_filter_options_t * content_filter_options =
+    static_cast<rmw_subscription_content_filter_options_t *>(
+    allocator.allocate(
+      sizeof(rmw_subscription_content_filter_options_t), allocator.state));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    allocator.deallocate(content_filter_options, allocator.state);
+  });
+  *content_filter_options = rmw_get_zero_initialized_content_filter_options();
+
+  EXPECT_EQ(
+    RMW_RET_OK, rmw_subscription_content_filter_options_init(
+      "float32_value=not_exist_float_max()",
+      0,
+      NULL,
+      &allocator,
+      content_filter_options));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK,
+      rmw_subscription_content_filter_options_fini(content_filter_options, &allocator));
+  });
+  options.content_filter_options = content_filter_options;
+
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+  EXPECT_FALSE(sub->is_cft_enabled);
+  rmw_ret_t ret = rmw_destroy_subscription(node, sub);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
 TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_internal_errors) {
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
