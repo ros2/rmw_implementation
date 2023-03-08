@@ -15,6 +15,7 @@
 #include <memory>
 
 #include "performance_test_fixture/performance_test_fixture.hpp"
+#include "rcutils/macros.h"
 
 #include "../../src/functions.hpp"
 
@@ -23,6 +24,7 @@ using performance_test_fixture::PerformanceTest;
 BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 {
   for (auto _ : st) {
+    RCUTILS_UNUSED(_);
     prefetch_symbols();
     unload_library();
   }
@@ -31,6 +33,7 @@ BENCHMARK_F(PerformanceTest, prefetch_symbols)(benchmark::State & st)
 BENCHMARK_F(PerformanceTest, lookup_symbol)(benchmark::State & st)
 {
   for (auto _ : st) {
+    RCUTILS_UNUSED(_);
     std::shared_ptr<rcpputils::SharedLibrary> lib = load_library();
     lookup_symbol(lib, "rmw_init");
   }
