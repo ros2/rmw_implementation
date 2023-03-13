@@ -583,6 +583,23 @@ RMW_INTERFACE_FN(
     rmw_events_t *, rmw_wait_set_t *, const rmw_time_t *))
 
 RMW_INTERFACE_FN(
+  rmw_create_masked_wait_set,
+  rmw_masked_wait_set_t *, nullptr,
+  2, ARG_TYPES(rmw_context_t *, size_t))
+
+RMW_INTERFACE_FN(
+  rmw_destroy_masked_wait_set,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(rmw_masked_wait_set_t *))
+
+RMW_INTERFACE_FN(
+  rmw_masked_wait,
+  rmw_ret_t, RMW_RET_ERROR,
+  7, ARG_TYPES(
+    rmw_subscriptions_t *, rmw_guard_conditions_t *, rmw_services_t *, rmw_clients_t *,
+    rmw_events_t *, rmw_masked_wait_set_t *, const rmw_time_t *))
+
+RMW_INTERFACE_FN(
   rmw_get_publisher_names_and_types_by_node,
   rmw_ret_t, RMW_RET_ERROR,
   6, ARG_TYPES(
@@ -811,6 +828,9 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_create_wait_set)
   GET_SYMBOL(rmw_destroy_wait_set)
   GET_SYMBOL(rmw_wait)
+  GET_SYMBOL(rmw_create_masked_wait_set)
+  GET_SYMBOL(rmw_destroy_masked_wait_set)
+  GET_SYMBOL(rmw_masked_wait)
   GET_SYMBOL(rmw_get_publisher_names_and_types_by_node)
   GET_SYMBOL(rmw_get_subscriber_names_and_types_by_node)
   GET_SYMBOL(rmw_get_service_names_and_types_by_node)
@@ -930,6 +950,9 @@ unload_library()
   symbol_rmw_create_wait_set = nullptr;
   symbol_rmw_destroy_wait_set = nullptr;
   symbol_rmw_wait = nullptr;
+  symbol_rmw_create_masked_wait_set = nullptr;
+  symbol_rmw_destroy_masked_wait_set = nullptr;
+  symbol_rmw_masked_wait = nullptr;
   symbol_rmw_get_publisher_names_and_types_by_node = nullptr;
   symbol_rmw_get_subscriber_names_and_types_by_node = nullptr;
   symbol_rmw_get_service_names_and_types_by_node = nullptr;
