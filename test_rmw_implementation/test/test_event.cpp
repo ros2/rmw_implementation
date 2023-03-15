@@ -116,7 +116,7 @@ void event_callback(const void * user_data, size_t number_of_events)
 }
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_event_matched_unmatched) {
+TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_matched_event) {
   // Notice: Not support connextdds since it doesn't support rmw_event_set_callback() interface
   if (std::string(rmw_get_implementation_identifier()).find("rmw_connextdds") == 0) {
     GTEST_SKIP();
@@ -140,22 +140,9 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_event_matched_u
       RMW_RET_OK, rmw_event_fini(&pub_matched_event)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t pub_unmatched_event{rmw_get_zero_initialized_event()};
-  ret = rmw_publisher_event_init(&pub_unmatched_event, pub, RMW_EVENT_PUBLICATION_UNMATCHED);
-  ASSERT_EQ(RMW_RET_OK, ret);
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(
-      RMW_RET_OK, rmw_event_fini(&pub_unmatched_event)) << rmw_get_error_string().str;
-  });
-
   struct EventUserData matched_data;
   matched_data.event_count = std::make_shared<std::atomic_size_t>(0);
   ret = rmw_event_set_callback(&pub_matched_event, event_callback, &matched_data);
-  ASSERT_EQ(RMW_RET_OK, ret);
-  struct EventUserData unmatched_data;
-  unmatched_data.event_count = std::make_shared<std::atomic_size_t>(0);
-  ret = rmw_event_set_callback(&pub_unmatched_event, event_callback, &unmatched_data);
   ASSERT_EQ(RMW_RET_OK, ret);
 
   // to take event if there is no subscription
@@ -163,14 +150,10 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_event_matched_u
     rmw_matched_status_t matched_status;
     bool taken;
     EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_matched_event, &matched_status, &taken));
-    EXPECT_EQ(0, matched_status.current_matched_count);
+    EXPECT_EQ(0, matched_status.total_count);
+    EXPECT_EQ(0, matched_status.total_count_change);
+    EXPECT_EQ(0, matched_status.current_count);
     EXPECT_EQ(0, matched_status.current_count_change);
-    EXPECT_TRUE(taken);
-
-    rmw_unmatched_status_t unmatched_status;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_unmatched_event, &unmatched_status, &taken));
-    EXPECT_EQ(0, unmatched_status.current_matched_count);
-    EXPECT_EQ(0, unmatched_status.current_count_change);
     EXPECT_TRUE(taken);
   }
 
@@ -181,7 +164,6 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_event_matched_u
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(*matched_data.event_count, 1);
-  EXPECT_EQ(*unmatched_data.event_count, 0);
 
   rmw_subscription_t * sub2 =
     rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
@@ -189,15 +171,16 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_event_matched_u
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(*matched_data.event_count, 2);
-  EXPECT_EQ(*unmatched_data.event_count, 0);
 
   // wait matched event
   rmw_matched_status_t matched_status;
   wait_and_take_event(&pub_matched_event, &matched_status);
-  EXPECT_EQ(2, matched_status.current_matched_count);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(2, matched_status.total_count_change);
+  EXPECT_EQ(2, matched_status.current_count);
   EXPECT_EQ(2, matched_status.current_count_change);
 
-  // Next, check unmatched event
+  // Next, check unmatched status change
   *matched_data.event_count = 0;
 
   // test the unmatched event while the subscription exiting
@@ -205,24 +188,23 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_event_matched_u
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(*unmatched_data.event_count, 1);
-  EXPECT_EQ(*matched_data.event_count, 0);
+  EXPECT_EQ(*matched_data.event_count, 1);
 
   ret = rmw_destroy_subscription(node, sub2);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(*unmatched_data.event_count, 2);
-  EXPECT_EQ(*matched_data.event_count, 0);
+  EXPECT_EQ(*matched_data.event_count, 2);
 
-  // wait unmatched event
-  rmw_unmatched_status_t unmatched_status;
-  wait_and_take_event(&pub_unmatched_event, &unmatched_status);
-  EXPECT_EQ(0, unmatched_status.current_matched_count);
-  EXPECT_EQ(2, unmatched_status.current_count_change);
+  // wait unmatched status change
+  wait_and_take_event(&pub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(0, matched_status.total_count_change);
+  EXPECT_EQ(0, matched_status.current_count);
+  EXPECT_EQ(-2, matched_status.current_count_change);
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_event_matched_unmatched) {
+TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_matched_event) {
   // Notice: Not support connextdds since it doesn't support rmw_event_set_callback() interface
   if (std::string(rmw_get_implementation_identifier()).find("rmw_connextdds") == 0) {
     GTEST_SKIP();
@@ -249,23 +231,9 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_event_matche
       RMW_RET_OK, rmw_event_fini(&sub_matched_event)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t sub_unmatched_event{rmw_get_zero_initialized_event()};
-  ret = rmw_subscription_event_init(&sub_unmatched_event, sub, RMW_EVENT_SUBSCRIPTION_UNMATCHED);
-  ASSERT_EQ(RMW_RET_OK, ret);
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(
-      RMW_RET_OK, rmw_event_fini(&sub_unmatched_event)) << rmw_get_error_string().str;
-  });
-
   struct EventUserData matched_data;
   matched_data.event_count = std::make_shared<std::atomic_size_t>(0);
   ret = rmw_event_set_callback(&sub_matched_event, event_callback, &matched_data);
-  ASSERT_EQ(RMW_RET_OK, ret);
-
-  struct EventUserData unmatched_data;
-  unmatched_data.event_count = std::make_shared<std::atomic_size_t>(0);
-  ret = rmw_event_set_callback(&sub_unmatched_event, event_callback, &unmatched_data);
   ASSERT_EQ(RMW_RET_OK, ret);
 
   // to take event if there is no publisher
@@ -273,14 +241,10 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_event_matche
     rmw_matched_status_t matched_status;
     bool taken;
     EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_matched_event, &matched_status, &taken));
-    EXPECT_EQ(0, matched_status.current_matched_count);
+    EXPECT_EQ(0, matched_status.total_count);
+    EXPECT_EQ(0, matched_status.total_count_change);
+    EXPECT_EQ(0, matched_status.current_count);
     EXPECT_EQ(0, matched_status.current_count_change);
-    EXPECT_TRUE(taken);
-
-    rmw_unmatched_status_t unmatched_status;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_unmatched_event, &unmatched_status, &taken));
-    EXPECT_EQ(0, unmatched_status.current_matched_count);
-    EXPECT_EQ(0, unmatched_status.current_count_change);
     EXPECT_TRUE(taken);
   }
 
@@ -291,7 +255,6 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_event_matche
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(*matched_data.event_count, 1);
-  EXPECT_EQ(*unmatched_data.event_count, 0);
 
   rmw_publisher_t * pub2 =
     rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &pub_options);
@@ -299,15 +262,16 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_event_matche
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   EXPECT_EQ(*matched_data.event_count, 2);
-  EXPECT_EQ(*unmatched_data.event_count, 0);
 
   // wait matched event
   rmw_matched_status_t matched_status;
   wait_and_take_event(&sub_matched_event, &matched_status);
-  EXPECT_EQ(2, matched_status.current_matched_count);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(2, matched_status.total_count_change);
+  EXPECT_EQ(2, matched_status.current_count);
   EXPECT_EQ(2, matched_status.current_count_change);
 
-  // Next, check unmatched event
+  // Next, check unmatched status change
   *matched_data.event_count = 0;
 
   // test the unmatched event while the publisher exiting
@@ -315,24 +279,23 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_event_matche
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(*matched_data.event_count, 0);
-  EXPECT_EQ(*unmatched_data.event_count, 1);
+  EXPECT_EQ(*matched_data.event_count, 1);
 
   ret = rmw_destroy_publisher(node, pub2);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(*matched_data.event_count, 0);
-  EXPECT_EQ(*unmatched_data.event_count, 2);
+  EXPECT_EQ(*matched_data.event_count, 2);
 
-  // wait unmatched event
-  rmw_unmatched_status_t unmatched_status;
-  wait_and_take_event(&sub_unmatched_event, &unmatched_status);
-  EXPECT_EQ(0, unmatched_status.current_matched_count);
-  EXPECT_EQ(2, unmatched_status.current_count_change);
+  // wait unmatched status change
+  wait_and_take_event(&sub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(0, matched_status.total_count_change);
+  EXPECT_EQ(0, matched_status.current_count);
+  EXPECT_EQ(-2, matched_status.current_count_change);
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_pub_multi_sub_matched_unmatched_event) {
+TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_pub_multi_sub_connect_disconnect) {
   rmw_publisher_t * pub =
     rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &pub_options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
@@ -351,15 +314,6 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_pub_multi_sub_matched_unmat
       RMW_RET_OK, rmw_event_fini(&pub_matched_event)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t pub_unmatched_event{rmw_get_zero_initialized_event()};
-  ret = rmw_publisher_event_init(&pub_unmatched_event, pub, RMW_EVENT_PUBLICATION_UNMATCHED);
-  ASSERT_EQ(RMW_RET_OK, ret);
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(
-      RMW_RET_OK, rmw_event_fini(&pub_unmatched_event)) << rmw_get_error_string().str;
-  });
-
   // test the matched event while a subscription coming
   rmw_subscription_t * sub1 =
     rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
@@ -371,45 +325,33 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_pub_multi_sub_matched_unmat
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  {
-    rmw_matched_status_t matched_status;
-    bool taken;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_matched_event, &matched_status, &taken));
-    EXPECT_EQ(2, matched_status.current_matched_count);
-    EXPECT_EQ(2, matched_status.current_count_change);
-    EXPECT_TRUE(taken);
+  rmw_matched_status_t matched_status;
+  bool taken;
+  EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_matched_event, &matched_status, &taken));
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(2, matched_status.total_count_change);
+  EXPECT_EQ(2, matched_status.current_count);
+  EXPECT_EQ(2, matched_status.current_count_change);
+  EXPECT_TRUE(taken);
 
-    rmw_unmatched_status_t unmatched_status;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_unmatched_event, &unmatched_status, &taken));
-    EXPECT_EQ(2, unmatched_status.current_matched_count);
-    EXPECT_EQ(0, unmatched_status.current_count_change);
-    EXPECT_TRUE(taken);
-  }
-
-  // test the unmatched event while the subscription exiting
+  // test the unmatched status change while the subscription exiting
   ret = rmw_destroy_subscription(node, sub1);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  // wait unmatched event
-  rmw_unmatched_status_t unmatched_status;
-  wait_and_take_event(&pub_unmatched_event, &unmatched_status);
-  EXPECT_EQ(1, unmatched_status.current_matched_count);
-  EXPECT_EQ(1, unmatched_status.current_count_change);
+  // wait unmatched status change
+  wait_and_take_event(&pub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(0, matched_status.total_count_change);
+  EXPECT_EQ(1, matched_status.current_count);
+  EXPECT_EQ(-1, matched_status.current_count_change);
 
   ret = rmw_destroy_subscription(node, sub2);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  wait_and_take_event(&pub_unmatched_event, &unmatched_status);
-  EXPECT_EQ(0, unmatched_status.current_matched_count);
-  EXPECT_EQ(1, unmatched_status.current_count_change);
-
-  {
-    rmw_matched_status_t matched_status;
-    bool taken;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_matched_event, &matched_status, &taken));
-    EXPECT_EQ(0, matched_status.current_matched_count);
-    EXPECT_EQ(0, matched_status.current_count_change);
-    EXPECT_TRUE(taken);
-  }
+  wait_and_take_event(&pub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(0, matched_status.total_count_change);
+  EXPECT_EQ(0, matched_status.current_count);
+  EXPECT_EQ(-1, matched_status.current_count_change);
 }
 
 TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_sub_multi_pub_matched_unmatched_event) {
@@ -434,15 +376,6 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_sub_multi_pub_matched_unmat
       RMW_RET_OK, rmw_event_fini(&sub_matched_event)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t sub_unmatched_event{rmw_get_zero_initialized_event()};
-  ret = rmw_subscription_event_init(&sub_unmatched_event, sub, RMW_EVENT_SUBSCRIPTION_UNMATCHED);
-  ASSERT_EQ(RMW_RET_OK, ret);
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    EXPECT_EQ(
-      RMW_RET_OK, rmw_event_fini(&sub_unmatched_event)) << rmw_get_error_string().str;
-  });
-
   // test the matched event while a publisher coming
   rmw_publisher_t * pub1 =
     rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &pub_options);
@@ -454,43 +387,31 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_sub_multi_pub_matched_unmat
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  {
-    rmw_matched_status_t matched_status;
-    bool taken;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_matched_event, &matched_status, &taken));
-    EXPECT_EQ(2, matched_status.current_matched_count);
-    EXPECT_EQ(2, matched_status.current_count_change);
-    EXPECT_TRUE(taken);
+  rmw_matched_status_t matched_status;
+  bool taken;
+  EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_matched_event, &matched_status, &taken));
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(2, matched_status.total_count_change);
+  EXPECT_EQ(2, matched_status.current_count);
+  EXPECT_EQ(2, matched_status.current_count_change);
+  EXPECT_TRUE(taken);
 
-    rmw_unmatched_status_t unmatched_status;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_unmatched_event, &unmatched_status, &taken));
-    EXPECT_EQ(2, unmatched_status.current_matched_count);
-    EXPECT_EQ(0, unmatched_status.current_count_change);
-    EXPECT_TRUE(taken);
-  }
-
-  // test the unmatched event while the publisher exiting
+  // test the unmatched status change while the publisher exiting
   ret = rmw_destroy_publisher(node, pub1);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
-  // wait unmatched event
-  rmw_unmatched_status_t unmatched_status;
-  wait_and_take_event(&sub_unmatched_event, &unmatched_status);
-  EXPECT_EQ(1, unmatched_status.current_matched_count);
-  EXPECT_EQ(1, unmatched_status.current_count_change);
+  // wait unmatched status change
+  wait_and_take_event(&sub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(0, matched_status.total_count_change);
+  EXPECT_EQ(1, matched_status.current_count);
+  EXPECT_EQ(-1, matched_status.current_count_change);
 
   ret = rmw_destroy_publisher(node, pub2);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-  wait_and_take_event(&sub_unmatched_event, &unmatched_status);
-  EXPECT_EQ(0, unmatched_status.current_matched_count);
-  EXPECT_EQ(1, unmatched_status.current_count_change);
-
-  {
-    rmw_matched_status_t matched_status;
-    bool taken;
-    EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_matched_event, &matched_status, &taken));
-    EXPECT_EQ(0, matched_status.current_matched_count);
-    EXPECT_EQ(0, matched_status.current_count_change);
-    EXPECT_TRUE(taken);
-  }
+  wait_and_take_event(&sub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(0, matched_status.total_count_change);
+  EXPECT_EQ(0, matched_status.current_count);
+  EXPECT_EQ(-1, matched_status.current_count_change);
 }
