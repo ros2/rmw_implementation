@@ -747,6 +747,12 @@ RMW_INTERFACE_FN(
   1, ARG_TYPES(
     rmw_feature_t))
 
+RMW_INTERFACE_FN(
+  rmw_notify_participant_dynamic_network_interface,
+  rmw_ret_t, RMW_RET_ERROR,
+  1, ARG_TYPES(
+    rmw_context_t *))
+
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
 
 void prefetch_symbols(void)
@@ -840,6 +846,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_client_set_on_new_response_callback)
   GET_SYMBOL(rmw_event_set_callback)
   GET_SYMBOL(rmw_feature_supported)
+  GET_SYMBOL(rmw_notify_participant_dynamic_network_interface)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -956,5 +963,6 @@ unload_library()
   symbol_rmw_client_set_on_new_response_callback = nullptr;
   symbol_rmw_event_set_callback = nullptr;
   symbol_rmw_feature_supported = nullptr;
+  symbol_rmw_notify_participant_dynamic_network_interface = nullptr;
   g_rmw_lib.reset();
 }
