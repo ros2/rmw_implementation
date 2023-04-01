@@ -769,7 +769,7 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_get_serialization_support,
   rmw_ret_t, RMW_RET_ERROR,
-  2, ARG_TYPES(const char *, rosidl_dynamic_typesupport_serialization_support_t **))
+  2, ARG_TYPES(const char *, rosidl_dynamic_typesupport_serialization_support_t * *))
 
 
 #define GET_SYMBOL(x) symbol_ ## x = get_symbol(#x);
