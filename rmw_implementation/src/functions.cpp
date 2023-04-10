@@ -767,7 +767,7 @@ RMW_INTERFACE_FN(
     rmw_subscription_allocation_t *))
 
 RMW_INTERFACE_FN(
-  rmw_init_serialization_support,
+  rmw_serialization_support_init,
   rmw_ret_t, RMW_RET_ERROR,
   3, ARG_TYPES(
     const char *, rcutils_allocator_t *, rosidl_dynamic_typesupport_serialization_support_t *))
@@ -868,7 +868,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_feature_supported)
   GET_SYMBOL(rmw_take_dynamic_message)
   GET_SYMBOL(rmw_take_dynamic_message_with_info)
-  GET_SYMBOL(rmw_init_serialization_support)
+  GET_SYMBOL(rmw_serialization_support_init)
 }
 
 void * symbol_rmw_init = nullptr;
@@ -987,6 +987,6 @@ unload_library()
   symbol_rmw_feature_supported = nullptr;
   symbol_rmw_take_dynamic_message = nullptr;
   symbol_rmw_take_dynamic_message_with_info = nullptr;
-  symbol_rmw_init_serialization_support = nullptr;
+  symbol_rmw_serialization_support_init = nullptr;
   g_rmw_lib.reset();
 }
