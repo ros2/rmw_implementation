@@ -2,6 +2,13 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Dynamic Subscription (BONUS: Allocators): rmw_implementation (`#219 <https://github.com/ros2/rmw_implementation/issues/219>`_)
+* Runtime Interface Reflection: rmw_implementation (`#215 <https://github.com/ros2/rmw_implementation/issues/215>`_)
+* Mark the benchmark _ variables as unused. (`#218 <https://github.com/ros2/rmw_implementation/issues/218>`_)
+* Contributors: Chris Lalancette, methylDragon
+
 2.11.0 (2023-02-13)
 -------------------
 * Update rmw_implementation to C++17. (`#214 <https://github.com/ros2/rmw_implementation/issues/214>`_)
