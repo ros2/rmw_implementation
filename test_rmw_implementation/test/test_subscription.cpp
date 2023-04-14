@@ -181,15 +181,8 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_unsupported_
   rmw_subscription_options_t options = rmw_get_default_subscription_options();
   auto allocator = rcutils_get_default_allocator();
 
-  rmw_subscription_content_filter_options_t * content_filter_options =
-    static_cast<rmw_subscription_content_filter_options_t *>(
-    allocator.allocate(
-      sizeof(rmw_subscription_content_filter_options_t), allocator.state));
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    allocator.deallocate(content_filter_options, allocator.state);
-  });
-  *content_filter_options = rmw_get_zero_initialized_content_filter_options();
+  rmw_subscription_content_filter_options_t content_filter_options =
+    rmw_get_zero_initialized_content_filter_options();
 
   EXPECT_EQ(
     RMW_RET_OK, rmw_subscription_content_filter_options_init(
@@ -197,14 +190,14 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), create_with_unsupported_
       0,
       NULL,
       &allocator,
-      content_filter_options));
+      &content_filter_options));
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     EXPECT_EQ(
       RMW_RET_OK,
-      rmw_subscription_content_filter_options_fini(content_filter_options, &allocator));
+      rmw_subscription_content_filter_options_fini(&content_filter_options, &allocator));
   });
-  options.content_filter_options = content_filter_options;
+  options.content_filter_options = &content_filter_options;
 
   rmw_subscription_t * sub =
     rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &options);
