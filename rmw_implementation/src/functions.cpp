@@ -330,6 +330,11 @@ RMW_INTERFACE_FN(
   2, ARG_TYPES(const rmw_publisher_t *, size_t *))
 
 RMW_INTERFACE_FN(
+  rmw_publisher_count_non_local_matched_subscriptions,
+  rmw_ret_t, RMW_RET_ERROR,
+  2, ARG_TYPES(const rmw_publisher_t *, size_t *))
+
+RMW_INTERFACE_FN(
   rmw_publisher_get_actual_qos,
   rmw_ret_t, RMW_RET_ERROR,
   2, ARG_TYPES(const rmw_publisher_t *, rmw_qos_profile_t *))
@@ -808,6 +813,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_publish)
   GET_SYMBOL(rmw_publish_loaned_message)
   GET_SYMBOL(rmw_publisher_count_matched_subscriptions)
+  GET_SYMBOL(rmw_publisher_count_non_local_matched_subscriptions)
   GET_SYMBOL(rmw_publisher_get_actual_qos)
   GET_SYMBOL(rmw_publisher_event_init)
   GET_SYMBOL(rmw_publish_serialized_message)
@@ -927,6 +933,7 @@ unload_library()
   symbol_rmw_publish = nullptr;
   symbol_rmw_publish_loaned_message = nullptr;
   symbol_rmw_publisher_count_matched_subscriptions = nullptr;
+  symbol_rmw_publisher_count_non_local_matched_subscriptions = nullptr;
   symbol_rmw_publisher_get_actual_qos = nullptr;
   symbol_rmw_publisher_event_init = nullptr;
   symbol_rmw_publish_serialized_message = nullptr;
