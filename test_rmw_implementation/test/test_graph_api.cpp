@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <chrono>
 
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
 
@@ -979,36 +978,84 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_and_services) 
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
   size_t count = 0u;
-
+  rmw_ret_t ret;
   rmw_service_t * srv = rmw_create_service(
     other_node, ts, service_name, &rmw_qos_profile_services_default);
   ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(RMW_RET_OK, rmw_count_services(node, service_name, &count));
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_services(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 1u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_services(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
   EXPECT_EQ(1u, count);
   count = 0u;
 
   rmw_client_t * client = rmw_create_client(
     other_node, ts, service_name, &rmw_qos_profile_services_default);
   ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(RMW_RET_OK, rmw_count_clients(node, service_name, &count));
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_clients(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 1u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_clients(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
   EXPECT_EQ(1u, count);
   count = 0u;
 
   rmw_service_t * srv2 = rmw_create_service(
     node, ts, service_name, &rmw_qos_profile_services_default);
   ASSERT_NE(nullptr, srv2) << rmw_get_error_string().str;
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(RMW_RET_OK, rmw_count_services(other_node, service_name, &count));
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_services(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 2u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_services(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
   EXPECT_EQ(2u, count);
   count = 0u;
 
   rmw_client_t * client2 = rmw_create_client(
     node, ts, service_name, &rmw_qos_profile_services_default);
   ASSERT_NE(nullptr, client2) << rmw_get_error_string().str;
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  EXPECT_EQ(RMW_RET_OK, rmw_count_clients(other_node, service_name, &count));
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_clients(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 2u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_clients(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
   EXPECT_EQ(2u, count);
 
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_client(other_node, client)) << rmw_get_error_string().str;
