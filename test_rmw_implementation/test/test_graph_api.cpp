@@ -931,12 +931,12 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_with_bad_argum
   node->implementation_identifier = implementation_identifier;
   rmw_reset_error();
 
-  // A null topic name is an invalid argument.
+  // A null service name is an invalid argument.
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, nullptr, &count));
   rmw_reset_error();
 
-  // An invalid topic name is an invalid argument.
-  constexpr char invalid_service_name[] = "not a valid topic name !";
+  // An invalid service name is an invalid argument.
+  constexpr char invalid_service_name[] = "not a valid service name !";
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, invalid_service_name, &count));
   rmw_reset_error();
 
@@ -959,12 +959,12 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_argu
   node->implementation_identifier = implementation_identifier;
   rmw_reset_error();
 
-  // A null topic name is an invalid argument.
+  // A null service name is an invalid argument.
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, nullptr, &count));
   rmw_reset_error();
 
-  // An invalid topic name is an invalid argument.
-  constexpr char invalid_service_name[] = "not a valid topic name !";
+  // An invalid service name is an invalid argument.
+  constexpr char invalid_service_name[] = "not a valid service name !";
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, invalid_service_name, &count));
   rmw_reset_error();
 
