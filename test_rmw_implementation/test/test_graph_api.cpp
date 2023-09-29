@@ -27,6 +27,8 @@
 #include "rmw/rmw.h"
 #include "rmw/sanity_checks.h"
 
+#include "test_msgs/srv/basic_types.h"
+
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
@@ -912,4 +914,152 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_subscribers_with_bad_a
   // A null count is an invalid argument.
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_subscribers(node, topic_name, nullptr));
   rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_with_bad_arguments) {
+  size_t count = 0u;
+  constexpr char service_name[] = "/test_service";
+
+  // A null node is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(nullptr, service_name, &count));
+  rmw_reset_error();
+
+  // A node from a different implementation cannot be used to query.
+  const char * implementation_identifier = node->implementation_identifier;
+  node->implementation_identifier = "not-an-rmw-implementation-identifier";
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, rmw_count_clients(node, service_name, &count));
+  node->implementation_identifier = implementation_identifier;
+  rmw_reset_error();
+
+  // A null service name is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, nullptr, &count));
+  rmw_reset_error();
+
+  // An invalid service name is an invalid argument.
+  constexpr char invalid_service_name[] = "not a valid service name !";
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, invalid_service_name, &count));
+  rmw_reset_error();
+
+  // A null count is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_clients(node, service_name, nullptr));
+  rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_arguments) {
+  size_t count = 0u;
+  constexpr char service_name[] = "/test_service";
+  // A null node is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(nullptr, service_name, &count));
+  rmw_reset_error();
+
+  // A node from a different implementation cannot be used to query.
+  const char * implementation_identifier = node->implementation_identifier;
+  node->implementation_identifier = "not-an-rmw-implementation-identifier";
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, rmw_count_services(node, service_name, &count));
+  node->implementation_identifier = implementation_identifier;
+  rmw_reset_error();
+
+  // A null service name is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, nullptr, &count));
+  rmw_reset_error();
+
+  // An invalid service name is an invalid argument.
+  constexpr char invalid_service_name[] = "not a valid service name !";
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, invalid_service_name, &count));
+  rmw_reset_error();
+
+  // A null count is an invalid argument.
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_count_services(node, service_name, nullptr));
+  rmw_reset_error();
+}
+
+TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_and_services) {
+  constexpr char service_name[] = "/test_service";
+  const rosidl_service_type_support_t * ts =
+    ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
+  size_t count = 0u;
+  rmw_ret_t ret;
+  rmw_service_t * srv = rmw_create_service(
+    other_node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_services(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 1u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_services(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(1u, count);
+  count = 0u;
+
+  rmw_client_t * client = rmw_create_client(
+    other_node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_clients(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 1u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_clients(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(1u, count);
+  count = 0u;
+
+  rmw_service_t * srv2 = rmw_create_service(
+    node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, srv2) << rmw_get_error_string().str;
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_services(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 2u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_services(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(2u, count);
+  count = 0u;
+
+  rmw_client_t * client2 = rmw_create_client(
+    node, ts, service_name, &rmw_qos_profile_services_default);
+  ASSERT_NE(nullptr, client2) << rmw_get_error_string().str;
+
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_count_clients(node, service_name, &count);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (RMW_RET_OK == ret && 2u == count) {
+      break;
+    }
+  }
+
+  EXPECT_NO_MEMORY_OPERATIONS(
+  {
+    ret = rmw_count_clients(node, service_name, &count);
+  });
+  EXPECT_EQ(RMW_RET_OK, ret);
+  EXPECT_EQ(2u, count);
+
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_client(other_node, client)) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_service(other_node, srv)) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_client(node, client2)) << rmw_get_error_string().str;
+  EXPECT_EQ(RMW_RET_OK, rmw_destroy_service(node, srv2)) << rmw_get_error_string().str;
 }
