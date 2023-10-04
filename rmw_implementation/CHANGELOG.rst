@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add rmw_count_clients,services & test (`#208 <https://github.com/ros2/rmw_implementation/issues/208>`_)
+* Contributors: Minju, Lee
+
 2.13.0 (2023-04-27)
 -------------------
 
