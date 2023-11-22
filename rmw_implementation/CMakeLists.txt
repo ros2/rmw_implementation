@@ -81,12 +81,12 @@ else()
   if(BUILD_TESTING)
     find_package(ament_cmake_gtest REQUIRED)
     ament_add_gtest(test_functions test/test_functions.cpp)
-    ament_target_dependencies(test_functions rcutils rmw)
     target_link_libraries(test_functions
       ${PROJECT_NAME}
-      ament_index_cpp::ament_index_cpp
       rcpputils::rcpputils
-      rcutils::rcutils)
+      rcutils::rcutils
+      rmw::rmw
+    )
 
     find_package(performance_test_fixture REQUIRED)
     # Give cppcheck hints about macro definitions coming from outside this package
