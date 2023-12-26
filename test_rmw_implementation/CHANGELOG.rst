@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Switch to using target_link_libraries everywhere. (`#222 <https://github.com/ros2/rmw_implementation/issues/222>`_)
+* Contributors: Chris Lalancette
+
 2.14.0 (2023-10-04)
 -------------------
 * Add rmw_count_clients,services & test (`#208 <https://github.com/ros2/rmw_implementation/issues/208>`_)
