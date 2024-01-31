@@ -39,7 +39,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestGraphAPI, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override

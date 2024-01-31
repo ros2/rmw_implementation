@@ -40,7 +40,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestSerializeDeserialize, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 };
 

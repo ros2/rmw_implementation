@@ -33,7 +33,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -209,7 +209,7 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids) {
   EXPECT_TRUE(are_equal);
 }
 
-class CLASSNAME (TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION)
+class CLASSNAME(TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION)
 {
 protected:
@@ -268,7 +268,7 @@ TEST_F(CLASSNAME(TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION)
 }
 
 
-class CLASSNAME (TestUniqueIdentifiersForMultipleClients, RMW_IMPLEMENTATION)
+class CLASSNAME(TestUniqueIdentifiersForMultipleClients, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION)
 {
 protected:

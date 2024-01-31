@@ -22,7 +22,9 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestSubscriptionAllocator, RMW_IMPLEMENTATION) : public ::testing::Test {};
+class CLASSNAME(TestSubscriptionAllocator, RMW_IMPLEMENTATION) : public ::testing::Test
+{
+};
 
 TEST_F(CLASSNAME(TestSubscriptionAllocator, RMW_IMPLEMENTATION), init_fini_subscription_allocation)
 {

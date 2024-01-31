@@ -36,7 +36,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestService, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestService, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -198,7 +198,7 @@ TEST_F(CLASSNAME(TestService, RMW_IMPLEMENTATION), destroy_with_internal_errors)
   });
 }
 
-class CLASSNAME (TestServiceUse, RMW_IMPLEMENTATION)
+class CLASSNAME(TestServiceUse, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestService, RMW_IMPLEMENTATION)
 {
 protected:

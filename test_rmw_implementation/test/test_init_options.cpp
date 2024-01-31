@@ -30,7 +30,9 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestInitOptions, RMW_IMPLEMENTATION) : public ::testing::Test {};
+class CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION) : public ::testing::Test
+{
+};
 
 TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_copy_fini) {
   rmw_init_options_t src_options = rmw_get_zero_initialized_init_options();

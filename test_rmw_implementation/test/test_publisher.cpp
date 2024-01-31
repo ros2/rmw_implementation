@@ -36,7 +36,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestPublisher, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestPublisher, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -262,7 +262,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestPublisherUse, RMW_IMPLEMENTATION)
+class CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestPublisher, RMW_IMPLEMENTATION)
 {
 protected:
@@ -537,7 +537,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), wait_for_all_acked_with_
 }
 
 
-class CLASSNAME (TestPublisherUseLoan, RMW_IMPLEMENTATION)
+class CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
 {
 protected:

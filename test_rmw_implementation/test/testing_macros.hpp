@@ -28,8 +28,8 @@
  * \note Time is measured against OS provided steady clock.
  */
 #define SLEEP_AND_RETRY_UNTIL(delay, timeout) for ( \
-    auto loop_start_time = std::chrono::steady_clock::now(); \
-    std::chrono::steady_clock::now() - loop_start_time < timeout; \
-    std::this_thread::sleep_for(delay))
+          auto loop_start_time = std::chrono::steady_clock::now(); \
+          std::chrono::steady_clock::now() - loop_start_time < timeout; \
+          std::this_thread::sleep_for(delay))
 
 #endif  // TESTING_MACROS_HPP_

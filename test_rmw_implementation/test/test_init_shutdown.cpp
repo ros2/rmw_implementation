@@ -33,7 +33,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestInitShutdown, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestInitShutdown, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override

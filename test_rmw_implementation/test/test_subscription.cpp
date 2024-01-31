@@ -43,7 +43,7 @@
 
 using rmw_dds_common::operator==;
 
-class CLASSNAME (TestSubscription, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestSubscription, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -272,7 +272,7 @@ TEST_F(CLASSNAME(TestSubscription, RMW_IMPLEMENTATION), get_actual_qos_from_syst
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestSubscriptionUse, RMW_IMPLEMENTATION)
+class CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestSubscription, RMW_IMPLEMENTATION)
 {
 protected:
@@ -1013,7 +1013,7 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), no_content_filter_set
   }
 }
 
-class CLASSNAME (TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
+class CLASSNAME(TestSubscriptionUseLoan, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION)
 {
 protected:
@@ -1185,7 +1185,7 @@ bool operator==(const rmw_message_info_t & m1, const rmw_message_info_t & m2)
          m1.from_intra_process == m2.from_intra_process;
 }
 
-class CLASSNAME (TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION)
+class CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestSubscription, RMW_IMPLEMENTATION)
 {
 protected:

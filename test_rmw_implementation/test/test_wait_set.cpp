@@ -34,7 +34,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestWaitSet, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -98,7 +98,7 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_create_wait_set)
   });
 }
 
-class CLASSNAME (TestWaitSetUse, RMW_IMPLEMENTATION)
+class CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION)
   : public CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION)
 {
 protected:
@@ -159,9 +159,9 @@ protected:
 // Macro to initialize and manage rmw_wait input arrays.
 // Requires `size` to a constant expression.
 #define INITIALIZE_ARRAY(var_name, internal_var_name, size) \
-  void * var_name ## _storage[size]; \
-  var_name.internal_var_name ## s = var_name ## _storage; \
-  var_name.internal_var_name ## _count = size;
+        void * var_name ## _storage[size]; \
+        var_name.internal_var_name ## s = var_name ## _storage; \
+        var_name.internal_var_name ## _count = size;
 
 TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
 {

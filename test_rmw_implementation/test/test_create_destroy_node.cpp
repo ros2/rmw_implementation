@@ -32,7 +32,7 @@
 # define CLASSNAME(NAME, SUFFIX) NAME
 #endif
 
-class CLASSNAME (TestNodeConstructionDestruction, RMW_IMPLEMENTATION) : public ::testing::Test
+class CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -136,7 +136,8 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_an
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestLocalhostNodeConstructionDestruction,
+class CLASSNAME(
+  TestLocalhostNodeConstructionDestruction,
   RMW_IMPLEMENTATION) : public ::testing::Test
 {
 protected:
