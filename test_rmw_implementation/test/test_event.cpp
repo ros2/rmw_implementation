@@ -29,14 +29,7 @@
 
 #include "test_msgs/msg/basic_types.h"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestEvent, RMW_IMPLEMENTATION) : public ::testing::Test
+class TestEvent : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -116,7 +109,7 @@ void event_callback(const void * user_data, size_t number_of_events)
 }
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_matched_event) {
+TEST_F(TestEvent, basic_publisher_matched_event) {
   // Notice: Not support connextdds since it doesn't support rmw_event_set_callback() interface
   if (std::string(rmw_get_implementation_identifier()).find("rmw_connextdds") == 0) {
     GTEST_SKIP();
@@ -204,7 +197,7 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_publisher_matched_event) 
   EXPECT_EQ(-2, matched_status.current_count_change);
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_matched_event) {
+TEST_F(TestEvent, basic_subscription_matched_event) {
   // Notice: Not support connextdds since it doesn't support rmw_event_set_callback() interface
   if (std::string(rmw_get_implementation_identifier()).find("rmw_connextdds") == 0) {
     GTEST_SKIP();
@@ -295,7 +288,7 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), basic_subscription_matched_even
   EXPECT_EQ(-2, matched_status.current_count_change);
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_pub_multi_sub_connect_disconnect) {
+TEST_F(TestEvent, one_pub_multi_sub_connect_disconnect) {
   rmw_publisher_t * pub =
     rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &pub_options);
   ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
@@ -354,7 +347,7 @@ TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_pub_multi_sub_connect_disco
   EXPECT_EQ(-1, matched_status.current_count_change);
 }
 
-TEST_F(CLASSNAME(TestEvent, RMW_IMPLEMENTATION), one_sub_multi_pub_matched_unmatched_event) {
+TEST_F(TestEvent, one_sub_multi_pub_matched_unmatched_event) {
   rmw_subscription_t * sub =
     rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
   ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;

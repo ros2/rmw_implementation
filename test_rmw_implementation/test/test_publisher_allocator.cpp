@@ -15,16 +15,7 @@
 
 #include "rmw/rmw.h"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestPublisherAllocator, RMW_IMPLEMENTATION) : public ::testing::Test {};
-
-TEST_F(CLASSNAME(TestPublisherAllocator, RMW_IMPLEMENTATION), init_fini_publisher_allocation)
+TEST(TestPublisherAllocator, init_fini_publisher_allocation)
 {
   if (rmw_init_publisher_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
     // Add tests here when the implementation it's supported

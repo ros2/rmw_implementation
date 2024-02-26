@@ -23,16 +23,7 @@
 
 #include "./allocator_testing_utils.h"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestInitOptions, RMW_IMPLEMENTATION) : public ::testing::Test {};
-
-TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_copy_fini) {
+TEST(TestInitOptions, init_copy_fini) {
   rmw_init_options_t src_options = rmw_get_zero_initialized_init_options();
   rmw_ret_t ret = rmw_init_options_init(&src_options, rcutils_get_default_allocator());
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
@@ -63,7 +54,7 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_copy_fini) {
   rcutils_reset_error();
 }
 
-TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_with_bad_arguments) {
+TEST(TestInitOptions, init_with_bad_arguments) {
   rmw_init_options_t options = rmw_get_zero_initialized_init_options();
   rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_zero_initialized_allocator());
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
@@ -80,7 +71,7 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), init_with_bad_arguments) 
   EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), copy_with_bad_arguments) {
+TEST(TestInitOptions, copy_with_bad_arguments) {
   rmw_init_options_t src_options = rmw_get_zero_initialized_init_options();
   rmw_init_options_t dst_options = rmw_get_zero_initialized_init_options();
 
@@ -118,7 +109,7 @@ TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), copy_with_bad_arguments) 
   EXPECT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestInitOptions, RMW_IMPLEMENTATION), fini_with_bad_arguments) {
+TEST(TestInitOptions, fini_with_bad_arguments) {
   rmw_init_options_t options = rmw_get_zero_initialized_init_options();
   rmw_ret_t ret = rmw_init_options_fini(&options);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);

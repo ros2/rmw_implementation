@@ -32,14 +32,7 @@
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestGraphAPI, RMW_IMPLEMENTATION) : public ::testing::Test
+class TestGraphAPI : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -83,7 +76,7 @@ protected:
   const char * const other_node_namespace = "/my_other_test_ns";
 };
 
-TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), get_node_names_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_node_names_with_bad_arguments) {
   rcutils_string_array_t node_names = rcutils_get_zero_initialized_string_array();
   rcutils_string_array_t node_namespaces = rcutils_get_zero_initialized_string_array();
 
@@ -140,9 +133,7 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), get_node_names_with_bad_argu
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_node_names_with_enclaves_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_node_names_with_enclaves_with_bad_arguments) {
   rcutils_string_array_t node_names = rcutils_get_zero_initialized_string_array();
   rcutils_string_array_t node_namespaces = rcutils_get_zero_initialized_string_array();
   rcutils_string_array_t enclaves = rcutils_get_zero_initialized_string_array();
@@ -223,9 +214,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_topic_names_and_types_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_topic_names_and_types_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t topic_names_and_types = rmw_get_zero_initialized_names_and_types();
   bool no_demangle = false;
@@ -269,9 +258,7 @@ TEST_F(
   rmw_reset_error();
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_service_names_and_types_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_service_names_and_types_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t service_names_and_types = rmw_get_zero_initialized_names_and_types();
 
@@ -313,9 +300,7 @@ TEST_F(
   rmw_reset_error();
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_subscriber_names_and_types_by_node_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_subscriber_names_and_types_by_node_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t topic_names_and_types = rmw_get_zero_initialized_names_and_types();
   bool no_demangle = false;
@@ -418,9 +403,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&topic_names_and_types));
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_publisher_names_and_types_by_node_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_publisher_names_and_types_by_node_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t topic_names_and_types = rmw_get_zero_initialized_names_and_types();
   bool no_demangle = false;
@@ -523,9 +506,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&topic_names_and_types));
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_service_names_and_types_by_node_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_service_names_and_types_by_node_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t service_names_and_types = rmw_get_zero_initialized_names_and_types();
 
@@ -626,9 +607,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&service_names_and_types));
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_client_names_and_types_by_node_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_client_names_and_types_by_node_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   rmw_names_and_types_t service_names_and_types = rmw_get_zero_initialized_names_and_types();
 
@@ -729,9 +708,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, rmw_names_and_types_check_zero(&service_names_and_types));
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_publishers_info_by_topic_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_publishers_info_by_topic_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   constexpr char topic_name[] = "/test_topic";
   bool no_mangle = false;
@@ -793,9 +770,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(
-  CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION),
-  get_subscriptions_info_by_topic_with_bad_arguments) {
+TEST_F(TestGraphAPI, get_subscriptions_info_by_topic_with_bad_arguments) {
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
   constexpr char topic_name[] = "/test_topic";
   bool no_mangle = false;
@@ -858,7 +833,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_publishers_with_bad_arguments) {
+TEST_F(TestGraphAPI, count_publishers_with_bad_arguments) {
   size_t count = 0u;
   constexpr char topic_name[] = "/test_topic";
 
@@ -887,7 +862,7 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_publishers_with_bad_ar
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_subscribers_with_bad_arguments) {
+TEST_F(TestGraphAPI, count_subscribers_with_bad_arguments) {
   size_t count = 0u;
   constexpr char topic_name[] = "/test_topic";
 
@@ -916,7 +891,7 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_subscribers_with_bad_a
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_with_bad_arguments) {
+TEST_F(TestGraphAPI, count_clients_with_bad_arguments) {
   size_t count = 0u;
   constexpr char service_name[] = "/test_service";
 
@@ -945,7 +920,7 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_with_bad_argum
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_arguments) {
+TEST_F(TestGraphAPI, count_services_with_bad_arguments) {
   size_t count = 0u;
   constexpr char service_name[] = "/test_service";
   // A null node is an invalid argument.
@@ -973,7 +948,7 @@ TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_services_with_bad_argu
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestGraphAPI, RMW_IMPLEMENTATION), count_clients_and_services) {
+TEST_F(TestGraphAPI, count_clients_and_services) {
   constexpr char service_name[] = "/test_service";
   const rosidl_service_type_support_t * ts =
     ROSIDL_GET_SRV_TYPE_SUPPORT(test_msgs, srv, BasicTypes);
