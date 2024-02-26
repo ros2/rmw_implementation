@@ -15,16 +15,7 @@
 
 #include "rmw/rmw.h"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestSubscriptionAllocator, RMW_IMPLEMENTATION) : public ::testing::Test {};
-
-TEST_F(CLASSNAME(TestSubscriptionAllocator, RMW_IMPLEMENTATION), init_fini_subscription_allocation)
+TEST(TestSubscriptionAllocator, init_fini_subscription_allocation)
 {
   if (rmw_init_subscription_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
     // Add tests here when the implementation it's supported

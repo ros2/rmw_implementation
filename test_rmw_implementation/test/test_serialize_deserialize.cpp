@@ -33,24 +33,13 @@
 
 #include "./allocator_testing_utils.h"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestSerializeDeserialize, RMW_IMPLEMENTATION) : public ::testing::Test
-{
-};
-
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), get_serialization_format) {
+TEST(TestSerializeDeserialize, get_serialization_format) {
   const char * serialization_format = rmw_get_serialization_format();
   EXPECT_NE(nullptr, serialization_format);
   EXPECT_STREQ(serialization_format, rmw_get_serialization_format());
 }
 
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_bad_arguments) {
+TEST(TestSerializeDeserialize, serialize_with_bad_arguments) {
   const rosidl_message_type_support_t * ts{
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes)};
   test_msgs__msg__BasicTypes input_message{};
@@ -86,7 +75,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), serialize_with_b
     rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_c_message) {
+TEST(TestSerializeDeserialize, clean_round_trip_for_c_message) {
   const rosidl_message_type_support_t * ts{
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes)};
   test_msgs__msg__BasicTypes input_message{};
@@ -119,10 +108,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
     rmw_get_error_string().str;
 }
 
-TEST_F(
-  CLASSNAME(
-    TestSerializeDeserialize,
-    RMW_IMPLEMENTATION), clean_round_trip_for_c_bounded_message) {
+TEST(TestSerializeDeserialize, clean_round_trip_for_c_bounded_message) {
   const rosidl_message_type_support_t * ts{
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BoundedPlainSequences)};
   test_msgs__msg__BoundedPlainSequences input_message{};
@@ -185,7 +171,7 @@ TEST_F(
   EXPECT_EQ(input_message.uint16_values.data[0], output_message.uint16_values.data[0]);
 }
 
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_message) {
+TEST(TestSerializeDeserialize, clean_round_trip_for_cpp_message) {
   const rosidl_message_type_support_t * ts =
     rosidl_typesupport_cpp::get_message_type_support_handle<test_msgs::msg::BasicTypes>();
   test_msgs::msg::BasicTypes input_message{};
@@ -214,10 +200,7 @@ TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip
     rmw_get_error_string().str;
 }
 
-TEST_F(
-  CLASSNAME(
-    TestSerializeDeserialize,
-    RMW_IMPLEMENTATION), clean_round_trip_for_cpp_bounded_message) {
+TEST(TestSerializeDeserialize, clean_round_trip_for_cpp_bounded_message) {
   using TestMessage = test_msgs::msg::BoundedPlainSequences;
   const rosidl_message_type_support_t * ts =
     rosidl_typesupport_cpp::get_message_type_support_handle<TestMessage>();
@@ -261,7 +244,7 @@ TEST_F(
   EXPECT_EQ(input_message, output_message);
 }
 
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), rmw_get_serialized_message_size)
+TEST(TestSerializeDeserialize, rmw_get_serialized_message_size)
 {
   if (rmw_get_serialized_message_size(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
     // TODO(anyone): Add tests here when the implementation it's supported

@@ -25,15 +25,7 @@
 #include "test_msgs/msg/basic_types.h"
 #include "test_msgs/srv/basic_types.h"
 
-
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestUniqueIdentifierAPI, RMW_IMPLEMENTATION) : public ::testing::Test
+class TestUniqueIdentifierAPI : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -89,7 +81,7 @@ protected:
   rmw_client_t * client{nullptr};
 };
 
-TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_pub_gid_with_bad_args) {
+TEST_F(TestUniqueIdentifierAPI, get_pub_gid_with_bad_args) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -124,7 +116,7 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_pub_gid_with_
 }
 
 
-TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_client_gid_with_bad_args) {
+TEST_F(TestUniqueIdentifierAPI, get_client_gid_with_bad_args) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_client(client, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -158,7 +150,7 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), get_client_gid_wi
   EXPECT_TRUE(gids_are_equal);
 }
 
-TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids_with_bad_args) {
+TEST_F(TestUniqueIdentifierAPI, compare_gids_with_bad_args) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -192,7 +184,7 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids_with
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids) {
+TEST_F(TestUniqueIdentifierAPI, compare_gids) {
   rmw_gid_t gid{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &gid);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -209,14 +201,12 @@ TEST_F(CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION), compare_gids) {
   EXPECT_TRUE(are_equal);
 }
 
-class CLASSNAME (TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION)
-  : public CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION)
+class TestUniqueIdentifiersForMultiplePublishers : public TestUniqueIdentifierAPI
 {
 protected:
-  using Base = CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION);
   void SetUp() override
   {
-    Base::SetUp();
+    TestUniqueIdentifierAPI::SetUp();
     rmw_publisher_options_t options = rmw_get_default_publisher_options();
     constexpr char topic1_name[] = "/test0";
     first_pub_for_topic1 = rmw_create_publisher(
@@ -234,7 +224,7 @@ protected:
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_publisher(node, first_pub_for_topic1);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    Base::TearDown();
+    TestUniqueIdentifierAPI::TearDown();
   }
 
   rmw_publisher_t * first_pub_for_topic1{nullptr};
@@ -242,7 +232,7 @@ protected:
   rmw_publisher_t * pub_for_topic0{nullptr};
 };
 
-TEST_F(CLASSNAME(TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION), different_pubs) {
+TEST_F(TestUniqueIdentifiersForMultiplePublishers, different_pubs) {
   rmw_gid_t gid_of_pub_for_topic0{};
   rmw_ret_t ret = rmw_get_gid_for_publisher(pub_for_topic0, &gid_of_pub_for_topic0);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -268,14 +258,12 @@ TEST_F(CLASSNAME(TestUniqueIdentifiersForMultiplePublishers, RMW_IMPLEMENTATION)
 }
 
 
-class CLASSNAME (TestUniqueIdentifiersForMultipleClients, RMW_IMPLEMENTATION)
-  : public CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION)
+class TestUniqueIdentifiersForMultipleClients : public TestUniqueIdentifierAPI
 {
 protected:
-  using Base = CLASSNAME(TestUniqueIdentifierAPI, RMW_IMPLEMENTATION);
   void SetUp() override
   {
-    Base::SetUp();
+    TestUniqueIdentifierAPI::SetUp();
     constexpr char service_name[] = "/test_service1";
     first_client_for_service1 = rmw_create_client(
       node, srv_ts, service_name, &qos_profile);
@@ -292,7 +280,7 @@ protected:
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_client(node, second_client_for_service1);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    Base::TearDown();
+    TestUniqueIdentifierAPI::TearDown();
   }
 
   rmw_client_t * client_for_service0{nullptr};
@@ -301,7 +289,7 @@ protected:
 };
 
 
-TEST_F(CLASSNAME(TestUniqueIdentifiersForMultipleClients, RMW_IMPLEMENTATION), different_clis) {
+TEST_F(TestUniqueIdentifiersForMultipleClients, different_clis) {
   rmw_gid_t gid_of_client_for_service0{};
   rmw_ret_t ret = rmw_get_gid_for_client(client_for_service0, &gid_of_client_for_service0);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;

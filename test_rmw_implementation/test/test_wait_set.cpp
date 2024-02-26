@@ -27,14 +27,7 @@
 #include "test_msgs/msg/basic_types.h"
 #include "test_msgs/srv/basic_types.h"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestWaitSet, RMW_IMPLEMENTATION) : public ::testing::Test
+class TestWaitSet : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -65,7 +58,7 @@ protected:
   rmw_context_t context;
 };
 
-TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_create_wait_set)
+TEST_F(TestWaitSet, rmw_create_wait_set)
 {
   // Created a valid wait_set
   rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 0);
@@ -98,15 +91,12 @@ TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_create_wait_set)
   });
 }
 
-class CLASSNAME (TestWaitSetUse, RMW_IMPLEMENTATION)
-  : public CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION)
+class TestWaitSetUse : public TestWaitSet
 {
 protected:
-  using Base = CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION);
-
   void SetUp() override
   {
-    Base::SetUp();
+    TestWaitSet::SetUp();
     constexpr char node_name[] = "my_node";
     constexpr char node_namespace[] = "/my_ns";
     node = rmw_create_node(&context, node_name, node_namespace);
@@ -145,7 +135,7 @@ protected:
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
     ret = rmw_destroy_node(node);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    Base::TearDown();
+    TestWaitSet::TearDown();
   }
 
   rmw_node_t * node{nullptr};
@@ -163,7 +153,7 @@ protected:
   var_name.internal_var_name ## s = var_name ## _storage; \
   var_name.internal_var_name ## _count = size;
 
-TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
+TEST_F(TestWaitSetUse, rmw_wait)
 {
   constexpr size_t number_of_subscriptions = 1u;
   constexpr size_t number_of_guard_conditions = 1u;
@@ -390,7 +380,7 @@ TEST_F(CLASSNAME(TestWaitSetUse, RMW_IMPLEMENTATION), rmw_wait)
   });
 }
 
-TEST_F(CLASSNAME(TestWaitSet, RMW_IMPLEMENTATION), rmw_destroy_wait_set)
+TEST_F(TestWaitSet, rmw_destroy_wait_set)
 {
   // Try to destroy a nullptr
   rmw_ret_t ret = rmw_destroy_wait_set(nullptr);

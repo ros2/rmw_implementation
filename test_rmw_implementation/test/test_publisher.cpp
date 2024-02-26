@@ -29,14 +29,7 @@
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestPublisher, RMW_IMPLEMENTATION) : public ::testing::Test
+class TestPublisher : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -72,7 +65,7 @@ protected:
   rmw_node_t * node;
 };
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy) {
+TEST_F(TestPublisher, create_and_destroy) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
@@ -84,7 +77,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_internal_errors) {
+TEST_F(TestPublisher, create_with_internal_errors) {
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
@@ -106,7 +99,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_internal_errors
   });
 }
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy_native) {
+TEST_F(TestPublisher, create_and_destroy_native) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
   constexpr char topic_name[] = "test";
   const rosidl_message_type_support_t * ts =
@@ -120,7 +113,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_and_destroy_native) 
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) {
+TEST_F(TestPublisher, create_with_bad_arguments) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
@@ -187,7 +180,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), create_with_bad_arguments) 
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
+TEST_F(TestPublisher, destroy_with_bad_arguments) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
@@ -218,7 +211,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_bad_arguments)
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_internal_errors) {
+TEST_F(TestPublisher, destroy_with_internal_errors) {
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
     ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes);
@@ -238,7 +231,7 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), destroy_with_internal_error
   });
 }
 
-TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_defaults) {
+TEST_F(TestPublisher, get_actual_qos_from_system_defaults) {
   rmw_publisher_options_t options = rmw_get_default_publisher_options();
   constexpr char topic_name[] = "/test";
   const rosidl_message_type_support_t * ts =
@@ -262,15 +255,12 @@ TEST_F(CLASSNAME(TestPublisher, RMW_IMPLEMENTATION), get_actual_qos_from_system_
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestPublisherUse, RMW_IMPLEMENTATION)
-  : public CLASSNAME(TestPublisher, RMW_IMPLEMENTATION)
+class TestPublisherUse : public TestPublisher
 {
 protected:
-  using Base = CLASSNAME(TestPublisher, RMW_IMPLEMENTATION);
-
   void SetUp() override
   {
-    Base::SetUp();
+    TestPublisher::SetUp();
     // Relax QoS policies to force mismatch.
     qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
     rmw_publisher_options_t options = rmw_get_default_publisher_options();
@@ -282,7 +272,7 @@ protected:
   {
     rmw_ret_t ret = rmw_destroy_publisher(node, pub);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
-    Base::TearDown();
+    TestPublisher::TearDown();
   }
 
   rmw_publisher_t * pub{nullptr};
@@ -292,7 +282,7 @@ protected:
   rmw_qos_profile_t qos_profile{rmw_qos_profile_default};
 };
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos_with_bad_arguments) {
+TEST_F(TestPublisherUse, get_actual_qos_with_bad_arguments) {
   rmw_qos_profile_t actual_qos_profile = rmw_qos_profile_unknown;
   rmw_ret_t ret = rmw_publisher_get_actual_qos(nullptr, &actual_qos_profile);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
@@ -310,7 +300,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos_with_bad_
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos) {
+TEST_F(TestPublisherUse, get_actual_qos) {
   rmw_qos_profile_t actual_qos_profile = rmw_qos_profile_unknown;
   rmw_ret_t ret = rmw_publisher_get_actual_qos(pub, &actual_qos_profile);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -320,7 +310,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), get_actual_qos) {
   EXPECT_EQ(qos_profile.durability, actual_qos_profile.durability);
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscriptions_with_bad_args) {
+TEST_F(TestPublisherUse, count_matched_subscriptions_with_bad_args) {
   size_t subscription_count = 0u;
   rmw_ret_t ret = rmw_publisher_count_matched_subscriptions(nullptr, &subscription_count);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
@@ -338,7 +328,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscripti
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscriptions) {
+TEST_F(TestPublisherUse, count_matched_subscriptions) {
   osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
 
   rmw_ret_t ret;
@@ -388,7 +378,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_matched_subscripti
   EXPECT_EQ(0u, subscription_count);
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscriptions) {
+TEST_F(TestPublisherUse, count_mismatched_subscriptions) {
   osrf_testing_tools_cpp::memory_tools::ScopedQuickstartGtest sqg;
 
   rmw_ret_t ret;
@@ -433,9 +423,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), count_mismatched_subscri
   EXPECT_EQ(0u, subscription_count);
 }
 
-TEST_F(
-  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
-  publish_message_with_bad_arguments) {
+TEST_F(TestPublisherUse, publish_message_with_bad_arguments) {
   test_msgs__msg__BasicTypes input_message{};
   ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&input_message));
   rmw_publisher_allocation_t * null_allocation{nullptr};  // still valid allocation
@@ -458,7 +446,7 @@ TEST_F(
   test_msgs__msg__BasicTypes__fini(&input_message);
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_with_internal_errors) {
+TEST_F(TestPublisherUse, publish_with_internal_errors) {
   test_msgs__msg__BasicTypes message{};
   ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&message));
   rmw_publisher_allocation_t * null_allocation{nullptr};  // still a valid allocation
@@ -472,9 +460,7 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_with_internal_er
   });
 }
 
-TEST_F(
-  CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION),
-  publish_serialized_message_with_bad_arguments) {
+TEST_F(TestPublisherUse, publish_serialized_message_with_bad_arguments) {
   rmw_publisher_allocation_t * null_allocation{nullptr};  // still valid allocation
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
   rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
@@ -501,7 +487,7 @@ TEST_F(
     RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_serialized_with_internal_errors) {
+TEST_F(TestPublisherUse, publish_serialized_with_internal_errors) {
   test_msgs__msg__BasicTypes message{};
   ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&message));
   rcutils_allocator_t default_allocator = rcutils_get_default_allocator();
@@ -527,8 +513,8 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), publish_serialized_with_
   });
 }
 
-TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), wait_for_all_acked_with_best_effort) {
-  // For best effort, alway return RMW_RET_OK immediately
+TEST_F(TestPublisherUse, wait_for_all_acked_with_best_effort) {
+  // For best effort, always return RMW_RET_OK immediately
   rmw_ret_t ret = rmw_publisher_wait_for_all_acked(pub, {0, 0});
   EXPECT_EQ(ret, RMW_RET_OK);
 
@@ -537,15 +523,12 @@ TEST_F(CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION), wait_for_all_acked_with_
 }
 
 
-class CLASSNAME (TestPublisherUseLoan, RMW_IMPLEMENTATION)
-  : public CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION)
+class TestPublisherUseLoan : public TestPublisherUse
 {
 protected:
-  using Base = CLASSNAME(TestPublisherUse, RMW_IMPLEMENTATION);
-
   void SetUp() override
   {
-    Base::SetUp();
+    TestPublisherUse::SetUp();
     // Check if loaning is supported by the implementation
     if (!pub->can_loan_messages) {
       void * msg_pointer = nullptr;
@@ -568,13 +551,11 @@ protected:
 
   void TearDown() override
   {
-    Base::TearDown();
+    TestPublisherUse::TearDown();
   }
 };
 
-TEST_F(
-  CLASSNAME(TestPublisherUseLoan, RMW_IMPLEMENTATION),
-  borrow_loaned_message_with_bad_arguments) {
+TEST_F(TestPublisherUseLoan, borrow_loaned_message_with_bad_arguments) {
   void * msg_pointer = nullptr;
   rmw_ret_t ret = rmw_borrow_loaned_message(nullptr, ts, &msg_pointer);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;

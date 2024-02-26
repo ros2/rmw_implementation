@@ -24,15 +24,7 @@
 
 #include "./testing_macros.hpp"
 
-
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestNodeConstructionDestruction, RMW_IMPLEMENTATION) : public ::testing::Test
+class TestNodeConstructionDestruction : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -61,7 +53,7 @@ protected:
   rmw_context_t context;
 };
 
-TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_with_bad_arguments) {
+TEST_F(TestNodeConstructionDestruction, create_with_bad_arguments) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
 
@@ -107,7 +99,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_wi
   rmw_reset_error();
 }
 
-TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), destroy_with_bad_arguments) {
+TEST_F(TestNodeConstructionDestruction, destroy_with_bad_arguments) {
   rmw_ret_t ret = rmw_destroy_node(nullptr);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rmw_reset_error();
@@ -128,7 +120,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), destroy_w
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
-TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_and_destroy) {
+TEST_F(TestNodeConstructionDestruction, create_and_destroy) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
   rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
@@ -136,8 +128,7 @@ TEST_F(CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION), create_an
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
 
-class CLASSNAME (TestLocalhostNodeConstructionDestruction,
-  RMW_IMPLEMENTATION) : public ::testing::Test
+class TestLocalhostNodeConstructionDestruction : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -167,10 +158,7 @@ protected:
   rmw_context_t context;
 };
 
-TEST_F(
-  CLASSNAME(
-    TestLocalhostNodeConstructionDestruction,
-    RMW_IMPLEMENTATION), create_and_destroy) {
+TEST_F(TestLocalhostNodeConstructionDestruction, create_and_destroy) {
   const char * const node_name = "my_node";
   const char * const node_namespace = "/my_ns";
   rmw_node_t * node = rmw_create_node(&context, node_name, node_namespace);
@@ -178,9 +166,7 @@ TEST_F(
   EXPECT_EQ(RMW_RET_OK, rmw_destroy_node(node)) << rmw_get_error_string().str;
 }
 
-TEST_F(
-  CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION),
-  create_with_internal_errors) {
+TEST_F(TestNodeConstructionDestruction, create_with_internal_errors) {
   RCUTILS_FAULT_INJECTION_TEST(
   {
     constexpr char node_name[] = "my_node";
@@ -198,9 +184,7 @@ TEST_F(
   });
 }
 
-TEST_F(
-  CLASSNAME(TestNodeConstructionDestruction, RMW_IMPLEMENTATION),
-  destroy_with_internal_errors) {
+TEST_F(TestNodeConstructionDestruction, destroy_with_internal_errors) {
   RCUTILS_FAULT_INJECTION_TEST(
   {
     constexpr char node_name[] = "my_node";
