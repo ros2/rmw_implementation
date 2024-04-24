@@ -61,7 +61,9 @@ Currently nightly results can be seen here:
 
 ### Documentation Policy [2.v]
 
-`rmw_implementation` does not expose a public API. There is no need to add documentation to new changes. In the case that this package adds public API features the documentation of new functionality will be required.
+`rmw_implementation` does not expose a public API.
+There is no need to add documentation to new changes.
+In the case that this package adds public API features the documentation of new functionality will be required.
 
 ## Documentation [3]
 
@@ -95,7 +97,7 @@ Most recent test results can be found [here](https://ci.ros2.org/view/nightly/jo
 Unit tests for these features are located in the test directory.
 Most recent test results can be found [here](https://ci.ros2.org/job/nightly_linux_release/lastBuild/testReport/rmw_implementation).
 
-Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/master/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/master/test_communication) packages, further extend coverage.
+Integration and system tests against available `rmw` implementations up the stack, such as those found in [`test_rclcpp`](https://github.com/ros2/system_tests/tree/rolling/test_rclcpp) and [`test_communication`](https://github.com/ros2/system_tests/tree/rolling/test_communication) packages, further extend coverage.
 
 ### Public API Testing [4.ii]
 
@@ -118,7 +120,8 @@ A description of how coverage statistics are summarized from this page, can be f
 
 ### Performance [4.iv]
 
-The performance tests of `rmw_implementation` are located in the [test/benchmark directory](https://github.com/ros2/rmw_implementation/tree/master/rmw_implementation/test/benchmark). The most recent test results can be found [here](http://build.ros2.org/view/Rci/job/Rci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).
+The performance tests of `rmw_implementation` are located in the [test/benchmark directory](https://github.com/ros2/rmw_implementation/tree/rolling/rmw_implementation/test/benchmark).
+The most recent test results can be found [here](http://build.ros2.org/view/Rci/job/Rci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).
 
 ### Linters and Static Analysis [4.v]
 
@@ -136,9 +139,9 @@ Currently nightly results can be seen here:
 
 `rmw_implementation` has run-time and build-time dependencies that are at **Quality Level 1**
 
- - rcpputils: [QUALITY DECLARATION](https://github.com/ros2/rcpputils/blob/master/QUALITY_DECLARATION.md)
- - rcutils: [QUALITY DECLARATION](https://github.com/ros2/rcutils/blob/master/QUALITY_DECLARATION.md)
- - rmw: [QUALITY DECLARATION](https://github.com/ros2/rmw/blob/master/rmw/QUALITY_DECLARATION.md)
+ - rcpputils: [QUALITY DECLARATION](https://github.com/ros2/rcpputils/blob/rolling/QUALITY_DECLARATION.md)
+ - rcutils: [QUALITY DECLARATION](https://github.com/ros2/rcutils/blob/rolling/QUALITY_DECLARATION.md)
+ - rmw: [QUALITY DECLARATION](https://github.com/ros2/rmw/blob/rolling/rmw/QUALITY_DECLARATION.md)
 
 ### Direct Runtime non-ROS Dependency [5.iii]
 
