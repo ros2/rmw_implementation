@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.3 (2024-05-15)
+------------------
+* Update quality declaration document (`#225 <https://github.com/ros2/rmw_implementation/issues/225>`_) (`#228 <https://github.com/ros2/rmw_implementation/issues/228>`_)
+* Contributors: mergify[bot]
+
 2.8.2 (2023-01-10)
 ------------------
 * Build-time RMW selection does not need ament_index_cpp (`#210 <https://github.com/ros2/rmw_implementation/issues/210>`_) (`#211 <https://github.com/ros2/rmw_implementation/issues/211>`_)
