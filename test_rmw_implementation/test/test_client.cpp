@@ -353,15 +353,15 @@ TEST_F(TestClientUse, service_server_is_available_bad_args)
 {
   bool is_available;
   rmw_ret_t ret = rmw_service_server_is_available(nullptr, client, &is_available);
-  EXPECT_EQ(ret, RMW_RET_ERROR) << rmw_get_error_string().str;
+  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT) << rmw_get_error_string().str;
   rmw_reset_error();
 
   ret = rmw_service_server_is_available(node, nullptr, &is_available);
-  EXPECT_EQ(ret, RMW_RET_ERROR) << rmw_get_error_string().str;
+  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT) << rmw_get_error_string().str;
   rmw_reset_error();
 
   ret = rmw_service_server_is_available(node, client, nullptr);
-  EXPECT_EQ(ret, RMW_RET_ERROR) << rmw_get_error_string().str;
+  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT) << rmw_get_error_string().str;
   rmw_reset_error();
 
   const char * implementation_identifier = client->implementation_identifier;
