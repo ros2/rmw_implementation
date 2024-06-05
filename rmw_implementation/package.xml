@@ -21,15 +21,12 @@
   <depend>rcpputils</depend>
   <depend>rcutils</depend>
   <build_depend>rmw</build_depend>
-  <!--
-  Bloom does not support group_depend so entries below duplicate the group rmw_implementation_packages.
-  This ensures that binary packages have support for all of these rmw impl. enabled.
-  -->
-  <build_depend>rmw_connextdds</build_depend>
-  <build_depend>rmw_cyclonedds_cpp</build_depend>
-  <build_depend>rmw_fastrtps_cpp</build_depend>
-  <build_depend>rmw_fastrtps_dynamic_cpp</build_depend>
-  <!-- end of group dependencies added for bloom -->
+
+  <!-- Explicit group resolution - see ros-infrastructure/catkin_pkg#369 -->
+  <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_connextdds</build_depend>
+  <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_cyclonedds_cpp</build_depend>
+  <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_fastrtps_cpp</build_depend>
+  <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_fastrtps_dynamic_cpp</build_depend>
 
   <depend>rmw_implementation_cmake</depend>
 
