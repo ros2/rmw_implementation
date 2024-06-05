@@ -384,7 +384,7 @@ TEST_F(TestWaitSet, rmw_destroy_wait_set)
 {
   // Try to destroy a nullptr
   rmw_ret_t ret = rmw_destroy_wait_set(nullptr);
-  EXPECT_EQ(ret, RMW_RET_ERROR) << rcutils_get_error_string().str;
+  EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT) << rcutils_get_error_string().str;
   rmw_reset_error();
 
   // Created a valid wait set
