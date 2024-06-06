@@ -1728,7 +1728,9 @@ TEST_F(CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION), content_
   }
 }
 
-TEST_F(TestContentFilterSubscriptionUse, create_two_filters_with_same_topic_name_and_destroy) {
+TEST_F(
+  CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION),
+  create_two_filters_with_same_topic_name_and_destroy) {
   if (sub->is_cft_enabled) {
     auto allocator = rcutils_get_default_allocator();
     rmw_subscription_options_t options = rmw_get_default_subscription_options();
