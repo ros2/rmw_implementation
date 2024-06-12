@@ -1727,3 +1727,48 @@ TEST_F(CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION), content_
     }
   }
 }
+
+TEST_F(
+  CLASSNAME(TestContentFilterSubscriptionUse, RMW_IMPLEMENTATION),
+  create_two_filters_with_same_topic_name_and_destroy) {
+  if (sub->is_cft_enabled) {
+    auto allocator = rcutils_get_default_allocator();
+    rmw_subscription_options_t options = rmw_get_default_subscription_options();
+
+    rmw_subscription_content_filter_options_t * content_filter_options =
+      static_cast<rmw_subscription_content_filter_options_t *>(
+      allocator.allocate(
+        sizeof(rmw_subscription_content_filter_options_t), allocator.state));
+
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      allocator.deallocate(content_filter_options, allocator.state);
+    });
+
+    *content_filter_options = rmw_get_zero_initialized_content_filter_options();
+
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_subscription_content_filter_options_init(
+        filter_expression,
+        expression_parameters_count,
+        expression_parameters,
+        &allocator,
+        content_filter_options));
+
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK,
+        rmw_subscription_content_filter_options_fini(content_filter_options, &allocator));
+    });
+
+    options.content_filter_options = content_filter_options;
+
+    // Create another subscription with content filter in the same topic
+    auto sub_2 = rmw_create_subscription(node, ts, topic_name, &qos_profile, &options);
+    ASSERT_NE(nullptr, sub_2) << rmw_get_error_string().str;
+
+    rmw_ret_t ret = rmw_destroy_subscription(node, sub_2);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  }
+}
