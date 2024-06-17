@@ -2,8 +2,8 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2024-06-17)
+------------------
 * Expect rmw_service_server_is_available to ret RMW_RET_INVALID_ARGUMENT (`#231 <https://github.com/ros2/rmw_implementation/issues/231>`_)
 * Expect rmw_destroy_wait_set to ret RMW_RET_INVALID_ARGUMENT (`#234 <https://github.com/ros2/rmw_implementation/issues/234>`_)
 * Add test creating two content filter topics with the same topic name (`#230 <https://github.com/ros2/rmw_implementation/issues/230>`_) (`#233 <https://github.com/ros2/rmw_implementation/issues/233>`_)
