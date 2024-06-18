@@ -82,6 +82,19 @@ load_library()
   // 3. If that fails, try loading all other implementations available in turn
   //    until one succeeds or we run out of options.
 
+  std::string wrapper_var;
+  try {
+    wrapper_var = rcpputils::get_env_var("RMW_IMPLEMENTATION_WRAPPER");
+  } catch (const std::exception & e) {
+    RMW_SET_ERROR_MSG_WITH_FORMAT_STRING(
+      "failed to fetch RMW_IMPLEMENTATION_WRAPPER "
+      "from environment due to %s", e.what());
+    return nullptr;
+  }
+  if (!wrapper_var.empty()) {
+    return attempt_to_load_one_rmw(wrapper_var);
+  }
+
   std::string env_var;
   try {
     env_var = rcpputils::get_env_var("RMW_IMPLEMENTATION");
