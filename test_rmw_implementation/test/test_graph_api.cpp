@@ -833,6 +833,132 @@ TEST_F(TestGraphAPI, get_subscriptions_info_by_topic_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
 
+TEST_F(TestGraphAPI, get_clients_info_by_service_with_bad_arguments) {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  constexpr char topic_name[] = "/test_service";
+  bool no_mangle = false;
+  rmw_topic_endpoint_info_array_t clients_info =
+    rmw_get_zero_initialized_topic_endpoint_info_array();
+
+  // A null node is an invalid argument.
+  rmw_ret_t ret = rmw_get_clients_info_by_service(
+    nullptr, &allocator, topic_name, no_mangle, &clients_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
+
+  // A node from a different implementation is an invalid argument.
+  const char * implementation_identifier = node->implementation_identifier;
+  node->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_get_clients_info_by_service(
+    node, &allocator, topic_name, no_mangle, &clients_info);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
+  node->implementation_identifier = implementation_identifier;
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
+
+  // A null allocator is an invalid argument.
+  ret = rmw_get_clients_info_by_service(
+    node, nullptr, topic_name, no_mangle, &clients_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
+
+  // An invalid (zero initialized) allocator is an invalid argument.
+  rcutils_allocator_t invalid_allocator = rcutils_get_zero_initialized_allocator();
+  ret = rmw_get_clients_info_by_service(
+    node, &invalid_allocator, topic_name, no_mangle, &clients_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
+
+  // A null topic name is an invalid argument.
+  ret = rmw_get_clients_info_by_service(
+    node, &allocator, nullptr, no_mangle, &clients_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
+
+  // A null array of topic endpoint info is an invalid argument.
+  ret = rmw_get_clients_info_by_service(node, &allocator, topic_name, no_mangle, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
+
+  // A non zero initialized array of topic endpoint info is an invalid argument.
+  ret = rmw_topic_endpoint_info_array_init_with_size(&clients_info, 1u, &allocator);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_get_clients_info_by_service(
+    node, &allocator, topic_name, no_mangle, &clients_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  ret = rmw_topic_endpoint_info_array_fini(&clients_info, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(TestGraphAPI, get_servers_info_by_service_with_bad_arguments) {
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+  constexpr char topic_name[] = "/test_service";
+  bool no_mangle = false;
+  rmw_topic_endpoint_info_array_t servers_info =
+    rmw_get_zero_initialized_topic_endpoint_info_array();
+
+  // A null node is an invalid argument.
+  rmw_ret_t ret = rmw_get_servers_info_by_service(
+    nullptr, &allocator, topic_name, no_mangle, &servers_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
+
+  // A node from a different implementation is an invalid argument.
+  const char * implementation_identifier = node->implementation_identifier;
+  node->implementation_identifier = "not-an-rmw-implementation-identifier";
+  ret = rmw_get_servers_info_by_service(
+    node, &allocator, topic_name, no_mangle, &servers_info);
+  EXPECT_EQ(RMW_RET_INCORRECT_RMW_IMPLEMENTATION, ret);
+  node->implementation_identifier = implementation_identifier;
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
+
+  // A null allocator is an invalid argument.
+  ret = rmw_get_servers_info_by_service(
+    node, nullptr, topic_name, no_mangle, &servers_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
+
+  // An invalid (zero initialized) allocator is an invalid argument.
+  rcutils_allocator_t invalid_allocator = rcutils_get_zero_initialized_allocator();
+  ret = rmw_get_servers_info_by_service(
+    node, &invalid_allocator, topic_name, no_mangle, &servers_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
+
+  // A null topic name is an invalid argument.
+  ret = rmw_get_servers_info_by_service(
+    node, &allocator, nullptr, no_mangle, &servers_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
+
+  // A null array of topic endpoint info is an invalid argument.
+  ret = rmw_get_servers_info_by_service(node, &allocator, topic_name, no_mangle, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
+
+  // A non zero initialized array of topic endpoint info is an invalid argument.
+  ret = rmw_topic_endpoint_info_array_init_with_size(&servers_info, 1u, &allocator);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ret = rmw_get_servers_info_by_service(
+    node, &allocator, topic_name, no_mangle, &servers_info);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
+  rmw_reset_error();
+  ret = rmw_topic_endpoint_info_array_fini(&servers_info, &allocator);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
 TEST_F(TestGraphAPI, count_publishers_with_bad_arguments) {
   size_t count = 0u;
   constexpr char topic_name[] = "/test_topic";
