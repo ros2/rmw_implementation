@@ -2,6 +2,9 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.15.2 (2024-04-24)
 -------------------
 * Update quality declaration document (`#225 <https://github.com/ros2/rmw_implementation/issues/225>`_) (`#226 <https://github.com/ros2/rmw_implementation/issues/226>`_)

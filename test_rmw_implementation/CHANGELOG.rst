@@ -2,6 +2,14 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add test creating two content filter topics with the same topic name (`#230 <https://github.com/ros2/rmw_implementation/issues/230>`_) (`#233 <https://github.com/ros2/rmw_implementation/issues/233>`_) (`#237 <https://github.com/ros2/rmw_implementation/issues/237>`_)
+  Co-authored-by: Mario Domínguez López <116071334+Mario-DL@users.noreply.github.com>
+  (cherry picked from commit 16e14d15e210672fbfe0beb1f57effbd8d1233b0)
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: mergify[bot]
+
 2.15.2 (2024-04-24)
 -------------------
 
