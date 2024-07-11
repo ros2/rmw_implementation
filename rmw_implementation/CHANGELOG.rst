@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.12.1 (2024-07-11)
+-------------------
 * Update quality declaration document (`#227 <https://github.com/ros2/rmw_implementation/issues/227>`_)
 * Contributors: Christophe Bedard
 
