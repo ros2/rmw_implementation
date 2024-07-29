@@ -138,7 +138,7 @@ protected:
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
     ASSERT_STREQ("/", options.enclave);
-    options.localhost_only = RMW_LOCALHOST_ONLY_ENABLED;
+    options.discovery_options.automatic_discovery_range = RMW_AUTOMATIC_DISCOVERY_RANGE_LOCALHOST;
     context = rmw_get_zero_initialized_context();
     ret = rmw_init(&options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
