@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2024-07-29)
+------------------
+* remove rmw_localhost_only_t. (`#239 <https://github.com/ros2/rmw_implementation/issues/239>`_)
+* Contributors: Tomoya Fujita
+
 3.0.0 (2024-06-17)
 ------------------
 * Expect rmw_service_server_is_available to ret RMW_RET_INVALID_ARGUMENT (`#231 <https://github.com/ros2/rmw_implementation/issues/231>`_)

@@ -2,6 +2,9 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.1 (2024-07-29)
+------------------
+
 3.0.0 (2024-06-17)
 ------------------
 * Add mechanism to disable workaround for dependency groups (`#229 <https://github.com/ros2/rmw_implementation/issues/229>`_)
