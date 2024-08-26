@@ -537,11 +537,11 @@ protected:
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
       EXPECT_EQ(nullptr, msg_pointer);
-      ret = rmw_return_loaned_message_from_publisher(pub, &msg_pointer);
+      ret = rmw_return_loaned_message_from_publisher(pub, msg_pointer);
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
       EXPECT_EQ(nullptr, msg_pointer);
-      ret = rmw_publish_loaned_message(pub, &msg_pointer, null_allocation);
+      ret = rmw_publish_loaned_message(pub, msg_pointer, null_allocation);
       EXPECT_EQ(RMW_RET_UNSUPPORTED, ret) << rmw_get_error_string().str;
       rmw_reset_error();
       EXPECT_EQ(nullptr, msg_pointer);
