@@ -32,7 +32,7 @@ class TestWaitSet : public ::testing::Test
 protected:
   void SetUp() override
   {
-    rmw_init_options_t options = rmw_get_zero_initialized_init_options();
+    rmw_init_options_t options = rmw_get_default_init_options();
     rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
@@ -42,7 +42,7 @@ protected:
     });
     options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
     ASSERT_STREQ("/", options.enclave);
-    context = rmw_get_zero_initialized_context();
+    context = rmw_get_default_context();
     ret = rmw_init(&options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   }
@@ -143,7 +143,7 @@ protected:
   rmw_guard_condition_t * gc{nullptr};
   rmw_service_t * srv{nullptr};
   rmw_client_t * client{nullptr};
-  rmw_event_t event{rmw_get_zero_initialized_event()};
+  rmw_event_t event{rmw_get_default_event()};
 };
 
 // Macro to initialize and manage rmw_wait input arrays.

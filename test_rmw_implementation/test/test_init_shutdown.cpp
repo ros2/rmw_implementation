@@ -31,7 +31,7 @@ class TestInitShutdown : public ::testing::Test
 protected:
   void SetUp() override
   {
-    options = rmw_get_zero_initialized_init_options();
+    options = rmw_get_default_init_options();
     rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
@@ -48,7 +48,7 @@ protected:
 };
 
 TEST_F(TestInitShutdown, init_with_bad_arguments) {
-  rmw_context_t context = rmw_get_zero_initialized_context();
+  rmw_context_t context = rmw_get_default_context();
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, rmw_init(nullptr, &context));
   rcutils_reset_error();
 
@@ -85,7 +85,7 @@ TEST_F(TestInitShutdown, shutdown_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
 
-  rmw_context_t context = rmw_get_zero_initialized_context();
+  rmw_context_t context = rmw_get_default_context();
   ret = rmw_shutdown(&context);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
@@ -111,7 +111,7 @@ TEST_F(TestInitShutdown, context_fini_with_bad_arguments) {
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
 
-  rmw_context_t context = rmw_get_zero_initialized_context();
+  rmw_context_t context = rmw_get_default_context();
   ret = rmw_context_fini(&context);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
@@ -133,7 +133,7 @@ TEST_F(TestInitShutdown, context_fini_with_bad_arguments) {
 }
 
 TEST_F(TestInitShutdown, init_shutdown) {
-  rmw_context_t context = rmw_get_zero_initialized_context();
+  rmw_context_t context = rmw_get_default_context();
   rmw_ret_t ret = rmw_init(&options, &context);
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
 
@@ -173,7 +173,7 @@ TEST_F(TestInitShutdown, init_shutdown) {
 TEST_F(TestInitShutdown, init_with_internal_errors) {
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    rmw_context_t context = rmw_get_zero_initialized_context();
+    rmw_context_t context = rmw_get_default_context();
     rmw_ret_t ret = rmw_init(&options, &context);
 
     RCUTILS_NO_FAULT_INJECTION(
@@ -194,7 +194,7 @@ TEST_F(TestInitShutdown, shutdown_with_internal_errors) {
   RCUTILS_FAULT_INJECTION_TEST(
   {
     rmw_ret_t ret = RMW_RET_OK;
-    rmw_context_t context = rmw_get_zero_initialized_context();
+    rmw_context_t context = rmw_get_default_context();
 
     RCUTILS_NO_FAULT_INJECTION(
     {
@@ -221,7 +221,7 @@ TEST_F(TestInitShutdown, shutdown_with_internal_errors) {
 TEST_F(TestInitShutdown, context_fini_with_internal_errors) {
   RCUTILS_FAULT_INJECTION_TEST(
   {
-    rmw_context_t context = rmw_get_zero_initialized_context();
+    rmw_context_t context = rmw_get_default_context();
     RCUTILS_NO_FAULT_INJECTION(
     {
       rmw_ret_t ret = rmw_init(&options, &context);

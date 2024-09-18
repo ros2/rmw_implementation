@@ -29,12 +29,12 @@ class TestDurationInfinite : public ::testing::Test
 protected:
   void SetUp() override
   {
-    init_options = rmw_get_zero_initialized_init_options();
+    init_options = rmw_get_default_init_options();
     rmw_ret_t ret = rmw_init_options_init(&init_options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     init_options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
     ASSERT_STREQ("/", init_options.enclave);
-    context = rmw_get_zero_initialized_context();
+    context = rmw_get_default_context();
     ret = rmw_init(&init_options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     constexpr char node_name[] = "infinite_duration_test_node";

@@ -29,12 +29,12 @@ class TestNodeConstructionDestruction : public ::testing::Test
 protected:
   void SetUp() override
   {
-    options = rmw_get_zero_initialized_init_options();
+    options = rmw_get_default_init_options();
     rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
     ASSERT_STREQ("/", options.enclave);
-    context = rmw_get_zero_initialized_context();
+    context = rmw_get_default_context();
     ret = rmw_init(&options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   }
@@ -62,6 +62,11 @@ TEST_F(TestNodeConstructionDestruction, create_with_bad_arguments) {
   rmw_reset_error();
 
   rmw_context_t invalid_context = rmw_get_zero_initialized_context();
+  node = rmw_create_node(&invalid_context, node_name, node_namespace);
+  EXPECT_EQ(nullptr, node);
+  rmw_reset_error();
+
+  invalid_context = rmw_get_default_context();
   node = rmw_create_node(&invalid_context, node_name, node_namespace);
   EXPECT_EQ(nullptr, node);
   rmw_reset_error();
@@ -133,13 +138,13 @@ class TestLocalhostNodeConstructionDestruction : public ::testing::Test
 protected:
   void SetUp() override
   {
-    options = rmw_get_zero_initialized_init_options();
+    options = rmw_get_default_init_options();
     rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_default_allocator());
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
     options.enclave = rcutils_strdup("/", rcutils_get_default_allocator());
     ASSERT_STREQ("/", options.enclave);
     options.discovery_options.automatic_discovery_range = RMW_AUTOMATIC_DISCOVERY_RANGE_LOCALHOST;
-    context = rmw_get_zero_initialized_context();
+    context = rmw_get_default_context();
     ret = rmw_init(&options, &context);
     ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
   }
