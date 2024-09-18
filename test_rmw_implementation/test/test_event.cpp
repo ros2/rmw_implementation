@@ -83,8 +83,8 @@ protected:
     EXPECT_TRUE(taken);
   }
 
-  rmw_init_options_t init_options{rmw_get_zero_initialized_init_options()};
-  rmw_context_t context{rmw_get_zero_initialized_context()};
+  rmw_init_options_t init_options{rmw_get_default_init_options()};
+  rmw_context_t context{rmw_get_default_context()};
   rmw_node_t * node{nullptr};
   rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
   rmw_subscription_options_t sub_options = rmw_get_default_subscription_options();
@@ -124,7 +124,7 @@ TEST_F(TestEvent, basic_publisher_matched_event) {
       RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t pub_matched_event{rmw_get_zero_initialized_event()};
+  rmw_event_t pub_matched_event{rmw_get_default_event()};
   rmw_ret_t ret = rmw_publisher_event_init(&pub_matched_event, pub, RMW_EVENT_PUBLICATION_MATCHED);
   ASSERT_EQ(RMW_RET_OK, ret);
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
@@ -212,7 +212,7 @@ TEST_F(TestEvent, basic_subscription_matched_event) {
       RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t sub_matched_event{rmw_get_zero_initialized_event()};
+  rmw_event_t sub_matched_event{rmw_get_default_event()};
   rmw_ret_t ret = rmw_subscription_event_init(
     &sub_matched_event,
     sub,
@@ -298,7 +298,7 @@ TEST_F(TestEvent, one_pub_multi_sub_connect_disconnect) {
       RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t pub_matched_event{rmw_get_zero_initialized_event()};
+  rmw_event_t pub_matched_event{rmw_get_default_event()};
   rmw_ret_t ret = rmw_publisher_event_init(&pub_matched_event, pub, RMW_EVENT_PUBLICATION_MATCHED);
   ASSERT_EQ(RMW_RET_OK, ret);
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
@@ -357,7 +357,7 @@ TEST_F(TestEvent, one_sub_multi_pub_matched_unmatched_event) {
       RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
   });
 
-  rmw_event_t sub_matched_event{rmw_get_zero_initialized_event()};
+  rmw_event_t sub_matched_event{rmw_get_default_event()};
   rmw_ret_t ret = rmw_subscription_event_init(
     &sub_matched_event,
     sub,

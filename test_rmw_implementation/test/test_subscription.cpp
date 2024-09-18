@@ -65,8 +65,8 @@ protected:
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 
-  rmw_init_options_t init_options{rmw_get_zero_initialized_init_options()};
-  rmw_context_t context{rmw_get_zero_initialized_context()};
+  rmw_init_options_t init_options{rmw_get_default_init_options()};
+  rmw_context_t context{rmw_get_default_context()};
   rmw_node_t * node{nullptr};
 };
 

@@ -24,7 +24,7 @@
 #include "./allocator_testing_utils.h"
 
 TEST(TestInitOptions, init_copy_fini) {
-  rmw_init_options_t src_options = rmw_get_zero_initialized_init_options();
+  rmw_init_options_t src_options = rmw_get_default_init_options();
   rmw_ret_t ret = rmw_init_options_init(&src_options, rcutils_get_default_allocator());
   ASSERT_EQ(RMW_RET_OK, ret) << rcutils_get_error_string().str;
 
@@ -55,7 +55,7 @@ TEST(TestInitOptions, init_copy_fini) {
 }
 
 TEST(TestInitOptions, init_with_bad_arguments) {
-  rmw_init_options_t options = rmw_get_zero_initialized_init_options();
+  rmw_init_options_t options = rmw_get_default_init_options();
   rmw_ret_t ret = rmw_init_options_init(&options, rcutils_get_zero_initialized_allocator());
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
@@ -72,7 +72,7 @@ TEST(TestInitOptions, init_with_bad_arguments) {
 }
 
 TEST(TestInitOptions, copy_with_bad_arguments) {
-  rmw_init_options_t src_options = rmw_get_zero_initialized_init_options();
+  rmw_init_options_t src_options = rmw_get_default_init_options();
   rmw_init_options_t dst_options = rmw_get_zero_initialized_init_options();
 
   rmw_ret_t ret = rmw_init_options_copy(nullptr, &dst_options);
@@ -110,7 +110,7 @@ TEST(TestInitOptions, copy_with_bad_arguments) {
 }
 
 TEST(TestInitOptions, fini_with_bad_arguments) {
-  rmw_init_options_t options = rmw_get_zero_initialized_init_options();
+  rmw_init_options_t options = rmw_get_default_init_options();
   rmw_ret_t ret = rmw_init_options_fini(&options);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
   rcutils_reset_error();
