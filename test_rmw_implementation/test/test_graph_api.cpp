@@ -872,7 +872,7 @@ TEST_F(TestGraphAPI, get_clients_info_by_service_with_bad_arguments) {
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&clients_info));
 
-  // A null topic name is an invalid argument.
+  // A null service name is an invalid argument.
   ret = rmw_get_clients_info_by_service(
     node, &allocator, nullptr, no_mangle, &clients_info);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
@@ -935,7 +935,7 @@ TEST_F(TestGraphAPI, get_servers_info_by_service_with_bad_arguments) {
   rmw_reset_error();
   EXPECT_EQ(RMW_RET_OK, rmw_topic_endpoint_info_array_check_zero(&servers_info));
 
-  // A null topic name is an invalid argument.
+  // A null service name is an invalid argument.
   ret = rmw_get_servers_info_by_service(
     node, &allocator, nullptr, no_mangle, &servers_info);
   EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret);
