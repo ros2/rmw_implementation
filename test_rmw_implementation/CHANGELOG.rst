@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Do not deref msg ptr for rmw\_{publish,return}_loaned_message*() (`#240 <https://github.com/ros2/rmw_implementation/issues/240>`_)
+* Contributors: Christophe Bedard
+
 3.0.1 (2024-07-29)
 ------------------
 * remove rmw_localhost_only_t. (`#239 <https://github.com/ros2/rmw_implementation/issues/239>`_)
