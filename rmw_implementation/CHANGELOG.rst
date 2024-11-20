@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Make sure to find_package(rmw) in rmw_implementation. (`#242 <https://github.com/ros2/rmw_implementation/issues/242>`_)
+* Contributors: Chris Lalancette
+
 3.0.2 (2024-10-03)
 ------------------
 
