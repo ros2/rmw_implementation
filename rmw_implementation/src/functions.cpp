@@ -986,7 +986,7 @@ rmw_init(const rmw_init_options_t * options, rmw_context_t * context)
 
   typedef rmw_ret_t (* FunctionSignature)(const rmw_init_options_t *, rmw_context_t *);
   FunctionSignature func = reinterpret_cast<FunctionSignature>(symbol_rmw_init);
-  return ret || func(options, context);
+  return ret != RMW_RET_OK ? ret : func(options, context);
 }
 
 #ifdef __cplusplus
