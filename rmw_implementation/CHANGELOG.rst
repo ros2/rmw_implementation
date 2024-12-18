@@ -2,8 +2,8 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.15.4 (2024-12-18)
+-------------------
 * Make sure to find_package(rmw) in rmw_implementation. (`#242 <https://github.com/ros2/rmw_implementation/issues/242>`_) (`#245 <https://github.com/ros2/rmw_implementation/issues/245>`_)
   This is required to get access to the register_rmw_implementation
   CMake macro.
