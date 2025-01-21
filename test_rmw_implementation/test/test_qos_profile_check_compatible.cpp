@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include "rmw/error_handling.h"
 #include "rmw/qos_profiles.h"
 
 TEST(TestQoSProfilesAreCompatible, compatible) {
@@ -43,6 +44,7 @@ TEST(TestQoSProfilesAreCompatible, invalid_input) {
     rmw_ret_t ret = rmw_qos_profile_check_compatible(
       rmw_qos_profile_sensor_data, rmw_qos_profile_sensor_data, nullptr, nullptr, 0u);
     EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
+    rmw_reset_error();
   }
   // Error on null reason and non-zero size
   {
@@ -50,5 +52,6 @@ TEST(TestQoSProfilesAreCompatible, invalid_input) {
     rmw_ret_t ret = rmw_qos_profile_check_compatible(
       rmw_qos_profile_sensor_data, rmw_qos_profile_sensor_data, &compatible, nullptr, 1u);
     EXPECT_EQ(ret, RMW_RET_INVALID_ARGUMENT);
+    rmw_reset_error();
   }
 }

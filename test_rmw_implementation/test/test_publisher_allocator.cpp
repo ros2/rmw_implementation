@@ -11,17 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #include <gtest/gtest.h>
 
+#include "rmw/error_handling.h"
 #include "rmw/rmw.h"
 
 TEST(TestPublisherAllocator, init_fini_publisher_allocation)
 {
-  if (rmw_init_publisher_allocation(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
-    // Add tests here when the implementation it's supported
+  rmw_ret_t ret = rmw_init_publisher_allocation(nullptr, nullptr, nullptr);
+  rmw_reset_error();
+  if (ret == RMW_RET_UNSUPPORTED) {
     GTEST_SKIP();
-  } else {
-    rmw_ret_t ret = rmw_fini_publisher_allocation(nullptr);
-    EXPECT_EQ(ret, RMW_RET_UNSUPPORTED);
   }
+
+  ASSERT_NE(ret, RMW_RET_UNSUPPORTED);
+
+  // TODO(anyone): Add tests here when the API has been implemented
 }
