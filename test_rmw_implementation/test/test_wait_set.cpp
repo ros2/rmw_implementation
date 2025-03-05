@@ -117,7 +117,14 @@ protected:
     ASSERT_NE(nullptr, srv) << rmw_get_error_string().str;
     client = rmw_create_client(node, service_ts, service_name, &rmw_qos_profile_default);
     ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
-    rmw_ret_t ret = rmw_subscription_event_init(&event, sub, RMW_EVENT_LIVELINESS_CHANGED);
+    rmw_ret_t ret = RMW_RET_OK;
+    // rmw_zenoh does not support RMW_EVENT_LIVELINESS_CHANGED.
+    // TODO(Yadunund): Rely on API suggested in https://github.com/ros2/rmw/issues/394 instead.
+    if (std::string(rmw_get_implementation_identifier()).find("rmw_zenoh_cpp") == 0) {
+      ret = rmw_subscription_event_init(&event, sub, RMW_EVENT_PUBLICATION_MATCHED);
+    } else {
+      ret = rmw_subscription_event_init(&event, sub, RMW_EVENT_LIVELINESS_CHANGED);
+    }
     ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 
