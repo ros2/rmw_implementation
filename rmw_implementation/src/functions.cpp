@@ -758,6 +758,12 @@ RMW_INTERFACE_FN(
     rmw_feature_t))
 
 RMW_INTERFACE_FN(
+  rmw_event_type_is_supported,
+  bool, RMW_EVENT_INVALID,
+  1, ARG_TYPES(
+    rmw_event_type_t))
+
+RMW_INTERFACE_FN(
   rmw_take_dynamic_message,
   rmw_ret_t, RMW_RET_ERROR,
   4, ARG_TYPES(
@@ -841,6 +847,7 @@ void prefetch_symbols(void)
   GET_SYMBOL(rmw_take_request)
   GET_SYMBOL(rmw_send_response)
   GET_SYMBOL(rmw_take_event)
+  GET_SYMBOL(rmw_event_type_is_supported)
   GET_SYMBOL(rmw_create_guard_condition)
   GET_SYMBOL(rmw_destroy_guard_condition)
   GET_SYMBOL(rmw_trigger_guard_condition)
@@ -999,6 +1006,7 @@ unload_library()
   symbol_rmw_client_set_on_new_response_callback = nullptr;
   symbol_rmw_event_set_callback = nullptr;
   symbol_rmw_feature_supported = nullptr;
+  symbol_rmw_event_type_is_supported = nullptr;
   symbol_rmw_take_dynamic_message = nullptr;
   symbol_rmw_take_dynamic_message_with_info = nullptr;
   symbol_rmw_serialization_support_init = nullptr;
