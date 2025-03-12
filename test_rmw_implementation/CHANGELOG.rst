@@ -2,6 +2,12 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.15.5 (2025-03-12)
+-------------------
+* Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_) (`#252 <https://github.com/ros2/rmw_implementation/issues/252>`_)
+* Update expectations of tests to remain compatible with non-DDS middlewares (`#248 <https://github.com/ros2/rmw_implementation/issues/248>`_) (`#251 <https://github.com/ros2/rmw_implementation/issues/251>`_)
+* Contributors: Alejandro Hernández Cordero, mergify[bot]
+
 2.15.4 (2024-12-18)
 -------------------
 

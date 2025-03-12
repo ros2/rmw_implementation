@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.15.5 (2025-03-12)
+-------------------
+* Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_) (`#252 <https://github.com/ros2/rmw_implementation/issues/252>`_)
+* Contributors: Alejandro Hernández Cordero
+
 2.15.4 (2024-12-18)
 -------------------
 * Make sure to find_package(rmw) in rmw_implementation. (`#242 <https://github.com/ros2/rmw_implementation/issues/242>`_) (`#245 <https://github.com/ros2/rmw_implementation/issues/245>`_)
