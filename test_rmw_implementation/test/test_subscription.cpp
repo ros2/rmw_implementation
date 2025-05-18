@@ -633,6 +633,114 @@ TEST_F(TestSubscriptionUse, ignore_local_publications) {
   }
 }
 
+TEST_F(TestSubscriptionUse, ignore_local_publications_serialized) {
+  rmw_ret_t ret;
+
+  // Create publisher
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub = rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  // Create subscription with ignore_local_publications = true
+  rmw_subscription_options_t sub_options_ignorelocal = rmw_get_default_subscription_options();
+  sub_options_ignorelocal.ignore_local_publications = true;
+  rmw_subscription_t * sub_ignorelocal =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options_ignorelocal);
+  ASSERT_NE(nullptr, sub_ignorelocal) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub_ignorelocal)) << rmw_get_error_string().str;
+  });
+
+  size_t subscription_count = 0u;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 2u == subscription_count) {  // Early return on failure.
+      break;
+    }
+  }
+
+  // Roundtrip message from publisher to both subscriptions
+  test_msgs__msg__BasicTypes original_message{};
+  ASSERT_TRUE(test_msgs__msg__BasicTypes__init(&original_message));
+  original_message.bool_value = true;
+  original_message.char_value = 'k';
+  original_message.float32_value = 3.14159f;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__BasicTypes__fini(&original_message);
+  });
+
+  rmw_publisher_allocation_t * null_allocation_p{nullptr};
+  rmw_subscription_allocation_t * null_allocation_s{nullptr};
+
+  ret = rmw_publish(pub, &original_message, null_allocation_p);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  rmw_subscriptions_t subscriptions;
+  void * subscriptions_storage[2];
+  subscriptions_storage[0] = sub_ignorelocal->data;
+  subscriptions_storage[1] = sub->data;
+  subscriptions.subscribers = subscriptions_storage;
+  subscriptions.subscriber_count = 2;
+
+  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 2);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+  });
+  rmw_time_t timeout = {1, 0};  // 1000ms
+  ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_NE(nullptr, subscriptions.subscribers[1]);
+
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
+  // ignore_local_publications = true
+  {
+    bool taken_serialized = false;
+    rmw_serialized_message_t msg = rmw_get_zero_initialized_serialized_message();
+    ASSERT_EQ(
+      RMW_RET_OK, rmw_serialized_message_init(
+        &msg, 0, &allocator)) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_serialized_message_fini(&msg)) << rmw_get_error_string().str;
+    });
+
+    ret = rmw_take_serialized_message(sub_ignorelocal, &msg, &taken_serialized, null_allocation_s);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    EXPECT_FALSE(taken_serialized);
+  }
+
+  // ignore_local_publications = false
+  {
+    bool taken_serialized = false;
+    rmw_serialized_message_t msg = rmw_get_zero_initialized_serialized_message();
+    ASSERT_EQ(
+      RMW_RET_OK, rmw_serialized_message_init(
+        &msg, 0, &allocator)) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_serialized_message_fini(&msg)) << rmw_get_error_string().str;
+    });
+
+    ret = rmw_take_serialized_message(sub, &msg, &taken_serialized, null_allocation_s);
+    EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    EXPECT_TRUE(taken_serialized);
+    // Optionally, could deserialize and compare, but not needed for this test.
+  }
+}
+
 TEST_F(TestSubscriptionUse, take_sequence) {
   size_t count = 1u;
   size_t taken = 10u;  // Non-zero value to check variable update
