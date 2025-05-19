@@ -629,10 +629,7 @@ TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publicat
   }
 }
 
-<<<<<<< HEAD
-TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
-=======
-TEST_F(TestSubscriptionUse, ignore_local_publications_serialized) {
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), ignore_local_publications_serialized) {
   rmw_ret_t ret;
 
   // Create publisher
@@ -740,8 +737,7 @@ TEST_F(TestSubscriptionUse, ignore_local_publications_serialized) {
   }
 }
 
-TEST_F(TestSubscriptionUse, take_sequence) {
->>>>>>> 1eceed4 (add ignore_local_publications_serialized test. (#255))
+TEST_F(CLASSNAME(TestSubscriptionUse, RMW_IMPLEMENTATION), take_sequence) {
   size_t count = 1u;
   size_t taken = 10u;  // Non-zero value to check variable update
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
