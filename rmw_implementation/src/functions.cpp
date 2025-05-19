@@ -759,7 +759,7 @@ RMW_INTERFACE_FN(
 
 RMW_INTERFACE_FN(
   rmw_event_type_is_supported,
-  bool, RMW_EVENT_INVALID,
+  bool, false,
   1, ARG_TYPES(
     rmw_event_type_t))
 
