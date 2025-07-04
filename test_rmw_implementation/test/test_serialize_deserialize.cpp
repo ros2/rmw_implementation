@@ -37,20 +37,6 @@
 
 #include "./allocator_testing_utils.h"
 
-<<<<<<< HEAD
-#ifdef RMW_IMPLEMENTATION
-# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
-# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
-#else
-# define CLASSNAME(NAME, SUFFIX) NAME
-#endif
-
-class CLASSNAME (TestSerializeDeserialize, RMW_IMPLEMENTATION) : public ::testing::Test
-{
-};
-
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), get_serialization_format) {
-=======
 static void check_bad_cdr_sequence_cases(
   const rosidl_message_type_support_t * ts,
   void * message)
@@ -127,8 +113,18 @@ static void check_bad_cdr_sequence_cases(
   }
 }
 
+#ifdef RMW_IMPLEMENTATION
+# define CLASSNAME_(NAME, SUFFIX) NAME ## __ ## SUFFIX
+# define CLASSNAME(NAME, SUFFIX) CLASSNAME_(NAME, SUFFIX)
+#else
+# define CLASSNAME(NAME, SUFFIX) NAME
+#endif
+
+class CLASSNAME (TestSerializeDeserialize, RMW_IMPLEMENTATION) : public ::testing::Test
+{
+};
+
 TEST(TestSerializeDeserialize, get_serialization_format) {
->>>>>>> 4dd5d57 (Test failing deserialization of invalid sequence length (#261))
   const char * serialization_format = rmw_get_serialization_format();
   EXPECT_NE(nullptr, serialization_format);
   EXPECT_STREQ(serialization_format, rmw_get_serialization_format());
@@ -269,9 +265,6 @@ TEST_F(
   EXPECT_EQ(input_message.uint16_values.data[0], output_message.uint16_values.data[0]);
 }
 
-<<<<<<< HEAD
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), clean_round_trip_for_cpp_message) {
-=======
 TEST(TestSerializeDeserialize, bad_cdr_sequence_correctly_fails_for_c) {
   {
     const char * serialization_format = rmw_get_serialization_format();
@@ -293,7 +286,6 @@ TEST(TestSerializeDeserialize, bad_cdr_sequence_correctly_fails_for_c) {
 }
 
 TEST(TestSerializeDeserialize, clean_round_trip_for_cpp_message) {
->>>>>>> 4dd5d57 (Test failing deserialization of invalid sequence length (#261))
   const rosidl_message_type_support_t * ts =
     rosidl_typesupport_cpp::get_message_type_support_handle<test_msgs::msg::BasicTypes>();
   test_msgs::msg::BasicTypes input_message{};
@@ -369,9 +361,6 @@ TEST_F(
   EXPECT_EQ(input_message, output_message);
 }
 
-<<<<<<< HEAD
-TEST_F(CLASSNAME(TestSerializeDeserialize, RMW_IMPLEMENTATION), rmw_get_serialized_message_size)
-=======
 TEST(TestSerializeDeserialize, bad_cdr_sequence_correctly_fails_for_cpp) {
   {
     const char * serialization_format = rmw_get_serialization_format();
@@ -389,7 +378,6 @@ TEST(TestSerializeDeserialize, bad_cdr_sequence_correctly_fails_for_cpp) {
 }
 
 TEST(TestSerializeDeserialize, rmw_get_serialized_message_size)
->>>>>>> 4dd5d57 (Test failing deserialization of invalid sequence length (#261))
 {
   if (rmw_get_serialized_message_size(nullptr, nullptr, nullptr) != RMW_RET_UNSUPPORTED) {
     // TODO(anyone): Add tests here when the implementation it's supported
