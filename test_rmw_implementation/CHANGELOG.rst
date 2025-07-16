@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add ignore_local_publications_serialized test. (backport `#255 <https://github.com/ros2/rmw_implementation/issues/255>`_) (`#258 <https://github.com/ros2/rmw_implementation/issues/258>`_)
+* Contributors: mergify[bot]
+
 2.8.4 (2024-07-26)
 ------------------
 * Add test creating two content filter topics with the same topic name … (backport `#233 <https://github.com/ros2/rmw_implementation/issues/233>`_) (`#236 <https://github.com/ros2/rmw_implementation/issues/236>`_)
