@@ -2,6 +2,13 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed windows warning (`#254 <https://github.com/ros2/rmw_implementation/issues/254>`_) (`#260 <https://github.com/ros2/rmw_implementation/issues/260>`_)
+  (cherry picked from commit 8c006087e3af66a79f61dbe0ff45e7a1ef31a686)
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: mergify[bot]
+
 2.15.5 (2025-03-12)
 -------------------
 * Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_) (`#252 <https://github.com/ros2/rmw_implementation/issues/252>`_)

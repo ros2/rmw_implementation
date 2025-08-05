@@ -2,6 +2,19 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Test failing deserialization of invalid sequence length (`#261 <https://github.com/ros2/rmw_implementation/issues/261>`_) (`#263 <https://github.com/ros2/rmw_implementation/issues/263>`_)
+  * Add test infrastructure.
+  * Test that deserialization with wrong sequence length fails.
+  ---------
+  (cherry picked from commit 4dd5d571a5bfa1a67183acf271dfa442932c7572)
+  Co-authored-by: Miguel Company <miguelcompany@eprosima.com>
+* add ignore_local_publications_serialized test. (`#255 <https://github.com/ros2/rmw_implementation/issues/255>`_) (`#257 <https://github.com/ros2/rmw_implementation/issues/257>`_)
+  (cherry picked from commit 1eceed45fbdbe6b93bb49993f1bed9698aeca38f)
+  Co-authored-by: Tomoya Fujita <Tomoya.Fujita@sony.com>
+* Contributors: mergify[bot]
+
 2.15.5 (2025-03-12)
 -------------------
 * Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_) (`#252 <https://github.com/ros2/rmw_implementation/issues/252>`_)
