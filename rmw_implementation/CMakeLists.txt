@@ -121,8 +121,8 @@ else()
 endif()
 
 register_rmw_implementation(
-  "c:rosidl_typesupport_c"
-  "cpp:rosidl_typesupport_cpp"
+  "c"
+  "cpp"
 )
 
 ament_package(
