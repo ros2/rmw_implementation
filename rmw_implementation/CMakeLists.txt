@@ -120,9 +120,13 @@ else()
   )
 endif()
 
+# Listing rosidl_typesupport_{c,cpp} here doesn't make sense, since they're just base language
+# typesupport packages. However, rclpy doesn't get built if C typesupport doesn't exist. It uses
+# get_rmw_typesupport() to get the C typesupport packages for rmw_implementation, which doesn't
+# differentiate between an empty list and no list, so we need to provide at least one package here.
 register_rmw_implementation(
-  "c"
-  "cpp"
+  "c:rosidl_typesupport_c"
+  "cpp:rosidl_typesupport_cpp"
 )
 
 ament_package(
