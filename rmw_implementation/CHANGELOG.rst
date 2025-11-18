@@ -2,6 +2,12 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.5 (2025-11-18)
+------------------
+* fix cmake deprecation (`#267 <https://github.com/ros2/rmw_implementation/issues/267>`_) (`#268 <https://github.com/ros2/rmw_implementation/issues/268>`_)
+* Fixed windows warning (`#254 <https://github.com/ros2/rmw_implementation/issues/254>`_) (`#259 <https://github.com/ros2/rmw_implementation/issues/259>`_)
+* Contributors: mergify[bot]
+
 3.0.4 (2025-03-11)
 ------------------
 * Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_)

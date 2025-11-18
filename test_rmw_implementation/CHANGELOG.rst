@@ -2,6 +2,13 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.5 (2025-11-18)
+------------------
+* fix cmake deprecation (`#267 <https://github.com/ros2/rmw_implementation/issues/267>`_) (`#268 <https://github.com/ros2/rmw_implementation/issues/268>`_)
+* Test failing deserialization of invalid sequence length (`#261 <https://github.com/ros2/rmw_implementation/issues/261>`_) (`#262 <https://github.com/ros2/rmw_implementation/issues/262>`_)
+* add ignore_local_publications_serialized test. (`#255 <https://github.com/ros2/rmw_implementation/issues/255>`_) (`#256 <https://github.com/ros2/rmw_implementation/issues/256>`_)
+* Contributors: mergify[bot]
+
 3.0.4 (2025-03-11)
 ------------------
 * Added rmw_event_type_is_supported (`#250 <https://github.com/ros2/rmw_implementation/issues/250>`_)
