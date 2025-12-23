@@ -2,6 +2,9 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.6 (2025-12-23)
+------------------
+
 3.0.5 (2025-11-18)
 ------------------
 * fix cmake deprecation (`#267 <https://github.com/ros2/rmw_implementation/issues/267>`_) (`#268 <https://github.com/ros2/rmw_implementation/issues/268>`_)
