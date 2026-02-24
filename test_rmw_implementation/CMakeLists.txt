@@ -13,9 +13,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_ros REQUIRED)
 
 if(BUILD_TESTING)
+  find_package(ament_cmake_ros REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(osrf_testing_tools_cpp REQUIRED)
 
