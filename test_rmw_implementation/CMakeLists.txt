@@ -69,7 +69,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_subscription
@@ -81,7 +81,7 @@ if(BUILD_TESTING)
     rmw::rmw
     rmw_dds_common::rmw_dds_common_library
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_serialize_deserialize
@@ -93,7 +93,7 @@ if(BUILD_TESTING)
     rmw::rmw
     rosidl_runtime_c::rosidl_runtime_c
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_publisher_allocator
@@ -120,7 +120,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_graph_api
@@ -131,7 +131,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_unique_identifiers
@@ -142,7 +142,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_service
@@ -153,7 +153,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_client
@@ -164,7 +164,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_qos_profile_check_compatible
@@ -183,7 +183,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   ament_add_gtest_executable(test_event
@@ -193,7 +193,7 @@ if(BUILD_TESTING)
     osrf_testing_tools_cpp::memory_tools
     rmw::rmw
     rmw_implementation::rmw_implementation
-    ${test_msgs_TARGETS}
+    test_msgs::test_msgs
   )
 
   function(test_api)
