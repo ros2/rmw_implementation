@@ -2,6 +2,11 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.7 (2026-04-09)
+------------------
+* Add rmw_zenoh_cpp as a build dependency (`#273 <https://github.com/ros2/rmw_implementation/issues/273>`_) (`#274 <https://github.com/ros2/rmw_implementation/issues/274>`_)
+* Contributors: mergify[bot]
+
 3.0.6 (2025-12-23)
 ------------------
 
