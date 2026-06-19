@@ -197,7 +197,7 @@ TEST_F(TestEventMessageLostDeadlock, take_event_does_not_deadlock_with_on_sample
     taker.detach();
     std::cerr
       << "\nDEADLOCK DETECTED: rmw_take_event(MESSAGE_LOST) (event mutex -> reader mutex) "
-         "deadlocked against on_sample_lost (reader mutex -> event mutex).\n"
+      "deadlocked against on_sample_lost (reader mutex -> event mutex).\n"
       << "  take_event iterations before stall: " << take_iters.load() << "\n"
       << "  sample-lost events observed: " << events_seen.load() << "\n";
     std::quick_exit(1);
@@ -218,6 +218,6 @@ TEST_F(TestEventMessageLostDeadlock, take_event_does_not_deadlock_with_on_sample
   if (events_seen.load() == 0u) {
     GTEST_SKIP()
       << "No SAMPLE_LOST was generated, so the lock-order inversion was not exercised. "
-         "Ensure intra-process delivery is disabled (see the profile in the CMake env).";
+      "Ensure intra-process delivery is disabled (see the profile in the CMake env).";
   }
 }
