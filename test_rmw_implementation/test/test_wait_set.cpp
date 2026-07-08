@@ -413,3 +413,93 @@ TEST_F(TestWaitSet, rmw_destroy_wait_set)
   ret = rmw_destroy_wait_set(wait_set);
   EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
 }
+
+/**
+ * This test creates a wait set with multiple guard conditions and triggers them in a separate thread.
+ * Expects that all guard conditions are notified exactly once and that rmw_wait returns RMW_RET_TIMEOUT after all
+ * guard conditions have been triggered.
+ */
+TEST_F(TestWaitSet, rmw_wait_guard_conditions)
+{
+  constexpr size_t number_of_guard_conditions = 10u;
+  typedef rmw_guard_condition_t* guard_condition_ptr_t;
+  guard_condition_ptr_t guard_condition_ptrs[number_of_guard_conditions];
+
+  // Create the guard conditions
+  size_t ready_conditions_value = 0u;
+  for (size_t i = 0; i < number_of_guard_conditions; ++i) {
+    guard_condition_ptrs[i] = rmw_create_guard_condition(&context);
+    ready_conditions_value |= (1u << i);
+    ASSERT_NE(nullptr, guard_condition_ptrs[i]) << rcutils_get_error_string().str;
+  }
+
+  // Create a wait set
+  rmw_wait_set_t* wait_set = rmw_create_wait_set(&context, number_of_guard_conditions);
+  ASSERT_NE(nullptr, wait_set) << rcutils_get_error_string().str;
+
+  // Thread that triggers all guard conditions in reverse order after 100ms
+  std::thread trigger_thread([&]() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    for (size_t i = number_of_guard_conditions; i > 0; --i) {
+      rmw_ret_t ret = rmw_trigger_guard_condition(guard_condition_ptrs[i - 1]);
+      EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+    }
+  });
+
+  // Prepare input arguments for rmw_wait
+  rmw_time_t timeout_argument = {0, 100000000};  // 100ms
+  rmw_guard_conditions_t guard_conditions;
+  INITIALIZE_ARRAY(guard_conditions, guard_condition, number_of_guard_conditions);
+
+  // Wait up to number_of_guard_conditions times or until all guard conditions are triggered
+  for (size_t i = 0; i < number_of_guard_conditions; ++i) {
+    // Prepare the input array for rmw_wait
+    for (size_t j = 0; j < number_of_guard_conditions; ++j) {
+      guard_conditions.guard_conditions[j] = guard_condition_ptrs[j]->data;
+    }
+    // Wait for guard conditions to be triggered
+    rmw_ret_t ret = rmw_wait(nullptr, &guard_conditions, nullptr, nullptr, nullptr, wait_set, &timeout_argument);
+    if (RMW_RET_OK == ret) {
+      // Check which guard conditions are ready
+      for (size_t j = 0; j < number_of_guard_conditions; ++j) {
+        if (guard_conditions.guard_conditions[j] != nullptr) {
+          // Check that condition was not already triggered
+          EXPECT_NE(ready_conditions_value & (1u << j), 0u);
+          // Mark this condition as triggered
+          ready_conditions_value &= ~(1u << j);
+        }
+      }
+
+      if (ready_conditions_value == 0u) {
+        // All guard conditions have been triggered
+        break;
+      }
+    }
+  }
+
+  // Join the trigger thread
+  trigger_thread.join();
+
+  // Check that all guard conditions were triggered
+  EXPECT_EQ(ready_conditions_value, 0u) << "Not all guard conditions were triggered";
+
+  // Calling rmw_wait shall now return RMW_RET_TIMEOUT since all guard conditions have been triggered
+  {
+    for (size_t j = 0; j < number_of_guard_conditions; ++j) {
+      guard_conditions.guard_conditions[j] = guard_condition_ptrs[j]->data;
+    }
+    rmw_ret_t ret = rmw_wait(nullptr, &guard_conditions, nullptr, nullptr, nullptr, wait_set, &timeout_argument);
+    EXPECT_EQ(ret, RMW_RET_TIMEOUT) << rcutils_get_error_string().str;
+  }
+
+  // Clean up: destroy guard conditions and wait set
+  for (size_t i = 0; i < number_of_guard_conditions; ++i) {
+    rmw_ret_t ret = rmw_destroy_guard_condition(guard_condition_ptrs[i]);
+    EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+  }
+
+  {
+    rmw_ret_t ret = rmw_destroy_wait_set(wait_set);
+    EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+  }
+}
