@@ -451,19 +451,19 @@ TEST_F(TestWaitSet, rmw_wait_guard_conditions)
       guard_conditions.guard_conditions[j] = guard_condition_ptrs[j]->data;
     }
 
-    // Thread that triggers all guard conditions in reverse order after 100ms
+    // Thread that triggers all guard conditions in reverse order after 10ms
     std::thread trigger_thread([&]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         for (size_t i = number_of_guard_conditions; i > 0; --i) {
           rmw_ret_t ret = rmw_trigger_guard_condition(guard_condition_ptrs[i - 1]);
-          ASSERT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
+          EXPECT_EQ(ret, RMW_RET_OK) << rcutils_get_error_string().str;
         }
       });
 
     // wait until we receive the first guard condition trigger
     rmw_ret_t ret = rmw_wait(nullptr, &guard_conditions, nullptr, nullptr, nullptr, wait_set,
       &timeout_argument);
-    ASSERT_EQ(ret, RMW_RET_OK) << "Failed to receive any guard condition trigger";
+    EXPECT_EQ(ret, RMW_RET_OK) << "Failed to receive any guard condition trigger";
 
     // Join the trigger thread
     trigger_thread.join();
