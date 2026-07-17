@@ -481,6 +481,7 @@ TEST_F(TestWaitSet, rmw_wait_guard_conditions)
     }
 
     // set timeout to almost zero there is not point in waiting longer from here on
+    timeout_argument.sec = 0;
     timeout_argument.nsec = 1;
 
     if(std::ranges::any_of(guard_conditions_triggered, [](bool triggered) {return !triggered;})) {
