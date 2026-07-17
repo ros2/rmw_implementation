@@ -428,7 +428,8 @@ TEST_F(TestWaitSet, rmw_wait_guard_conditions)
   std::array<guard_condition_ptr_t, number_of_guard_conditions> guard_condition_ptrs;
 
   // Create the guard conditions
-  std::vector<bool> guard_conditions_triggered(number_of_guard_conditions, false);
+  std::array<bool, number_of_guard_conditions> guard_conditions_triggered;
+  guard_conditions_triggered.fill(false);
 
   for (size_t i = 0; i < number_of_guard_conditions; ++i) {
     guard_condition_ptrs[i] = rmw_create_guard_condition(&context);
@@ -440,10 +441,10 @@ TEST_F(TestWaitSet, rmw_wait_guard_conditions)
   ASSERT_NE(nullptr, wait_set) << rcutils_get_error_string().str;
 
   for(size_t runs = 0; runs < 100; runs++) {
-    guard_conditions_triggered = std::vector<bool>(number_of_guard_conditions, false);
+    guard_conditions_triggered.fill(false);
 
     // Prepare input arguments for rmw_wait
-    rmw_time_t timeout_argument = {0, 100000000};  // 100ms
+    rmw_time_t timeout_argument = {2, 0};  // 2 seconds
     rmw_guard_conditions_t guard_conditions;
     INITIALIZE_ARRAY(guard_conditions, guard_condition, number_of_guard_conditions);
 
