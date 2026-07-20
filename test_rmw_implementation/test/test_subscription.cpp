@@ -29,6 +29,7 @@
 
 #include "test_msgs/msg/basic_types.h"
 #include "test_msgs/msg/strings.h"
+#include "test_msgs/msg/unbounded_sequences.h"
 #include "./config.hpp"
 #include "./testing_macros.hpp"
 
@@ -82,6 +83,93 @@ TEST_F(TestSubscription, create_and_destroy) {
   ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
   rmw_ret_t ret = rmw_destroy_subscription(node, sub);
   EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+}
+
+TEST_F(TestSubscription, unread_message_remains_ready_across_waits) {
+  constexpr char topic_name[] = "/test_unread_message_remains_ready";
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences);
+  rmw_qos_profile_t qos_profile = rmw_qos_profile_default;
+
+  rmw_subscription_options_t sub_options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
+  });
+
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  rmw_ret_t ret = RMW_RET_OK;
+  size_t subscription_count = 0u;
+  SLEEP_AND_RETRY_UNTIL(rmw_intraprocess_discovery_delay, rmw_intraprocess_discovery_delay * 10) {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &subscription_count);
+    if (RMW_RET_OK == ret && 1u == subscription_count) {
+      break;
+    }
+  }
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_EQ(1u, subscription_count);
+
+  // Buffer-aware endpoints are discovered separately from their base DDS endpoints.
+  std::this_thread::sleep_for(rmw_intraprocess_discovery_delay * 10);
+
+  test_msgs__msg__UnboundedSequences original_message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&original_message));
+  original_message.alignment_check = 42;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__UnboundedSequences__fini(&original_message);
+  });
+
+  ret = rmw_publish(pub, &original_message, nullptr);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  void * subscriptions_storage[1] = {sub->data};
+  rmw_subscriptions_t subscriptions;
+  subscriptions.subscribers = subscriptions_storage;
+  subscriptions.subscriber_count = 1;
+
+  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+  });
+
+  rmw_time_t timeout = {5, 0};
+  ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_NE(nullptr, subscriptions.subscribers[0]);
+
+  // Do not take the message. An unread sample must keep the subscription ready.
+  subscriptions.subscribers[0] = sub->data;
+  rmw_time_t no_wait = {0, 0};
+  ret = rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &no_wait);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  ASSERT_NE(nullptr, subscriptions.subscribers[0]);
+
+  test_msgs__msg__UnboundedSequences received_message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&received_message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__UnboundedSequences__fini(&received_message);
+  });
+
+  bool taken = false;
+  ret = rmw_take(sub, &received_message, &taken, nullptr);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  EXPECT_TRUE(taken);
+  EXPECT_EQ(original_message.alignment_check, received_message.alignment_check);
 }
 
 TEST_F(TestSubscription, create_and_destroy_native) {
