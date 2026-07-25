@@ -744,6 +744,14 @@ TEST_F(TestSubscriptionUse, ignore_local_publications_serialized) {
 TEST_F(TestSubscriptionUse, take_sequence) {
   constexpr size_t message_count = 3u;
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
+  auto seq = test_msgs__msg__BasicTypes__Sequence__create(message_count);
+  ASSERT_NE(nullptr, seq);
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__BasicTypes__Sequence__destroy(seq);
+  });
+
   rmw_message_sequence_t sequence = rmw_get_zero_initialized_message_sequence();
   rmw_ret_t ret = rmw_message_sequence_init(&sequence, message_count, &allocator);
   ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
@@ -753,12 +761,6 @@ TEST_F(TestSubscriptionUse, take_sequence) {
       RMW_RET_OK, rmw_message_sequence_fini(&sequence)) << rmw_get_error_string().str;
   });
 
-  auto seq = test_msgs__msg__BasicTypes__Sequence__create(message_count);
-  ASSERT_NE(nullptr, seq);
-  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
-  {
-    test_msgs__msg__BasicTypes__Sequence__destroy(seq);
-  });
   for (size_t ii = 0; ii < message_count; ++ii) {
     sequence.data[ii] = &seq->data[ii];
   }
@@ -788,6 +790,10 @@ TEST_F(TestSubscriptionUse, take_sequence) {
   {
     EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
   });
+
+  rmw_gid_t publisher_gid{};
+  ret = rmw_get_gid_for_publisher(pub, &publisher_gid);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 
   size_t matched_subscriptions = 0u;
   SLEEP_AND_RETRY_UNTIL(
@@ -848,10 +854,12 @@ TEST_F(TestSubscriptionUse, take_sequence) {
       EXPECT_EQ(
         static_cast<int32_t>(total_taken + index + 1u),
         seq->data[index].int32_value);
+      EXPECT_EQ(publisher_gid, info_sequence.data[index].publisher_gid);
     }
     total_taken += taken;
   }
-  EXPECT_EQ(message_count, total_taken);
+  EXPECT_EQ(message_count, total_taken)
+    << "Timed out after taking " << total_taken << " of " << message_count << " messages";
 }
 
 TEST_F(TestSubscriptionUse, take_sequence_with_bad_args) {
