@@ -2,6 +2,9 @@
 Changelog for package rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.6 (2026-07-30)
+------------------
+
 3.1.5 (2026-04-09)
 ------------------
 * Add rmw_zenoh_cpp as a build dependency (`#273 <https://github.com/ros2/rmw_implementation/issues/273>`_)

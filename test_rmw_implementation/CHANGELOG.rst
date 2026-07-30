@@ -2,6 +2,11 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.6 (2026-07-30)
+------------------
+* Add regression test for unread subscription readiness across waits (`#282 <https://github.com/ros2/rmw_implementation/issues/282>`_) (`#284 <https://github.com/ros2/rmw_implementation/issues/284>`_)
+* Contributors: mergify[bot]
+
 3.1.5 (2026-04-09)
 ------------------
 * Use new aggregate rosidl target instead of _TARGETS (`#276 <https://github.com/ros2/rmw_implementation/issues/276>`_)
