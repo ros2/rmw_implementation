@@ -415,6 +415,7 @@ TEST_F(TestClient, check_qos) {
 
   rmw_client_t * client =
     rmw_create_client(node, ts, service_name, &qos_profile);
+  ASSERT_NE(nullptr, client) << rmw_get_error_string().str;
 
   rmw_qos_profile_t actual_rp_qos;
   rmw_ret_t ret = rmw_client_request_publisher_get_actual_qos(
@@ -450,4 +451,7 @@ TEST_F(TestClient, check_qos) {
   EXPECT_EQ(actual_rs_qos.liveliness_lease_duration.sec, qos_profile.liveliness_lease_duration.sec);
   EXPECT_EQ(
     actual_rs_qos.liveliness_lease_duration.nsec, qos_profile.liveliness_lease_duration.nsec);
+
+  ret = rmw_destroy_client(node, client);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
 }
