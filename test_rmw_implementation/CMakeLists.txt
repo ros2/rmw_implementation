@@ -207,6 +207,15 @@ if(BUILD_TESTING)
     test_msgs::test_msgs
   )
 
+  ament_add_gtest_executable(test_event_message_lost_deadlock
+    test/test_event_message_lost_deadlock.cpp
+  )
+  target_link_libraries(test_event_message_lost_deadlock
+    rmw::rmw
+    rmw_implementation::rmw_implementation
+    test_msgs::test_msgs
+  )
+
   function(test_api)
     message(STATUS "Creating API tests for '${rmw_implementation}'")
     set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
@@ -309,6 +318,23 @@ if(BUILD_TESTING)
       ENV
         ${rmw_implementation_env_var}
     )
+
+    # Reproduces an AB-BA lock-order inversion between rmw_take_event(MESSAGE_LOST)
+    # and on_sample_lost. This is specific to rmw_fastrtps: it relies on disabling
+    # intra-process delivery (via the Fast DDS profile below, a no-op for other
+    # implementations) to force real SAMPLE_LOST. Other implementations do not
+    # reliably produce SAMPLE_LOST for this pattern, so registering it for them only
+    # yields false failures; restrict registration to the fastrtps variants. (The test
+    # itself also skips cleanly if no loss is generated.)
+    if(rmw_implementation MATCHES "fastrtps")
+      ament_add_ros_isolated_gtest_test(test_event_message_lost_deadlock
+        TEST_NAME test_event_message_lost_deadlock${target_suffix}
+        TIMEOUT 60
+        ENV
+          ${rmw_implementation_env_var}
+          FASTRTPS_DEFAULT_PROFILES_FILE=${CMAKE_CURRENT_SOURCE_DIR}/test/no_intraprocess_profile.xml
+      )
+    endif()
   endfunction()
 
   call_for_each_rmw_implementation(test_api)
