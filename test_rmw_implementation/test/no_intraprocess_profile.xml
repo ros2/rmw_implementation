@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Disables Fast DDS intra-process delivery so that a same-process publisher/subscriber
+  pair actually goes through the RTPS path and can produce SAMPLE_LOST. Required by
+  test_event_message_lost_deadlock to exercise the on_sample_lost receive path.
+  Ignored by non-Fast DDS implementations.
+-->
+<dds xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <library_settings>
+    <intraprocess_delivery>OFF</intraprocess_delivery>
+  </library_settings>
+</dds>
