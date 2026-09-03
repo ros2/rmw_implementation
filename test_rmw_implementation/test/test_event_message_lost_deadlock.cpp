@@ -53,6 +53,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <thread>
+#include <tuple>
 
 #include "rcutils/allocator.h"
 #include "rcutils/strdup.h"
@@ -145,7 +146,8 @@ TEST_F(TestEventMessageLostDeadlock, take_event_does_not_deadlock_with_on_sample
       test_msgs__msg__BasicTypes msg;
       test_msgs__msg__BasicTypes__init(&msg);
       while (!stop.load(std::memory_order_relaxed)) {
-        (void)rmw_publish(pub, &msg, nullptr);
+        // Failures are irrelevant here; the flood must keep running.
+        std::ignore = rmw_publish(pub, &msg, nullptr);
       }
       test_msgs__msg__BasicTypes__fini(&msg);
     });
@@ -156,7 +158,8 @@ TEST_F(TestEventMessageLostDeadlock, take_event_does_not_deadlock_with_on_sample
       rmw_message_lost_status_t status;
       bool taken = false;
       while (!stop.load(std::memory_order_relaxed)) {
-        (void)rmw_take_event(&event, &status, &taken);
+        // Failures are irrelevant here; the loop must keep taking.
+        std::ignore = rmw_take_event(&event, &status, &taken);
         take_iters.fetch_add(1, std::memory_order_relaxed);
       }
     });
