@@ -29,7 +29,6 @@
   <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_connextdds</build_depend>
   <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_cyclonedds_cpp</build_depend>
   <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_fastrtps_cpp</build_depend>
-  <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_fastrtps_dynamic_cpp</build_depend>
   <build_depend condition="$DISABLE_GROUPS_WORKAROUND != 1">rmw_zenoh_cpp</build_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
