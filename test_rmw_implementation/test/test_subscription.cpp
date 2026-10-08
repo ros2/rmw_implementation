@@ -27,6 +27,8 @@
 #include "rmw/error_handling.h"
 #include "rmw/subscription_content_filter_options.h"
 
+#include "rosidl_runtime_c/primitives_sequence_functions.h"
+
 #include "test_msgs/msg/basic_types.h"
 #include "test_msgs/msg/strings.h"
 #include "test_msgs/msg/unbounded_sequences.h"
@@ -948,6 +950,137 @@ TEST_F(TestSubscriptionUse, take_sequence) {
   }
   EXPECT_EQ(message_count, total_taken)
     << "Timed out after taking " << total_taken << " of " << message_count << " messages";
+}
+
+// Message types with a uint8[] field (directly or nested) may be sent through
+// additional, implementation-specific endpoints. The publisher_gid reported on
+// take must still match rmw_get_gid_for_publisher(), as clients rely on it
+// (e.g. rclcpp drops inter-process duplicates of intra-process messages).
+TEST_F(TestSubscription, take_with_info_publisher_gid_for_uint8_sequence_type) {
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences);
+  constexpr char topic_name[] = "/test_uint8_sequence_gid";
+  rmw_qos_profile_t qos_profile = rmw_qos_profile_default;
+  qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+
+  rmw_subscription_options_t sub_options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
+  });
+
+  rmw_subscription_t * sub_serialized =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options);
+  ASSERT_NE(nullptr, sub_serialized) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub_serialized)) << rmw_get_error_string().str;
+  });
+
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  rmw_gid_t publisher_gid{};
+  rmw_ret_t ret = rmw_get_gid_for_publisher(pub, &publisher_gid);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  size_t matched_subscriptions = 0u;
+  SLEEP_AND_RETRY_UNTIL(
+    rmw_intraprocess_discovery_delay,
+    rmw_intraprocess_discovery_delay * 100)
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &matched_subscriptions);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (2u == matched_subscriptions) {
+      break;
+    }
+  }
+  ASSERT_EQ(2u, matched_subscriptions);
+
+  test_msgs__msg__UnboundedSequences original_message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&original_message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__UnboundedSequences__fini(&original_message);
+  });
+  constexpr size_t uint8_values_size = 100u;
+  ASSERT_TRUE(
+    rosidl_runtime_c__uint8__Sequence__init(
+      &original_message.uint8_values, uint8_values_size));
+  for (size_t index = 0u; index < uint8_values_size; ++index) {
+    original_message.uint8_values.data[index] = static_cast<uint8_t>(index);
+  }
+  ret = rmw_publish(pub, &original_message, nullptr);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1u);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+  });
+  auto wait_for_data = [&wait_set](rmw_subscription_t * subscription) {
+      void * subscriptions_storage[1];
+      subscriptions_storage[0] = subscription->data;
+      rmw_subscriptions_t subscriptions;
+      subscriptions.subscribers = subscriptions_storage;
+      subscriptions.subscriber_count = 1u;
+      rmw_time_t timeout{10, 0};
+      rmw_ret_t ret =
+        rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+      return RMW_RET_OK == ret && nullptr != subscriptions.subscribers[0];
+    };
+
+  // rmw_take_with_info
+  {
+    ASSERT_TRUE(wait_for_data(sub));
+    test_msgs__msg__UnboundedSequences output_message{};
+    ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&output_message));
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      test_msgs__msg__UnboundedSequences__fini(&output_message);
+    });
+    rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+    bool taken = false;
+    ret = rmw_take_with_info(sub, &output_message, &taken, &message_info, nullptr);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    ASSERT_TRUE(taken);
+    EXPECT_TRUE(
+      test_msgs__msg__UnboundedSequences__are_equal(&original_message, &output_message));
+    EXPECT_EQ(publisher_gid, message_info.publisher_gid);
+  }
+
+  // rmw_take_serialized_message_with_info
+  {
+    ASSERT_TRUE(wait_for_data(sub_serialized));
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
+    rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+    ret = rmw_serialized_message_init(&serialized_message, 0u, &allocator);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+        rmw_get_error_string().str;
+    });
+    rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+    bool taken = false;
+    ret = rmw_take_serialized_message_with_info(
+      sub_serialized, &serialized_message, &taken, &message_info, nullptr);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    ASSERT_TRUE(taken);
+    EXPECT_EQ(publisher_gid, message_info.publisher_gid);
+  }
 }
 
 TEST_F(TestSubscriptionUse, take_sequence_with_bad_args) {
