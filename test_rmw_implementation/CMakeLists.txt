@@ -80,6 +80,7 @@ if(BUILD_TESTING)
     rcutils::rcutils
     rmw::rmw
     rmw_dds_common::rmw_dds_common_library
+    rosidl_runtime_c::rosidl_runtime_c
     rmw_implementation::rmw_implementation
     test_msgs::test_msgs
   )
