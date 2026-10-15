@@ -1083,6 +1083,159 @@ TEST_F(TestSubscription, take_with_info_publisher_gid_for_uint8_sequence_type) {
   }
 }
 
+// Message types with a uint8[] field (directly or nested) may be sent through
+// additional, implementation-specific endpoints. Subscriptions that ignore local
+// publications must not take messages published from the same node through them.
+TEST_F(TestSubscription, ignore_local_publications_for_uint8_sequence_type) {
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences);
+  constexpr char topic_name[] = "/test_uint8_sequence_ignore_local";
+  rmw_qos_profile_t qos_profile = rmw_qos_profile_default;
+  qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+
+  rmw_subscription_options_t sub_options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
+  });
+
+  rmw_subscription_options_t sub_options_ignorelocal = rmw_get_default_subscription_options();
+  sub_options_ignorelocal.ignore_local_publications = true;
+  rmw_subscription_t * sub_ignorelocal =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options_ignorelocal);
+  ASSERT_NE(nullptr, sub_ignorelocal) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub_ignorelocal)) << rmw_get_error_string().str;
+  });
+
+  rmw_subscription_t * sub_ignorelocal_serialized =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options_ignorelocal);
+  ASSERT_NE(nullptr, sub_ignorelocal_serialized) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub_ignorelocal_serialized)) <<
+      rmw_get_error_string().str;
+  });
+
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  // Some implementations do not match subscriptions that ignore local publications
+  // with local publishers at all, so do not require all three to be matched.
+  size_t matched_subscriptions = 0u;
+  rmw_ret_t ret;
+  SLEEP_AND_RETRY_UNTIL(
+    rmw_intraprocess_discovery_delay,
+    rmw_intraprocess_discovery_delay * 10)
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &matched_subscriptions);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (3u == matched_subscriptions) {
+      break;
+    }
+  }
+  ASSERT_LE(1u, matched_subscriptions);
+
+  test_msgs__msg__UnboundedSequences original_message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&original_message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__UnboundedSequences__fini(&original_message);
+  });
+  constexpr size_t uint8_values_size = 100u;
+  ASSERT_TRUE(
+    rosidl_runtime_c__uint8__Sequence__init(
+      &original_message.uint8_values, uint8_values_size));
+  for (size_t index = 0u; index < uint8_values_size; ++index) {
+    original_message.uint8_values.data[index] = static_cast<uint8_t>(index);
+  }
+  ret = rmw_publish(pub, &original_message, nullptr);
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+
+  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, 1u);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+  });
+  auto wait_for_data = [&wait_set](rmw_subscription_t * subscription, rmw_time_t timeout) {
+      void * subscriptions_storage[1];
+      subscriptions_storage[0] = subscription->data;
+      rmw_subscriptions_t subscriptions;
+      subscriptions.subscribers = subscriptions_storage;
+      subscriptions.subscriber_count = 1u;
+      rmw_ret_t ret =
+        rmw_wait(&subscriptions, nullptr, nullptr, nullptr, nullptr, wait_set, &timeout);
+      return RMW_RET_OK == ret && nullptr != subscriptions.subscribers[0];
+    };
+
+  // The message was delivered to the subscription that does not ignore local publications
+  {
+    ASSERT_TRUE(wait_for_data(sub, {10, 0}));
+    test_msgs__msg__UnboundedSequences output_message{};
+    ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&output_message));
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      test_msgs__msg__UnboundedSequences__fini(&output_message);
+    });
+    bool taken = false;
+    ret = rmw_take(sub, &output_message, &taken, nullptr);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    ASSERT_TRUE(taken);
+    EXPECT_TRUE(
+      test_msgs__msg__UnboundedSequences__are_equal(&original_message, &output_message));
+  }
+
+  // rmw_take
+  {
+    // Subscriptions that ignore local publications may or may not be awaken by locally sent
+    // messages; give a local message time to arrive before checking nothing is taken.
+    wait_for_data(sub_ignorelocal, {1, 0});
+    test_msgs__msg__UnboundedSequences output_message{};
+    ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&output_message));
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      test_msgs__msg__UnboundedSequences__fini(&output_message);
+    });
+    bool taken = false;
+    ret = rmw_take(sub_ignorelocal, &output_message, &taken, nullptr);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    EXPECT_FALSE(taken);
+  }
+
+  // rmw_take_serialized_message
+  {
+    wait_for_data(sub_ignorelocal_serialized, {1, 0});
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
+    rmw_serialized_message_t serialized_message = rmw_get_zero_initialized_serialized_message();
+    ret = rmw_serialized_message_init(&serialized_message, 0u, &allocator);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_serialized_message_fini(&serialized_message)) <<
+        rmw_get_error_string().str;
+    });
+    bool taken = false;
+    ret = rmw_take_serialized_message(
+      sub_ignorelocal_serialized, &serialized_message, &taken, nullptr);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    EXPECT_FALSE(taken);
+  }
+}
+
 TEST_F(TestSubscriptionUse, take_sequence_with_bad_args) {
   size_t count = 1u;
   size_t taken = 0u;
