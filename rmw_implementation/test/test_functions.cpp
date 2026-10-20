@@ -57,5 +57,12 @@ TEST(Functions, load_and_lookup_with_internal_errors) {
 
 TEST(Functions, nominal_prefetch_and_unload) {
   prefetch_symbols();
+  EXPECT_NE(nullptr, get_library());
+  unload_library();
+}
+
+TEST(Functions, library_is_lazy_loaded_after_unload) {
+  unload_library();
+  EXPECT_NE(nullptr, get_library());
   unload_library();
 }
