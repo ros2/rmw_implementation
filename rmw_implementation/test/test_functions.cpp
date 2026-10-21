@@ -20,6 +20,7 @@
 #include "rcutils/testing/fault_injection.h"
 
 #include "rmw/error_handling.h"
+#include "rmw/rmw.h"
 
 #include "../src/functions.hpp"
 
@@ -57,12 +58,9 @@ TEST(Functions, load_and_lookup_with_internal_errors) {
 
 TEST(Functions, nominal_prefetch_and_unload) {
   prefetch_symbols();
-  EXPECT_NE(nullptr, get_library());
+  EXPECT_NE(nullptr, rmw_get_implementation_identifier());
   unload_library();
-}
-
-TEST(Functions, library_is_lazy_loaded_after_unload) {
-  unload_library();
-  EXPECT_NE(nullptr, get_library());
+  prefetch_symbols();
+  EXPECT_NE(nullptr, rmw_get_implementation_identifier());
   unload_library();
 }
