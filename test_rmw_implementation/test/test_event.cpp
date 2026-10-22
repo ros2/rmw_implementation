@@ -410,3 +410,98 @@ TEST_F(TestEvent, one_sub_multi_pub_matched_unmatched_event) {
   EXPECT_EQ(0, matched_status.current_count);
   EXPECT_EQ(-1, matched_status.current_count_change);
 }
+
+TEST_F(TestEvent, publisher_matched_event_after_wait_set_entities_change) {
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  rmw_event_t pub_matched_event{rmw_get_zero_initialized_event()};
+  rmw_ret_t ret = rmw_publisher_event_init(&pub_matched_event, pub, RMW_EVENT_PUBLICATION_MATCHED);
+  ASSERT_EQ(RMW_RET_OK, ret);
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_event_fini(&pub_matched_event)) << rmw_get_error_string().str;
+  });
+
+  constexpr size_t gc_count = 3;
+  rmw_guard_condition_t * gcs[gc_count];
+  for (size_t i = 0; i < gc_count; ++i) {
+    gcs[i] = rmw_create_guard_condition(&context);
+    ASSERT_NE(nullptr, gcs[i]) << rmw_get_error_string().str;
+  }
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    for (size_t i = 0; i < gc_count; ++i) {
+      EXPECT_EQ(
+        RMW_RET_OK, rmw_destroy_guard_condition(gcs[i])) << rmw_get_error_string().str;
+    }
+  });
+
+  rmw_wait_set_t * wait_set = rmw_create_wait_set(&context, gc_count + 1);
+  ASSERT_NE(nullptr, wait_set) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_wait_set(wait_set)) << rmw_get_error_string().str;
+  });
+
+  // Wait for a match with a wait set holding `used_gc_count` guard conditions, none of which is
+  // triggered, so only the event may be reported as ready.
+  auto wait_for_match = [&](size_t used_gc_count, size_t expected_current_count) {
+      void * gc_storage[gc_count];
+      for (size_t i = 0; i < used_gc_count; ++i) {
+        gc_storage[i] = gcs[i]->data;
+      }
+      rmw_guard_conditions_t guard_conditions;
+      guard_conditions.guard_condition_count = used_gc_count;
+      guard_conditions.guard_conditions = gc_storage;
+      void * events_storage[1] = {&pub_matched_event};
+      rmw_events_t events;
+      events.event_count = 1;
+      events.events = events_storage;
+
+      rmw_time_t timeout = {1, 0};  // 1000ms
+      ASSERT_EQ(
+        RMW_RET_OK,
+        rmw_wait(nullptr, &guard_conditions, nullptr, nullptr, &events, wait_set, &timeout)) <<
+        rmw_get_error_string().str;
+      EXPECT_NE(nullptr, events.events[0]);
+      for (size_t i = 0; i < used_gc_count; ++i) {
+        EXPECT_EQ(nullptr, guard_conditions.guard_conditions[i]) << "guard condition " << i;
+      }
+
+      rmw_matched_status_t matched_status;
+      bool taken = false;
+      EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_matched_event, &matched_status, &taken));
+      EXPECT_TRUE(taken);
+      EXPECT_EQ(expected_current_count, matched_status.current_count);
+    };
+
+  rmw_subscription_t * sub1 =
+    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
+  ASSERT_NE(nullptr, sub1) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub1)) << rmw_get_error_string().str;
+  });
+  wait_for_match(1, 1u);
+
+  rmw_subscription_t * sub2 =
+    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
+  ASSERT_NE(nullptr, sub2) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub2)) << rmw_get_error_string().str;
+  });
+  // Wait with more entities than in the previous rmw_wait call.
+  wait_for_match(gc_count, 2u);
+}
