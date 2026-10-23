@@ -45,7 +45,17 @@
 #define STRINGIFY_(s) #s
 #define STRINGIFY(s) STRINGIFY_(s)
 
-static std::shared_ptr<rcpputils::SharedLibrary> g_rmw_lib = nullptr;
+// The RMW library handle is intentionally never destroyed, so the RMW library is not unloaded
+// by a static destructor at process exit. During exit, the RMW library can be the last object
+// keeping this library loaded (e.g. after the application dlclose()d the library that uses
+// ROS 2), and unloading it from a static destructor of this library would then unmap this
+// library while the destructor is still running.
+static std::shared_ptr<rcpputils::SharedLibrary> &
+rmw_lib()
+{
+  static auto * lib = new std::shared_ptr<rcpputils::SharedLibrary>();
+  return *lib;
+}
 
 static std::shared_ptr<rcpputils::SharedLibrary>
 attempt_to_load_one_rmw(const std::string & library)
@@ -132,10 +142,11 @@ load_library()
 std::shared_ptr<rcpputils::SharedLibrary>
 get_library()
 {
-  if (!g_rmw_lib) {
-    g_rmw_lib = load_library();
+  auto & lib = rmw_lib();
+  if (!lib) {
+    lib = load_library();
   }
-  return g_rmw_lib;
+  return lib;
 }
 
 void *
@@ -1036,5 +1047,5 @@ unload_library()
   symbol_rmw_take_dynamic_message = nullptr;
   symbol_rmw_take_dynamic_message_with_info = nullptr;
   symbol_rmw_serialization_support_init = nullptr;
-  g_rmw_lib.reset();
+  rmw_lib().reset();
 }
