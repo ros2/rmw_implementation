@@ -2567,3 +2567,42 @@ TEST_F(TestContentFilterSubscriptionUse, create_two_filters_with_same_topic_name
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
 }
+
+// Message types with a uint8[] field may be taken through an implementation-specific
+// path, which must still reject null arguments.
+TEST_F(TestSubscription, take_with_info_with_bad_args_for_uint8_sequence_type) {
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences);
+  constexpr char topic_name[] = "/test_uint8_sequence_bad_args";
+  rmw_subscription_options_t sub_options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
+  });
+
+  test_msgs__msg__UnboundedSequences message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__UnboundedSequences__fini(&message);
+  });
+  bool taken = false;
+  rmw_message_info_t message_info = rmw_get_zero_initialized_message_info();
+
+  rmw_ret_t ret = rmw_take_with_info(sub, nullptr, &taken, &message_info, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_FALSE(taken);
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &message, nullptr, &message_info, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  rmw_reset_error();
+
+  ret = rmw_take_with_info(sub, &message, &taken, nullptr, nullptr);
+  EXPECT_EQ(RMW_RET_INVALID_ARGUMENT, ret) << rmw_get_error_string().str;
+  EXPECT_FALSE(taken);
+  rmw_reset_error();
+}
