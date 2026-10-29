@@ -32,6 +32,7 @@
 #include "rmw/rmw.h"
 
 #include "test_msgs/msg/basic_types.h"
+#include "test_msgs/msg/unbounded_sequences.h"
 
 class TestEvent : public ::testing::Test
 {
@@ -758,4 +759,67 @@ TEST_F(TestEventWait, incompatible_qos_event_wakes_event_only_wait_with_unread_s
   ASSERT_NO_FATAL_FAILURE(expect_incompatible_publisher_wakes_event_only_wait());
 
   ASSERT_NO_FATAL_FAILURE(expect_sample_pending_and_take_it());
+}
+
+// Message types with a uint8[] field may be sent through additional,
+// implementation-specific endpoints, which must not be counted as matches.
+TEST_F(TestEvent, matched_events_for_uint8_sequence_type) {
+  ts = ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences);
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &rmw_qos_profile_default, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+  rmw_event_t pub_matched_event{rmw_get_zero_initialized_event()};
+  rmw_ret_t ret = rmw_publisher_event_init(&pub_matched_event, pub, RMW_EVENT_PUBLICATION_MATCHED);
+  ASSERT_EQ(RMW_RET_OK, ret);
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_event_fini(&pub_matched_event)) << rmw_get_error_string().str;
+  });
+
+  rmw_subscription_t * sub1 =
+    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
+  ASSERT_NE(nullptr, sub1) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_destroy_subscription(node, sub1)) << rmw_get_error_string().str;
+  });
+  rmw_event_t sub_matched_event{rmw_get_zero_initialized_event()};
+  ret = rmw_subscription_event_init(&sub_matched_event, sub1, RMW_EVENT_SUBSCRIPTION_MATCHED);
+  ASSERT_EQ(RMW_RET_OK, ret);
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_event_fini(&sub_matched_event)) << rmw_get_error_string().str;
+  });
+
+  rmw_subscription_t * sub2 =
+    rmw_create_subscription(node, ts, topic_name, &rmw_qos_profile_default, &sub_options);
+  ASSERT_NE(nullptr, sub2) << rmw_get_error_string().str;
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  rmw_matched_status_t matched_status;
+  bool taken;
+  EXPECT_EQ(RMW_RET_OK, rmw_take_event(&pub_matched_event, &matched_status, &taken));
+  EXPECT_TRUE(taken);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(2, matched_status.current_count);
+  EXPECT_EQ(RMW_RET_OK, rmw_take_event(&sub_matched_event, &matched_status, &taken));
+  EXPECT_TRUE(taken);
+  EXPECT_EQ(1, matched_status.total_count);
+  EXPECT_EQ(1, matched_status.current_count);
+
+  ret = rmw_destroy_subscription(node, sub2);
+  EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  wait_and_take_event(&pub_matched_event, &matched_status);
+  EXPECT_EQ(2, matched_status.total_count);
+  EXPECT_EQ(1, matched_status.current_count);
+  EXPECT_EQ(-1, matched_status.current_count_change);
 }
