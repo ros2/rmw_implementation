@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <atomic>
 #include <chrono>
 #include <thread>
 
@@ -2566,6 +2567,89 @@ TEST_F(TestContentFilterSubscriptionUse, create_two_filters_with_same_topic_name
     rmw_ret_t ret = rmw_destroy_subscription(node, sub_2);
     EXPECT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
   }
+}
+
+// Message types with a uint8[] field (directly or nested) may be sent through
+// additional, implementation-specific endpoints. The new message callback must report
+// each message received through them once, including those received before it is set.
+TEST_F(TestSubscription, on_new_message_callback_for_uint8_sequence_type) {
+  const rosidl_message_type_support_t * ts =
+    ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, UnboundedSequences);
+  constexpr char topic_name[] = "/test_uint8_sequence_new_message_callback";
+  rmw_qos_profile_t qos_profile = rmw_qos_profile_default;
+  qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+
+  rmw_subscription_options_t sub_options = rmw_get_default_subscription_options();
+  rmw_subscription_t * sub =
+    rmw_create_subscription(node, ts, topic_name, &qos_profile, &sub_options);
+  ASSERT_NE(nullptr, sub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_subscription(node, sub)) << rmw_get_error_string().str;
+  });
+
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub =
+    rmw_create_publisher(node, ts, topic_name, &qos_profile, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+
+  size_t matched_subscriptions = 0u;
+  rmw_ret_t ret;
+  SLEEP_AND_RETRY_UNTIL(
+    rmw_intraprocess_discovery_delay,
+    rmw_intraprocess_discovery_delay * 10)
+  {
+    ret = rmw_publisher_count_matched_subscriptions(pub, &matched_subscriptions);
+    ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+    if (1u == matched_subscriptions) {
+      break;
+    }
+  }
+  ASSERT_EQ(1u, matched_subscriptions);
+
+  test_msgs__msg__UnboundedSequences message{};
+  ASSERT_TRUE(test_msgs__msg__UnboundedSequences__init(&message));
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    test_msgs__msg__UnboundedSequences__fini(&message);
+  });
+  ASSERT_TRUE(rosidl_runtime_c__uint8__Sequence__init(&message.uint8_values, 100u));
+  auto publish = [&](size_t count) {
+      for (size_t i = 0u; i < count; ++i) {
+        EXPECT_EQ(RMW_RET_OK, rmw_publish(pub, &message, nullptr)) << rmw_get_error_string().str;
+      }
+      // Give the messages time to arrive.
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    };
+
+  // Messages received before the callback is set are reported when it is set.
+  publish(3u);
+  std::atomic<size_t> reported{0u};
+  rmw_event_callback_t callback = [](const void * user_data, size_t number_of_events) {
+      static_cast<std::atomic<size_t> *>(const_cast<void *>(user_data))->fetch_add(
+        number_of_events);
+    };
+  ret = rmw_subscription_set_on_new_message_callback(sub, callback, &reported);
+  if (RMW_RET_UNSUPPORTED == ret) {
+    rmw_reset_error();
+    GTEST_SKIP() << "new message callbacks are not supported";
+  }
+  ASSERT_EQ(RMW_RET_OK, ret) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(
+      RMW_RET_OK, rmw_subscription_set_on_new_message_callback(sub, nullptr, nullptr)) <<
+      rmw_get_error_string().str;
+  });
+  EXPECT_EQ(3u, reported.load());
+
+  // Messages received afterwards are reported once each.
+  publish(3u);
+  EXPECT_EQ(6u, reported.load());
 }
 
 // Message types with a uint8[] field may be taken through an implementation-specific
