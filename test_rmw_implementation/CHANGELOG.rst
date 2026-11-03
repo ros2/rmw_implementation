@@ -2,6 +2,12 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.7 (2026-11-03)
+------------------
+* Add publisher_gid test for message types with uint8[] fields (`#294 <https://github.com/ros2/rmw_implementation/issues/294>`_) (`#298 <https://github.com/ros2/rmw_implementation/issues/298>`_)
+* Clean up QoS test entities (`#285 <https://github.com/ros2/rmw_implementation/issues/285>`_) (`#286 <https://github.com/ros2/rmw_implementation/issues/286>`_)
+* Contributors: mergify[bot]
+
 3.1.6 (2026-07-30)
 ------------------
 * Add regression test for unread subscription readiness across waits (`#282 <https://github.com/ros2/rmw_implementation/issues/282>`_) (`#284 <https://github.com/ros2/rmw_implementation/issues/284>`_)
