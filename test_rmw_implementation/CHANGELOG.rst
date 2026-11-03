@@ -2,6 +2,13 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.8.6 (2026-11-03)
+------------------
+* Add test for publisher matched event after wait set entities change (backport `#304 <https://github.com/ros2/rmw_implementation/issues/304>`_) (`#311 <https://github.com/ros2/rmw_implementation/issues/311>`_)
+* Clean up QoS test entities (`#285 <https://github.com/ros2/rmw_implementation/issues/285>`_) (`#289 <https://github.com/ros2/rmw_implementation/issues/289>`_)
+* Test failing deserialization of invalid sequence length (backport `#261 <https://github.com/ros2/rmw_implementation/issues/261>`_) (`#264 <https://github.com/ros2/rmw_implementation/issues/264>`_)
+* Contributors: mergify[bot]
+
 2.8.5 (2025-07-16)
 ------------------
 * add ignore_local_publications_serialized test. (backport `#255 <https://github.com/ros2/rmw_implementation/issues/255>`_) (`#258 <https://github.com/ros2/rmw_implementation/issues/258>`_)
