@@ -2,6 +2,26 @@
 Changelog for package test_rmw_implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.2.2 (2026-11-03)
+------------------
+* Add matched event test for message types with uint8[] fields (`#307 <https://github.com/ros2/rmw_implementation/issues/307>`_)
+* Add new message callback test for message types with uint8[] fields (`#302 <https://github.com/ros2/rmw_implementation/issues/302>`_)
+* Add take_with_info bad args test for message types with uint8[] fields (`#303 <https://github.com/ros2/rmw_implementation/issues/303>`_)
+* Add portable QoS event-only wait regression tests (`#299 <https://github.com/ros2/rmw_implementation/issues/299>`_)
+* Add test for publisher matched event after wait set entities change (`#304 <https://github.com/ros2/rmw_implementation/issues/304>`_)
+* Add ignore_local_publications test for loaned messages (`#300 <https://github.com/ros2/rmw_implementation/issues/300>`_)
+* Add take_sequence test for message types with uint8[] fields (`#297 <https://github.com/ros2/rmw_implementation/issues/297>`_)
+* Add ignore_local_publications test for message types with uint8[] fields (`#296 <https://github.com/ros2/rmw_implementation/issues/296>`_)
+* Add publisher_gid test for message types with uint8[] fields (`#294 <https://github.com/ros2/rmw_implementation/issues/294>`_)
+* Remove rmw_fastrtps_dynamic_cpp (`#295 <https://github.com/ros2/rmw_implementation/issues/295>`_)
+* Use the SPDX identifier Apache-2.0 in package.xml license tags (`#293 <https://github.com/ros2/rmw_implementation/issues/293>`_)
+* Including missing dependencies (`#292 <https://github.com/ros2/rmw_implementation/issues/292>`_)
+* address compiler warning from ignored rmw_publish and rmw_take_event. (`#291 <https://github.com/ros2/rmw_implementation/issues/291>`_)
+* Add regression test for take_event/on_sample_lost lock-order inversion (`#278 <https://github.com/ros2/rmw_implementation/issues/278>`_)
+* Clean up QoS test entities (`#285 <https://github.com/ros2/rmw_implementation/issues/285>`_)
+* Add a publish-and-take test for rmw_take_sequence (`#283 <https://github.com/ros2/rmw_implementation/issues/283>`_)
+* Contributors: Alejandro Hernández Cordero, Christophe Bedard, Dennis Lanov, Maurice Alexander Purnawan, Michael Carroll, Thomas Moore, Timothy Simpson, Tomoya Fujita, xiaoyang
+
 3.2.1 (2026-07-30)
 ------------------
 * Add regression test for unread subscription readiness across waits (`#282 <https://github.com/ros2/rmw_implementation/issues/282>`_)
