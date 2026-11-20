@@ -14,6 +14,12 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <functional>
+#include <future>
+#include <thread>
+#include <tuple>
+
 #include "osrf_testing_tools_cpp/scope_exit.hpp"
 
 #include "rcutils/allocator.h"
@@ -385,6 +391,102 @@ TEST_F(TestWaitSetUse, rmw_wait)
       rmw_reset_error();
     }
   });
+}
+
+class TestWaitSetSharedEntity : public TestWaitSetUse
+{
+protected:
+  // Waits on either the subscription or the guard condition; reports whether it came back ready.
+  static rmw_ret_t wait_on(
+    rmw_wait_set_t * wait_set, rmw_subscription_t * subscription,
+    rmw_guard_condition_t * guard_condition, rmw_time_t timeout, bool * ready)
+  {
+    void * sub_storage[1] = {subscription ? subscription->data : nullptr};
+    void * gc_storage[1] = {guard_condition ? guard_condition->data : nullptr};
+    rmw_subscriptions_t subscriptions{subscription ? 1u : 0u, sub_storage};
+    rmw_guard_conditions_t guard_conditions{guard_condition ? 1u : 0u, gc_storage};
+    rmw_ret_t ret = rmw_wait(
+      &subscriptions, &guard_conditions, nullptr, nullptr, nullptr, wait_set, &timeout);
+    *ready = (subscription ? sub_storage[0] : gc_storage[0]) != nullptr;
+    return ret;
+  }
+
+  // One entity is in two wait sets. While wait set `blocked` waits on it, wait set `other`
+  // waits on it and times out; triggering the entity afterwards must still wake `blocked`.
+  void expect_blocked_wait_set_woken(
+    rmw_subscription_t * subscription, rmw_guard_condition_t * guard_condition,
+    const std::function<void()> & trigger)
+  {
+    using namespace std::chrono_literals;
+    rmw_wait_set_t * blocked = rmw_create_wait_set(&context, 1);
+    ASSERT_NE(nullptr, blocked) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(RMW_RET_OK, rmw_destroy_wait_set(blocked)) << rmw_get_error_string().str;
+    });
+    rmw_wait_set_t * other = rmw_create_wait_set(&context, 1);
+    ASSERT_NE(nullptr, other) << rmw_get_error_string().str;
+    OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+    {
+      EXPECT_EQ(RMW_RET_OK, rmw_destroy_wait_set(other)) << rmw_get_error_string().str;
+    });
+
+    auto blocked_result = std::async(
+      std::launch::async, [&]() {
+        bool ready = false;
+        rmw_ret_t ret = wait_on(blocked, subscription, guard_condition, {10, 0}, &ready);
+        return std::make_tuple(ret, ready, std::chrono::steady_clock::now());
+      });
+    std::this_thread::sleep_for(500ms);
+
+    bool other_ready = true;
+    EXPECT_EQ(
+      RMW_RET_TIMEOUT,
+      wait_on(other, subscription, guard_condition, {0, 10000000}, &other_ready));
+    EXPECT_FALSE(other_ready);
+
+    const auto triggered_at = std::chrono::steady_clock::now();
+    trigger();
+    ASSERT_EQ(std::future_status::ready, blocked_result.wait_for(15s));
+    const auto [ret, ready, woken_at] = blocked_result.get();
+    EXPECT_EQ(RMW_RET_OK, ret);
+    EXPECT_TRUE(ready);
+    EXPECT_LT(woken_at - triggered_at, 5s);
+  }
+};
+
+TEST_F(TestWaitSetSharedEntity, guard_condition_in_two_wait_sets)
+{
+  expect_blocked_wait_set_woken(
+    nullptr, gc, [this]() {
+      EXPECT_EQ(RMW_RET_OK, rmw_trigger_guard_condition(gc)) << rmw_get_error_string().str;
+    });
+}
+
+TEST_F(TestWaitSetSharedEntity, subscription_in_two_wait_sets)
+{
+  rmw_publisher_options_t pub_options = rmw_get_default_publisher_options();
+  rmw_publisher_t * pub = rmw_create_publisher(
+    node, ROSIDL_GET_MSG_TYPE_SUPPORT(test_msgs, msg, BasicTypes), "/test",
+    &rmw_qos_profile_default, &pub_options);
+  ASSERT_NE(nullptr, pub) << rmw_get_error_string().str;
+  OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
+  {
+    EXPECT_EQ(RMW_RET_OK, rmw_destroy_publisher(node, pub)) << rmw_get_error_string().str;
+  });
+  size_t matched = 0u;
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+  while (matched == 0u && std::chrono::steady_clock::now() < deadline) {
+    ASSERT_EQ(RMW_RET_OK, rmw_subscription_count_matched_publishers(sub, &matched));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+  ASSERT_EQ(1u, matched);
+
+  test_msgs__msg__BasicTypes msg{};
+  expect_blocked_wait_set_woken(
+    sub, nullptr, [&]() {
+      EXPECT_EQ(RMW_RET_OK, rmw_publish(pub, &msg, nullptr)) << rmw_get_error_string().str;
+    });
 }
 
 TEST_F(TestWaitSet, rmw_destroy_wait_set)
