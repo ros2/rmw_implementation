@@ -315,7 +315,7 @@ if(BUILD_TESTING)
     # yields false failures; restrict registration to the fastrtps variants. (The test
     # itself also skips cleanly if no loss is generated.)
     if(rmw_implementation MATCHES "fastrtps")
-      ament_add_ros_isolated_gtest_test(test_event_message_lost_deadlock
+      ament_add_gtest_test(test_event_message_lost_deadlock
         TEST_NAME test_event_message_lost_deadlock${target_suffix}
         TIMEOUT 60
         ENV
