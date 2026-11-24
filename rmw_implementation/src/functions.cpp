@@ -535,7 +535,7 @@ RMW_INTERFACE_FN(
 RMW_INTERFACE_FN(
   rmw_send_response,
   rmw_ret_t, RMW_RET_ERROR,
-  3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, void *))
+  3, ARG_TYPES(const rmw_service_t *, rmw_request_id_t *, const void *))
 
 RMW_INTERFACE_FN(
   rmw_service_response_publisher_get_actual_qos,
